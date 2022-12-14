@@ -10,12 +10,86 @@
         </div>
         <p>Dashboard</p>
       </section>
-      <SidebarMenuAccordion title="Employee" icon="fa-users" />
-      <SidebarMenuAccordion title="Leave" icon="fa-reguler fa-clock" />
-      <SidebarMenuAccordion title="Attedance" icon="fa-calendar" />
-      <SidebarMenuAccordion title="Payroll" icon="fa-credit-card" />
-      <SidebarMenuAccordion title="Administration" icon="fa-briefcase" />
-      <SidebarMenuAccordion title="Settings" icon="fa-gear" />
+      <SidebarMenuAccordion
+        title="Employee"
+        icon="fa-users"
+        :contents="[
+          {
+            text: 'All Employees',
+            to: '/employee',
+          },
+          { text: 'Designation', to: '/designation' },
+          { text: 'Employment Status', to: '/employee-status' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Leave"
+        icon="fa-reguler fa-clock"
+        :contents="[
+          {
+            text: 'Leave Status',
+            to: '/leave-status',
+          },
+          { text: 'Leave Request', to: '/leave-request' },
+          { text: 'Calendar', to: '/leave-calendar' },
+          { text: 'Summary', to: '/leave-summary' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Attedance"
+        icon="fa-calendar"
+        :contents="[
+          {
+            text: 'Daily Log',
+            to: '/attedance-daily',
+          },
+          { text: 'Attedance Request', to: '/attedance-request' },
+          { text: 'Attedance Details', to: '/attedance-details' },
+          { text: 'Summary', to: '/attedance-summary' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Payroll"
+        icon="fa-credit-card"
+        :contents="[
+          {
+            text: 'Payrun',
+            to: '/payroll-run',
+          },
+          { text: 'Payslip', to: '/payroll-slip' },
+          { text: 'Summary', to: '/payroll-summary' },
+          { text: 'Beneficiary badge', to: '/payroll-beneficiary' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Administration"
+        icon="fa-briefcase"
+        :contents="[
+          {
+            text: 'Users & Roles',
+            to: '/user-roles',
+          },
+          { text: 'Work Shifts', to: '/work-shifts' },
+          { text: 'Departements', to: '/departements' },
+          { text: 'Holiday', to: '/holiday' },
+          { text: 'Org. Structure', to: '/org-structure' },
+          { text: 'Announcements', to: '/announcements' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Settings"
+        icon="fa-gear"
+        :contents="[
+          {
+            text: 'App Settings',
+            to: '/setting-app',
+          },
+          { text: 'Leave Settings', to: '/setting-leave' },
+          { text: 'Attedance Settings', to: '/setting-attadance' },
+          { text: 'Payroll Settings', to: '/setting-payroll' },
+          { text: 'Import', to: '/setting-import' },
+        ]"
+      />
     </nav>
   </section>
 </template>
