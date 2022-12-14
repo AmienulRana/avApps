@@ -9,12 +9,8 @@
       </section>
     </template>
     <template v-slot:content>
-      <p class="mt-2"><router-link to="/employee">Employee</router-link></p>
-      <p class="mt-2">
-        <router-link to="/designation">Designation</router-link>
-      </p>
-      <p class="mt-2">
-        <router-link to="/employee-status">Employment Status</router-link>
+      <p class="mt-2 text-sm" v-for="(content, index) in contents" :key="index">
+        <router-link :to="`${content.to}`">{{ content.text }}</router-link>
       </p>
     </template>
   </Accordion>
@@ -28,6 +24,7 @@ export default {
   props: {
     icon: String,
     title: String,
+    contents: Array,
   },
 };
 </script>
