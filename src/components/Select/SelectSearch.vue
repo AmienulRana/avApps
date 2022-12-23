@@ -1,9 +1,11 @@
 <template>
   <div class="flex justify-between items-center mb-5">
-    <label :class="label_class" class="text-sm text-gray-400 w-1/5">{{
-      label
-    }}</label>
-    <div class="w-4/6 relative">
+    <label
+      :class="label_class ? label_class : 'w-1/5'"
+      class="text-sm text-gray-400"
+      >{{ label }}</label
+    >
+    <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
         class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-600 rounded-md"
@@ -54,6 +56,7 @@ export default {
     isOpen: Boolean,
     label: String,
     input_class: String,
+    label_class: String,
     options: Array,
     position: {
       type: String,
