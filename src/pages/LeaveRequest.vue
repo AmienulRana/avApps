@@ -60,6 +60,32 @@
       </section>
     </section>
   </LayoutAdmin>
+  <Modal title="Assign Leave" :showModal="showModal" @close="showModal = false">
+    <section class="flex w-full justify-center"></section>
+    <section class="mt-4">
+      <label class="text-sm">Response Note</label>
+      <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
+      </textarea>
+      <section class="grid grid-cols-3 items-center mt-4">
+        <p class="text-sm">Update status</p>
+        <div class="flex">
+          <Radio label="Pending" />
+          <Radio label="Approved" class="mx-8" />
+          <Radio label="Rejected" />
+        </div>
+      </section>
+    </section>
+    <template #footer>
+      <section class="flex w-52 justify-between">
+        <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
+          Cancel
+        </Button>
+        <Button class="bg-green-500 w-24 py-2 text-white rounded-md">
+          Save
+        </Button>
+      </section>
+    </template>
+  </Modal>
 </template>
 
 <script>
