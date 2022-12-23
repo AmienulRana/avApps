@@ -3,6 +3,7 @@
     <section
       @click="isOpen = !isOpen"
       class="flex justify-between items-center cursor-pointer"
+      :class="headerClass"
     >
       <slot name="header"></slot>
       <font-awesome-icon
@@ -17,15 +18,7 @@
     >
       <section
         v-if="isOpen"
-        class="
-          bg-blue-800
-          rounded-md
-          w-full
-          text-base text-left
-          px-5
-          mt-2
-          py-2.5
-        "
+        class="bg-blue-800 rounded-md text-base text-left px-5 mt-2 py-2.5"
       >
         <slot name="content"> </slot>
       </section>
@@ -36,9 +29,14 @@
 <script>
 export default {
   name: "AccordionComponent",
+  props: { headerClass: String },
   data() {
     return {
       isOpen: false,
+      position: {
+        type: String,
+        default: "bottom",
+      },
     };
   },
 };

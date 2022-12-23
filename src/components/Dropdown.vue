@@ -1,49 +1,39 @@
 <template>
   <div class="relative mx-2">
     <Button
-      class="
-        bg-white
-        hover:bg-gray-100 hover:text-blue-800
-        rounded-full
-        px-6
-        py-2
-        duration-300
+      class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm"
+      :class="
+        backgroundTitle
+          ? `${backgroundTitle} shadow-none`
+          : 'bg-white hover:bg-gray-50 hover:text-blue-800'
       "
-      @click="showDropdown = !showDropdown"
+      @click.stop="$emit('update:activeDropdown', this.$event)"
     >
-      Employment Status
+      {{ title }}
+      <slot name="header"></slot>
     </Button>
     <Transition
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
     >
       <section
-        class="
-          bg-white
-          absolute
-          top-full
-          left-0
-          right-auto
-          shadow-md
-          max-h-80
-          custom-scrollbar
-          w-72
-          mt-2.5
-        "
+        class="z-10 bg-white absolute top-full left-0 right-auto shadow-md max-h-80 custom-scrollbar w-72 mt-2.5"
         v-if="showDropdown"
       >
-        <div class="relative bg-white border-b pb-2.5 px-6 py-4 w-full">
-          <Input :icon="true" />
-          <font-awesome-icon
-            icon="fa-magnifying-glass"
-            class="absolute top-1/2 -translate-y-1/3 left-9 text-primary"
-          />
+        <div
+          class="bg-white border-b pb-2.5 px-6 py-4 w-full"
+          v-if="dropdownSearch"
+          @click.stop
+        >
+          <div class="relative">
+            <Input :icon="true" input_class="rounded-full" />
+            <font-awesome-icon
+              icon="fa-magnifying-glass"
+              class="absolute top-1/2 -translate-y-1/2 left-3 text-primary"
+            />
+          </div>
         </div>
-        <ul>
-          <li class="py-4 px-8 hover:bg-gray-100 cursor-pointer">Tes</li>
-          <li class="py-4 px-8 hover:bg-gray-100 cursor-pointer">Tes</li>
-          <li class="py-4 px-8 hover:bg-gray-100 cursor-pointer">Tes</li>
-        </ul>
+        <slot name="content"></slot>
       </section>
     </Transition>
   </div>
@@ -56,11 +46,16 @@ import Input from "./Input.vue";
 export default {
   name: "DropdownComponent",
   components: { Button, Input },
-  data() {
-    return {
-      showDropdown: false,
-    };
+  props: {
+    showDropdown: Boolean,
+    backgroundTitle: String,
+    title: String,
+    dropdownSearch: {
+      type: Boolean,
+      default: true,
+    },
   },
+  emits: ["update:activeDropdown"],
 };
 </script>
 

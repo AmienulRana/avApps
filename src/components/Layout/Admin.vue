@@ -1,7 +1,8 @@
 <template>
   <section class="flex bg-primary h-auto">
     <Sidebar />
-    <main class="relative w-full min-h-screen bg-whitesmoke">
+    <main class="relative w-full min-h-screen bg-whitesmoke overflow-x-hidden">
+      <Navbar />
       <slot />
     </main>
   </section>
@@ -9,9 +10,10 @@
 
 <script>
 import Sidebar from "../Sidebar/Sidebar.vue";
+import Navbar from "../Navbar.vue";
 export default {
   name: "LayoutAdmin",
-  components: { Sidebar },
+  components: { Sidebar, Navbar },
 };
 </script>
 

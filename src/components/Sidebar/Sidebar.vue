@@ -11,41 +11,47 @@
         <p>Dashboard</p>
       </section>
       <SidebarMenuAccordion
-        title="Employee"
+        title="Organisasi"
+        icon="fa-user-tie"
+        :contents="[
+          {
+            text: 'departemen',
+            to: '/organisasi/departemen',
+          },
+          { text: 'jabatan', to: '/organisasi/jabatan' },
+        ]"
+      />
+      <SidebarMenuAccordion
+        title="Karyawan"
         icon="fa-users"
         :contents="[
           {
-            text: 'All Employees',
+            text: 'Data karyawan',
             to: '/employee',
           },
-          { text: 'Designation', to: '/designation' },
-          { text: 'Employment Status', to: '/employee-status' },
+          { text: 'Status Karyawan', to: '/employee-status' },
+          { text: 'Peringatan', to: '/designation' },
+          { text: 'Mutasi / Resign', to: '/designation' },
         ]"
       />
       <SidebarMenuAccordion
-        title="Leave"
-        icon="fa-reguler fa-clock"
+        title="Pengajuan"
+        icon="fa-users"
         :contents="[
           {
-            text: 'Leave Status',
-            to: '/leave-status',
+            text: 'Leave Request',
+            to: '/leave-request',
           },
-          { text: 'Leave Request', to: '/leave-request' },
-          { text: 'Calendar', to: '/leave-calendar' },
-          { text: 'Summary', to: '/leave-summary' },
         ]"
       />
       <SidebarMenuAccordion
-        title="Attedance"
+        title="Absensi"
         icon="fa-calendar"
         :contents="[
           {
-            text: 'Daily Log',
-            to: '/attedance-daily',
+            text: 'Daily Log Absensi',
+            to: '/attedance/daily',
           },
-          { text: 'Attedance Request', to: '/attedance-request' },
-          { text: 'Attedance Details', to: '/attedance-details' },
-          { text: 'Summary', to: '/attedance-summary' },
         ]"
       />
       <SidebarMenuAccordion
@@ -53,41 +59,9 @@
         icon="fa-credit-card"
         :contents="[
           {
-            text: 'Payrun',
-            to: '/payroll-run',
+            text: 'Daftar Nominatif Penerima gaji',
+            to: '/payroll/nominatif',
           },
-          { text: 'Payslip', to: '/payroll-slip' },
-          { text: 'Summary', to: '/payroll-summary' },
-          { text: 'Beneficiary badge', to: '/payroll-beneficiary' },
-        ]"
-      />
-      <SidebarMenuAccordion
-        title="Administration"
-        icon="fa-briefcase"
-        :contents="[
-          {
-            text: 'Users & Roles',
-            to: '/user-roles',
-          },
-          { text: 'Work Shifts', to: '/work-shifts' },
-          { text: 'Departements', to: '/departements' },
-          { text: 'Holiday', to: '/holiday' },
-          { text: 'Org. Structure', to: '/org-structure' },
-          { text: 'Announcements', to: '/announcements' },
-        ]"
-      />
-      <SidebarMenuAccordion
-        title="Settings"
-        icon="fa-gear"
-        :contents="[
-          {
-            text: 'App Settings',
-            to: '/setting-app',
-          },
-          { text: 'Leave Settings', to: '/setting-leave' },
-          { text: 'Attedance Settings', to: '/setting-attadance' },
-          { text: 'Payroll Settings', to: '/setting-payroll' },
-          { text: 'Import', to: '/setting-import' },
         ]"
       />
     </nav>
@@ -103,5 +77,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

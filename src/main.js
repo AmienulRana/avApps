@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import router from "./routes";
 import "./assets/styles/index.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
@@ -14,13 +15,21 @@ import {
   faChevronUp,
   faClock,
   faCreditCard,
+  faDollar,
+  faEllipsis,
   faExpand,
   faGear,
   faMagnifyingGlass,
   faMoon,
   faTable,
+  faUser,
   faUsers,
   faUserTie,
+  faLock,
+  faPencil,
+  faXmark,
+  faTrashAlt,
+  faFile,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -37,7 +46,18 @@ library.add(
   faCalendar,
   faCreditCard,
   faBriefcase,
-  faGear
+  faGear,
+  faEllipsis,
+  faDollar,
+  faUser,
+  faLock,
+  faPencil,
+  faXmark,
+  faTrashAlt,
+  faFile
 );
 
-createApp(App).component("font-awesome-icon", FontAwesomeIcon).mount("#app");
+createApp(App)
+  .use(router)
+  .component("font-awesome-icon", FontAwesomeIcon)
+  .mount("#app");
