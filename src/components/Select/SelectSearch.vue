@@ -8,9 +8,9 @@
     <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
-        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-600 rounded-md"
+        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-400 rounded-md"
       >
-        <p>{{ options[0] }}</p>
+        <p></p>
         <font-awesome-icon
           icon="fa-chevron-up w-6 h-6"
           class="duration-500 ease-in-out"
