@@ -7,7 +7,10 @@
           <Button class="bg-seagreen rounded text-white px-6 py-2"
             >Settings</Button
           >
-          <Button class="bg-primary rounded text-white mx-2 px-6 py-2">
+          <Button
+            class="bg-primary rounded text-white mx-2 px-6 py-2"
+            @click="modal.showModal = true"
+          >
             Assign Leave</Button
           >
         </div>
@@ -60,20 +63,56 @@
       </section>
     </section>
   </LayoutAdmin>
-  <Modal title="Assign Leave" :showModal="showModal" @close="showModal = false">
-    <section class="flex w-full justify-center"></section>
-    <section class="mt-4">
-      <label class="text-sm">Response Note</label>
-      <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
-      </textarea>
-      <section class="grid grid-cols-3 items-center mt-4">
-        <p class="text-sm">Update status</p>
-        <div class="flex">
-          <Radio label="Pending" />
-          <Radio label="Approved" class="mx-8" />
-          <Radio label="Rejected" />
+  <Modal
+    title="Assign Leave"
+    :showModal="modal.showModal"
+    @close="modal.showModal = false"
+  >
+    <section @click="modal.showSelect = false">
+      <SelectSearch
+        label="Employee"
+        :options="['Farhan']"
+        :isOpen="modal.showSelect"
+        @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
+        class="flex-col"
+        input_class="w-full mt-2"
+        label_class="w-full"
+      />
+      <Select
+        class="flex-col mt-4"
+        input_class="w-full mt-2"
+        label_class="w-full"
+        label="Leave type"
+        :options="[
+          'Cuti Tahunan (Paid)',
+          'Cuti Menikah (Paid)',
+          'Izin Sakit (Paid)',
+          'Izin Sakit (Unpaid)',
+          'Izin Khusus (Paid)',
+          'Izin Khusus (Unpaid)',
+        ]"
+      />
+      <section class="flex justify-between items-center mt-4">
+        <p class="text-sm">
+          Age <span class="text-gray-400">(Leave duration)</span>
+        </p>
+        <div class="flex md:px-16">
+          <Radio label="Single Day" />
+          <Radio label="Multi Day" class="mx-8" />
+          <Radio label="Half Day" />
+          <Radio label="Hours" class="mx-8" />
         </div>
       </section>
+      <Input
+        type="date"
+        class="flex-col mt-4"
+        label="Enter Date"
+        label_class="w-full"
+        input_class="mt-2"
+      />
+      <label class="text-sm">Reason Note</label>
+      <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
+      </textarea>
     </section>
     <template #footer>
       <section class="flex w-52 justify-between">
@@ -95,6 +134,10 @@ import Dropdown from "../components/Dropdown.vue";
 import Pagination from "../components/Paggination.vue";
 import TableLeaveRequest from "../components/TableLeaveRequest.vue";
 import Modal from "../components/Modal.vue";
+import Select from "@/components/Select";
+import SelectSearch from "@/components/Select/SelectSearch.vue";
+import Radio from "@/components/Radio.vue";
+import Input from "@/components/Input.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -104,7 +147,11 @@ export default {
     TableLeaveRequest,
     Dropdown,
     Pagination,
+    SelectSearch,
     Modal,
+    Select,
+    Radio,
+    Input,
   },
   data() {
     return {
@@ -112,7 +159,10 @@ export default {
       currentPage: 1,
       contactEmployee: 0,
       layoutData: "card",
-      showModal: true,
+      modal: {
+        showModal: false,
+        showSelect: false,
+      },
     };
   },
   methods: {
