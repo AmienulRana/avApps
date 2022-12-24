@@ -1,9 +1,11 @@
 <template>
   <LayoutAdmin @click="activeDropdown = false">
-    <section class="px-8 mt-6 w-full">
-      <section class="flex justify-between">
-        <h1 class="text-2xl">All Employees</h1>
-        <Button class="bg-primary text-white px-6 py-2">Add Employee</Button>
+    <section class="md:px-8 px-4 mt-6 w-full">
+      <section class="flex justify-between items-center">
+        <h1 class="md:text-2xl text-lg">All Employees</h1>
+        <Button class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+          >Add Employee</Button
+        >
       </section>
       <section class="flex mt-6 flex-wrap w-10/12">
         <Button
@@ -30,73 +32,45 @@
           Showing 1 to 10 items of 11
         </p>
         <div
-          class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid gap-4"
+          class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"
           v-if="layoutData === 'card'"
         >
           <section
-            class="
-              flex
-              relative
-              justify-center
-              items-center
-              flex-col
-              bg-white
-              p-4
-            "
+            class="flex relative justify-center rounded items-center flex-col bg-white p-4"
             v-for="(data, index) in new Array(10)"
             :key="index"
           >
             <div
-              class="
-                w-12
-                h-12
-                flex
-                justify-center
-                items-center
-                rounded-full
-                bg-zinc-400
-              "
+              class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              <h2 class="text-md text-white">AR</h2>
+              <h2 class="md:text-base text-sm text-white">AR</h2>
             </div>
-            <h1 class="text-md mt-2 mb-0">Nama Karyawan</h1>
-            <p class="text-md text-gray-500">Perusahaan</p>
-            <p class="text-sm text-gray-400">Jabatan</p>
-            <p class="text-md text-gray-500">Id Employee</p>
+            <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
+              Nama Karyawan
+            </h1>
+            <p class="text-sm md:text-base text-gray-500">Perusahaan</p>
+            <p class="text-xs text-gray-400 my-2 md:my-0">Jabatan</p>
+            <p class="text-sm md:text-base text-gray-500">Id Employee</p>
             <Button
               class="bg-blue-600 px-4 text-sm py-1 my-2 text-white rounded-full"
             >
               Permanent
             </Button>
-            <p class="text-md text-gray-400">Departemen</p>
-            <p class="text-md text-gray-400">Shift jam kerja</p>
-            <p class="text-md text-blue-600 mt-3">
+            <p class="text-sm md:text-base text-gray-400">Departemen</p>
+            <p class="text-sm md:text-base text-gray-400 my-2 md:my-0">
+              Shift jam kerja
+            </p>
+            <p class="text-sm md:text-base text-blue-600 mt-3">
               <router-link to="/employee/123">View Details</router-link>
             </p>
             <Button
-              class="
-                absolute
-                top-4
-                right-4
-                px-3
-                bg-blue-100
-                text-primary
-                rounded-full
-              "
+              class="absolute top-4 right-4 px-3 bg-blue-100 text-primary rounded-full"
               @click="showContactEmployee(index + 1)"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
-              class="
-                absolute
-                top-10
-                right-6
-                rounded-md
-                bg-white
-                shadow-md
-                md:w-10/12 md:h-max
-              "
+              class="absolute top-10 right-6 rounded-md bg-white shadow-md md:w-10/12 md:h-max"
               v-if="contactEmployee === index + 1"
             >
               <ul>
@@ -224,5 +198,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
