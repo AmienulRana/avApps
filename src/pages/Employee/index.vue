@@ -36,7 +36,7 @@
           v-if="layoutData === 'card'"
         >
           <section
-            class="flex relative justify-center rounded items-center flex-col bg-white p-4"
+            class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
             v-for="(data, index) in new Array(10)"
             :key="index"
           >
