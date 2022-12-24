@@ -1,8 +1,8 @@
 <template>
   <div class="flex justify-between items-center mb-5">
     <label
-      :class="label_class ? label_class : 'w-1/5'"
-      class="text-sm text-gray-400"
+      :class="label_class ? label_class : 'w-1/5 text-gray-400'"
+      class="text-sm"
       >{{ label }}</label
     >
     <select
