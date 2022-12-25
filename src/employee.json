@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Lolita Mueller",
+        "status": "Permanent",
+        "company": "Armada Vision",
+        "designation": "Software Enginner",
+        "id": "1",
+        "departement": "Development",
+        "workshifts": "Regular Work Shift",
+        "role": "Employee"
+    },
+    {
+        "name": "Hafsah Budiman",
+        "status": "Probation",
+        "company": "Armada Vision",
+        "designation": "Project Manager",
+        "id": "2",
+        "departement": "Accounts",
+        "workshifts": "Regular Work Shift",
+        "role": "Manager"
+    },
+    {
+        "name": "Ivan Arafat",
+        "status": "Permanent",
+        "company": "Armada Vision",
+        "designation": "Director",
+        "id": "3",
+        "departement": "Admin & HRM",
+        "workshifts": "Regular Work Shift",
+        "role": "App Admin"
+    },
+    {
+        "name": "Lolita Mueller",
+        "status": "Terminated",
+        "company": "Armada Vision",
+        "designation": "General Manager",
+        "id": "4",
+        "departement": "UI/UX",
+        "workshifts": "Regular Work Shift",
+        "role": "Department Manager"
+    },
+    {
+        "name": "Purwadi Susanto",
+        "status": "Probation",
+        "company": "Armada Vision",
+        "designation": "Project Manager",
+        "id": "5",
+        "departement": "Admin & HRM",
+        "workshifts": "Regular Work Shift",
+        "role": "Employee"
+    }
+]
