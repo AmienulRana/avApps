@@ -19,7 +19,9 @@
             <div
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              <h2 class="text-md text-white">AR</h2>
+              <h2 class="text-md text-white">
+                {{ employe.name.split("")[0] }}
+              </h2>
             </div>
             <div class="ml-3.5">
               <h1 class="text-md text-blue-400 mb-0">{{ employe.name }}</h1>
