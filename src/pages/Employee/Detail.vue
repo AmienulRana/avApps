@@ -128,29 +128,6 @@
             >
               {{ title }}
             </li>
-            <li
-              class="cursor-pointer text-sm px-4 mb-4 truncate w-full"
-              @click="sideTabActive = 'cuti' || 'off'"
-            >
-              <Accordion :isOpen="isOpenAccordion">
-                <template v-slot:header>
-                  <p
-                    :class="
-                      sideTabActive === 'cuti' || sideTabActive === 'off'
-                        ? 'text-primary'
-                        : 'text-gray-400'
-                    "
-                  >
-                    Cuti
-                  </p>
-                </template>
-                <template v-slot:content
-                  ><p class="text-white" @click.stop="sideTabActive = 'off'">
-                    Off day
-                  </p></template
-                >
-              </Accordion>
-            </li>
           </ul>
         </section>
         <section class="md:w-3/4 w-full bg-white">
@@ -160,10 +137,7 @@
           <Rekening v-if="sideTabActive === 'Rekening'" />
           <Payroll v-if="sideTabActive === 'Payroll'" />
           <Deducation v-if="sideTabActive === 'Deducation dan Allowance'" />
-          <Cuti
-            v-if="sideTabActive === 'cuti' || 'off'"
-            :tab_active="sideTabActive"
-          />
+          <Cuti v-if="sideTabActive === 'Cuti'" />
         </section>
       </section>
     </section>
@@ -179,7 +153,6 @@ import Rekening from "../../components/Rekening.vue";
 import Payroll from "../../components/Payroll.vue";
 import Cuti from "../../components/Cuti.vue";
 import Deducation from "../../components/Deducation.vue";
-import Accordion from "../../components/Accordion.vue";
 
 import Button from "@/components/Button.vue";
 export default {
@@ -192,7 +165,6 @@ export default {
     Experience,
     Rekening,
     Payroll,
-    Accordion,
     Cuti,
     Deducation,
   },
@@ -214,6 +186,7 @@ export default {
         "Rekening",
         "Payroll",
         "Deducation dan Allowance",
+        "Cuti",
       ],
       isOpenAccordion: false,
       sideTabActive: "Personal Detail",

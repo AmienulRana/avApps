@@ -96,45 +96,27 @@
       </div>
     </section>
     <section class="mt-4" v-if="tab_active === '2'">
-      <div class="flex items-center mb-2.5">
+      <div class="mb-2">
+        <p class="text-end text-sm text-gray-400">Off day</p>
+      </div>
+      <div
+        class="flex items-center mb-2.5"
+        v-for="day in shift_day"
+        :key="day.name"
+      >
         <Select
-          label="Senin"
+          :label="day.name"
           input_class="w-4/6"
           class="w-full mr-6"
           :options="shift_data"
+          :disabled="day.isCuti"
         />
-        <!-- <SwitchButton class="mt-0" /> -->
+        <SwitchButton
+          @update:model="(value) => (day.isCuti = value)"
+          :value="day.isCuti"
+        />
       </div>
-      <Select
-        label="Selasa"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
-      <Select
-        label="Rabu"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
-      <Select
-        label="Kamis"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
-      <Select
-        label="Jum'at"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
-      <Select
-        label="Sabtu"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
+      {{ tes }}
       <div class="flex justify-end w-full mb-4">
         <Button class="bg-primary text-white w-24 text-sm rounded py-2">
           Save
@@ -148,11 +130,11 @@
 import Input from "./Input.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
-// import SwitchButton from "./SwitchButton.vue";
+import SwitchButton from "./SwitchButton.vue";
 
 export default {
   name: "PersonalDetail",
-  components: { Input, Select, SelectSearch },
+  components: { Input, Select, SelectSearch, SwitchButton },
   data() {
     return {
       indicator_position: {
@@ -165,7 +147,15 @@ export default {
         "Shift 1 Stationery (08:00 am - 05:00pm)",
         "Shift 2 Stationery",
         "Shift 3 Stationery",
-        "Off day",
+      ],
+      shift_day: [
+        { name: "Senin", isCuti: false },
+        { name: "Selasa", isCuti: false },
+        { name: "Rabu", isCuti: false },
+        { name: "Kamis", isCuti: false },
+        { name: "Jumat", isCuti: false },
+        { name: "Sabtu", isCuti: false },
+        { name: "Minggu", isCuti: false },
       ],
     };
   },
@@ -176,6 +166,11 @@ export default {
       this.indicator_position.left = buttonPosition;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
+    },
+  },
+  computed: {
+    tes() {
+      return console.log(this.shift_day);
     },
   },
   mounted() {

@@ -184,7 +184,9 @@
             <div
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              <h2 class="md:text-base text-sm text-white">AR</h2>
+              <h2 class="md:text-base text-sm text-white">
+                {{ data.name.split("")[0] }}
+              </h2>
             </div>
             <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
               {{ data.name }}
