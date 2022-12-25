@@ -30,6 +30,8 @@ import {
   faXmark,
   faTrashAlt,
   faFile,
+  faHomeAlt,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -54,7 +56,9 @@ library.add(
   faPencil,
   faXmark,
   faTrashAlt,
-  faFile
+  faFile,
+  faHomeAlt,
+  faCheck
 );
 
 createApp(App)
