@@ -25,12 +25,13 @@
     </section>
 
     <section class="mt-4" v-if="tab_active === '1'">
-      <Input label="Username" input_class="w-4/6" class="mb-2.5" />
-      <Input label="NIK Karyawan" input_class="w-4/6" class="mb-2.5" />
+      <Input label="Username" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+      <Input label="NIK Karyawan" input_class="md:w-4/6 mt-2" class="mb-2.5" />
       <SelectSearch
         :options="['Administration', 'IT']"
         label="Departement"
         position="bottom"
+        input_class="md:4/6 mt-2"
         :isOpen="show_select === 'departemen'"
         @handleShowSelect="show_select = 'departemen'"
       />
@@ -38,18 +39,19 @@
         :options="['Project Mananger', 'Developer']"
         label="Jabatan"
         position="bottom"
+        input_class="md:4/6 mt-2"
         :isOpen="show_select === 'jabatan'"
         @handleShowSelect="show_select = 'jabatan'"
       />
       <Select
         label="Status Karyawan"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['Permanent', 'Probation', 'Contract']"
       />
       <Select
         label="Tanggungan"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
       />
@@ -62,6 +64,7 @@
           'Project Mananger',
         ]"
         label="Atasan Pertama"
+        input_class="md:w-4/6 mt-2"
         position="top"
         :isOpen="show_select === 'atasan-1'"
         @handleShowSelect="show_select = 'atasan-1'"
@@ -75,13 +78,14 @@
           'Project Mananger',
         ]"
         label="Atasan Kedua"
+        input_class="md:w-4/6 mt-2"
         position="top"
         :isOpen="show_select === 'atasan-2'"
         @handleShowSelect="show_select = 'atasan-2'"
       />
       <Select
         label="Lokasi Absensi"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="[
           'Mufidah Stationery',
@@ -106,7 +110,7 @@
       >
         <Select
           :label="day.name"
-          input_class="w-4/6"
+          input_class="md:w-4/6 mt-2 md:mt-0"
           class="w-full mr-6"
           :options="shift_data"
           :disabled="day.isCuti"
@@ -116,7 +120,6 @@
           :value="day.isCuti"
         />
       </div>
-      {{ tes }}
       <div class="flex justify-end w-full mb-4">
         <Button class="bg-primary text-white w-24 text-sm rounded py-2">
           Save
@@ -170,11 +173,6 @@ export default {
       this.indicator_position.width = buttonWidth;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
-    },
-  },
-  computed: {
-    tes() {
-      return console.log(this.shift_day);
     },
   },
   mounted() {
