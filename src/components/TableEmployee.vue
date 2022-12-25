@@ -20,7 +20,10 @@
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
               <h2 class="text-md text-white">
-                {{ employe.name.split("")[0] }}
+                {{
+                  employe.name.substr(0, 1) +
+                  employe.name.substr(employe.name.indexOf(" ") + 1, 1)
+                }}
               </h2>
             </div>
             <div class="ml-3.5">
