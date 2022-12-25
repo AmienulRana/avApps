@@ -136,7 +136,6 @@
           <Experience v-if="sideTabActive === 'Pendidikan dan Pengalaman'" />
           <Rekening v-if="sideTabActive === 'Rekening'" />
           <Payroll v-if="sideTabActive === 'Payroll'" />
-          <Deducation v-if="sideTabActive === 'Deducation dan Allowance'" />
           <Cuti v-if="sideTabActive === 'Cuti'" />
         </section>
       </section>
@@ -152,7 +151,6 @@ import Experience from "../../components/Education.vue";
 import Rekening from "../../components/Rekening.vue";
 import Payroll from "../../components/Payroll.vue";
 import Cuti from "../../components/Cuti.vue";
-import Deducation from "../../components/Deducation.vue";
 
 import Button from "@/components/Button.vue";
 export default {
@@ -166,7 +164,6 @@ export default {
     Rekening,
     Payroll,
     Cuti,
-    Deducation,
   },
   data() {
     return {
@@ -185,7 +182,6 @@ export default {
         "Pendidikan dan Pengalaman",
         "Rekening",
         "Payroll",
-        "Deducation dan Allowance",
         "Cuti",
       ],
       isOpenAccordion: false,
