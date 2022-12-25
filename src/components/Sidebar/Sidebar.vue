@@ -36,7 +36,7 @@
       />
       <SidebarMenuAccordion
         title="Pengajuan"
-        icon="fa-users"
+        icon="fa-clock"
         :contents="[
           {
             text: 'Leave Request',
