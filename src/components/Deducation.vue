@@ -19,15 +19,7 @@
         Allowance
       </button>
       <span
-        class="
-          absolute
-          top-1/2
-          -translate-y-1/2
-          duration-300
-          rounded-md
-          w-1/2
-          bg-primary
-        "
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
@@ -87,19 +79,23 @@
           <span v-if="!modeEdit">Tambah</span>
           Deducation
         </h1>
-        <Input label="Detail Potongan" input_class="w-4/6" class="mb-2.5" />
+        <Input
+          label="Detail Potongan"
+          input_class="md:w-4/6 mt-2"
+          class="mb-2.5"
+        />
         <p class="text-gray-400 text-md">Potongan tanggungan :</p>
-        <div class="px-6">
+        <div class="md:px-6 px-3">
           <Input
             type="number"
             label="Pribadi"
-            input_class="w-4/6"
+            input_class="md:w-4/6 mt-2"
             class="mb-2.5"
           />
           <Input
             type="number"
             label="Perusahaan"
-            input_class="w-4/6"
+            input_class="md:w-4/6 mt-2"
             class="mb-2.5"
           />
         </div>
@@ -112,7 +108,7 @@
     </section>
     <Allowance v-if="tab_active === '2'" />
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
@@ -152,5 +148,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

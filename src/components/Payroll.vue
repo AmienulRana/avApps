@@ -26,15 +26,7 @@
         Deducation
       </button>
       <span
-        class="
-          absolute
-          top-1/2
-          -translate-y-1/2
-          duration-300
-          rounded-md
-          w-36
-          bg-primary
-        "
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-36 bg-primary"
         ref="indicator"
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px; width:${indicator_position.width}px;`"
       />
@@ -43,14 +35,14 @@
     <section class="mt-4" v-if="tab_active === '1'">
       <Select
         label="Periode Penggajian"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['Bulan', '2 Minggu', 'Minggu']"
       />
       <Input
         type="number"
         label="Gaji pokok"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         placeholder="Tidak ada perkiraan untuk Project Manager "
       />
@@ -62,7 +54,7 @@
     </section>
     <section class="mt-4" v-if="tab_active === '2'"></section>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
@@ -104,5 +96,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

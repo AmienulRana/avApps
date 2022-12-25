@@ -48,12 +48,18 @@
         <span v-else-if="!modeEdit">Tambah</span>
         Allowance
       </h1>
-      <Input label="Tunjangan" input_class="w-4/6" class="mb-2.5" />
-      <Input type="number" label="Jumlah" input_class="w-4/6" class="mb-2.5" />
+      <Input label="Tunjangan" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+      <Input
+        type="number"
+        label="Jumlah"
+        input_class="md:w-4/6 mt-2"
+        class="mb-2.5"
+      />
       <SelectSearch
         :isOpen="select_search.isOpen"
         label="Type"
         :options="['Proposional', 'Fix']"
+        input_class="md:w-4/6 mt-2"
         position="top"
         @handleShowSelect="select_search.isOpen = !select_search.isOpen"
       />
@@ -65,7 +71,7 @@
       </div>
     </section>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";

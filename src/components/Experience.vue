@@ -22,18 +22,18 @@
     </tbody>
   </table>
   <section class="mt-8">
-    <Input label="Nama Perusahaan" input_class="w-4/6" class="mb-2.5" />
-    <Input label="Posisi" input_class="w-4/6" class="mb-2.5" />
+    <Input label="Nama Perusahaan" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+    <Input label="Posisi" input_class="md:w-4/6 mt-2" class="mb-2.5" />
     <Input
       type="date"
       label="Tanggal Mulai"
-      input_class="w-4/6"
+      input_class="md:w-4/6 mt-2"
       class="mb-2.5"
     />
     <Input
       type="date"
       label="Tanggal Berakhir"
-      input_class="w-4/6"
+      input_class="md:w-4/6 mt-2"
       class="mb-2.5"
     />
     <div class="flex justify-end w-full my-4">
@@ -42,7 +42,7 @@
       </Button>
     </div>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
@@ -54,5 +54,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
