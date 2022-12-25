@@ -1,10 +1,10 @@
 <template>
   <section class="px-4" @click="show_select = false">
     <section
-      class="bg-gray-100 mt-2 rounded-md px-4 py-1 flex justify-center relative"
+      class="bg-gray-100 mt-2 rounded-md md:px-4 px-2 py-1 flex md:justify-center justify-between relative"
     >
       <button
-        class="w-1/2 h-full py-2 z-10 duration-300 text-sm"
+        class="md:w-1/2 w-max h-full py-2 z-10 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, '1')"
         :class="tab_active === '1' ? 'text-white' : ''"
         ref="first_tab"
@@ -12,25 +12,26 @@
         Employment Data
       </button>
       <button
-        class="w-1/2 z-10 h-full py-2 duration-300 text-sm"
+        class="md:w-1/2 w-max z-10 h-full py-2 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, '2')"
         :class="tab_active === '2' ? 'text-white' : ''"
       >
         Employment Attadance Day
       </button>
       <span
-        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
-        :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md bg-primary"
+        :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;  width:${indicator_position.width}px;`"
       />
     </section>
 
     <section class="mt-4" v-if="tab_active === '1'">
-      <Input label="Username" input_class="w-4/6" class="mb-2.5" />
-      <Input label="NIK Karyawan" input_class="w-4/6" class="mb-2.5" />
+      <Input label="Username" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+      <Input label="NIK Karyawan" input_class="md:w-4/6 mt-2" class="mb-2.5" />
       <SelectSearch
         :options="['Administration', 'IT']"
         label="Departement"
         position="bottom"
+        input_class="md:4/6 mt-2"
         :isOpen="show_select === 'departemen'"
         @handleShowSelect="show_select = 'departemen'"
       />
@@ -38,18 +39,19 @@
         :options="['Project Mananger', 'Developer']"
         label="Jabatan"
         position="bottom"
+        input_class="md:4/6 mt-2"
         :isOpen="show_select === 'jabatan'"
         @handleShowSelect="show_select = 'jabatan'"
       />
       <Select
         label="Status Karyawan"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['Permanent', 'Probation', 'Contract']"
       />
       <Select
         label="Tanggungan"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
       />
@@ -62,6 +64,7 @@
           'Project Mananger',
         ]"
         label="Atasan Pertama"
+        input_class="md:w-4/6 mt-2"
         position="top"
         :isOpen="show_select === 'atasan-1'"
         @handleShowSelect="show_select = 'atasan-1'"
@@ -75,13 +78,14 @@
           'Project Mananger',
         ]"
         label="Atasan Kedua"
+        input_class="md:w-4/6 mt-2"
         position="top"
         :isOpen="show_select === 'atasan-2'"
         @handleShowSelect="show_select = 'atasan-2'"
       />
       <Select
         label="Lokasi Absensi"
-        input_class="w-4/6"
+        input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="[
           'Mufidah Stationery',
@@ -106,7 +110,7 @@
       >
         <Select
           :label="day.name"
-          input_class="w-4/6"
+          input_class="md:w-4/6 mt-2 md:mt-0"
           class="w-full mr-6"
           :options="shift_data"
           :disabled="day.isCuti"
@@ -116,7 +120,6 @@
           :value="day.isCuti"
         />
       </div>
-      {{ tes }}
       <div class="flex justify-end w-full mb-4">
         <Button class="bg-primary text-white w-24 text-sm rounded py-2">
           Save
@@ -140,6 +143,7 @@ export default {
       indicator_position: {
         left: 0,
         height: 0,
+        width: 0,
       },
       show_select: false,
       tab_active: "1",
@@ -163,21 +167,21 @@ export default {
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
       const buttonPosition = event.target.offsetLeft;
+      const buttonWidth = event.target.offsetWidth;
+
       this.indicator_position.left = buttonPosition;
+      this.indicator_position.width = buttonWidth;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
     },
   },
-  computed: {
-    tes() {
-      return console.log(this.shift_day);
-    },
-  },
   mounted() {
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
+    const buttonWidth = this.$refs.first_tab?.offsetWidth;
     const buttonPosition = this.$refs.first_tab?.offsetLeft;
     this.indicator_position.left = buttonPosition;
     this.indicator_position.height = buttonHeight;
+    this.indicator_position.width = buttonWidth;
   },
 };
 </script>

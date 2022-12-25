@@ -1,7 +1,6 @@
 <template>
   <section>
     <section
-      @click="isOpen = !isOpen"
       class="flex justify-between items-center cursor-pointer"
       :class="headerClass"
     >
@@ -12,27 +11,26 @@
         :class="isOpen ? '' : 'rotate-180'"
       />
     </section>
-    <Transition
+    <!-- <Transition
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
+    > -->
+    <section
+      v-if="isOpen"
+      class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
     >
-      <section
-        v-if="isOpen"
-        class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
-      >
-        <slot name="content"> </slot>
-      </section>
-    </Transition>
+      <slot name="content"> </slot>
+    </section>
+    <!-- </Transition> -->
   </section>
 </template>
 
 <script>
 export default {
   name: "AccordionComponent",
-  props: { headerClass: String },
+  props: { headerClass: String, isOpen: Boolean },
   data() {
     return {
-      isOpen: false,
       position: {
         type: String,
         default: "bottom",

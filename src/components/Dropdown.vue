@@ -50,7 +50,7 @@
             v-for="(option, index) in searchResult"
             :key="index"
             @click="$emit('selected', option)"
-            class="px-4 py-2 hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
+            class="px-4 py-2 text-sm hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
             :class="option === selectedOption ? 'bg-primary text-white' : ''"
           >
             {{ option }}

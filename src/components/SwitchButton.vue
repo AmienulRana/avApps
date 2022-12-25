@@ -1,13 +1,13 @@
 <template>
   <div
-    class="w-14 h-6 flex items-center rounded-full p-1 duration-300 cursor-pointer"
+    class="min-w-14 h-6 flex items-center rounded-full p-1 duration-300 cursor-pointer"
     :class="value ? 'bg-primary' : 'bg-gray-300'"
     :aria-checked="value.toString()"
     @click="toggle"
   >
     <div
       class="bg-white w-4 h-4 rounded-full shadow-md transform duration-300"
-      :class="{ 'translate-x-7': value }"
+      :class="{ 'translate-x-8': value }"
     ></div>
   </div>
 </template>
@@ -28,3 +28,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.min-w-14 {
+  min-width: 3.5rem;
+}
+</style>

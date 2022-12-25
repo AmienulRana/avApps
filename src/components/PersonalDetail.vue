@@ -4,7 +4,7 @@
       class="bg-gray-100 mt-2 rounded-md px-4 py-1 flex justify-center relative"
     >
       <button
-        class="w-1/2 h-full py-2 z-10 duration-300"
+        class="w-1/2 h-full py-2 z-10 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, 'data_diri')"
         :class="tab_active === 'data_diri' ? 'text-white' : ''"
         ref="first_tab"
@@ -12,7 +12,7 @@
         Data Diri
       </button>
       <button
-        class="w-1/2 z-10 h-full py-2 duration-300"
+        class="w-1/2 z-10 h-full py-2 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, 'arsip')"
         :class="tab_active === 'arsip' ? 'text-white' : ''"
       >

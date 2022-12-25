@@ -20,7 +20,10 @@
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
               <h2 class="text-md text-white">
-                {{ employe.name.split("")[0] }}
+                {{
+                  employe.name.substr(0, 1) +
+                  employe.name.substr(employe.name.indexOf(" ") + 1, 1)
+                }}
               </h2>
             </div>
             <div class="ml-3.5">
@@ -32,7 +35,18 @@
             <p class="text-sm text-gray-400">{{ employe.id }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">{{ employe.status }}</p>
+            <p
+              class="text-white flex justify-center items-center px-4 text-sm py-1 my-2 rounded-full"
+              :class="
+                employe.status === 'Permanent'
+                  ? 'bg-blue-500'
+                  : employe.status === 'Probation'
+                  ? 'bg-orange-500'
+                  : 'bg-red-600'
+              "
+            >
+              {{ employe.status }}
+            </p>
           </td>
           <td class="p-3 text-sm">
             <p class="text-sm text-gray-400">{{ employe.departement }}</p>

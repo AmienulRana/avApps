@@ -185,7 +185,10 @@
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
               <h2 class="md:text-base text-sm text-white">
-                {{ data.name.split("")[0] }}
+                {{
+                  data.name.substr(0, 1) +
+                  data.name.substr(data.name.indexOf(" ") + 1, 1)
+                }}
               </h2>
             </div>
             <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
