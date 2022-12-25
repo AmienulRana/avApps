@@ -44,10 +44,12 @@
         title="Pengajuan"
         icon="fa-clock"
         :contents="[
-          {
-            text: 'Leave Request',
-            to: '/leave-request',
-          },
+          { text: 'Leave Request', to: '/leave-request' },
+          { text: 'Overtime Request', to: '/overtime-request' },
+          { text: 'Outside Assignment', to: '/outsign-assignment' },
+          { text: 'Change Work Shift', to: '/change-shift' },
+          { text: 'Change Off Day', to: '/change-off' },
+          { text: 'Need Approval', to: '/need-approval' },
         ]"
         :isOpen="isOpen === 'leave'"
         @click="handleToggleAccordion('leave')"
