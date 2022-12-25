@@ -1,8 +1,8 @@
 <template>
-  <div class="flex justify-between items-center mb-5">
+  <div class="md:flex justify-between items-center mb-5">
     <label
-      :class="label_class ? label_class : 'w-1/5 text-gray-400'"
-      class="text-sm min-w-max"
+      :class="label_class ? label_class : 'md:w-1/5 text-gray-400'"
+      class="text-sm min-w-max w-full"
       v-if="label"
       >{{ label }}</label
     >
