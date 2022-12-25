@@ -96,6 +96,9 @@
       </div>
     </section>
     <section class="mt-4" v-if="tab_active === '2'">
+      <div class="mb-2">
+        <p class="text-end text-sm text-gray-400">Off day</p>
+      </div>
       <div
         class="flex items-center mb-2.5"
         v-for="day in shift_day"
@@ -108,8 +111,12 @@
           :options="shift_data"
           :disabled="day.isCuti"
         />
-        <SwitchButton class="mt-0" />
+        <SwitchButton
+          @update:model="(value) => (day.isCuti = value)"
+          :value="day.isCuti"
+        />
       </div>
+      {{ tes }}
       <div class="flex justify-end w-full mb-4">
         <Button class="bg-primary text-white w-24 text-sm rounded py-2">
           Save
@@ -140,7 +147,6 @@ export default {
         "Shift 1 Stationery (08:00 am - 05:00pm)",
         "Shift 2 Stationery",
         "Shift 3 Stationery",
-        "Off day",
       ],
       shift_day: [
         { name: "Senin", isCuti: false },
@@ -160,6 +166,11 @@ export default {
       this.indicator_position.left = buttonPosition;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
+    },
+  },
+  computed: {
+    tes() {
+      return console.log(this.shift_day);
     },
   },
   mounted() {
