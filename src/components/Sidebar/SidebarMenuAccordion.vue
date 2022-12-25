@@ -9,7 +9,12 @@
       </section>
     </template>
     <template v-slot:content>
-      <p class="mt-2 text-sm" v-for="(content, index) in contents" :key="index">
+      <p
+        class="mt-2 text-gray-300 hover:text-white list-disc flex items-center"
+        v-for="(content, index) in contents"
+        :key="index"
+      >
+        <span class="block bg-gray-400 rounded-full mr-2" />
         <router-link :to="`${content.to}`">{{ content.text }}</router-link>
       </p>
     </template>
@@ -29,4 +34,15 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+p.text-gray-300 {
+  font-size: 12.5px;
+}
+p.text-gray-300:hover > span {
+  background-color: white !important;
+}
+p > span {
+  min-width: 6px;
+  min-height: 6px;
+}
+</style>
