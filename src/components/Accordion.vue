@@ -18,13 +18,13 @@
     >
       <section
         v-if="isOpen"
-        class="bg-blue-800 rounded-md text-base text-left px-5 mt-2 py-2.5"
+        class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
       >
         <slot name="content"> </slot>
       </section>
     </Transition>
   </section>
-</template> 
+</template>
 
 <script>
 export default {

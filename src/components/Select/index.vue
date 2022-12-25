@@ -1,21 +1,17 @@
 <template>
-  <div class="flex justify-between items-center mb-5">
-    <label :class="label_class" class="text-sm text-gray-400 w-1/5">{{
-      label
-    }}</label>
+  <div class="md:flex justify-between items-center">
+    <label
+      :class="label_class ? label_class : 'md:w-1/5 text-gray-400'"
+      class="text-sm"
+      >{{ label }}</label
+    >
     <select
-      class="
-        w-full
-        border border-gray-600
-        focus:outline focus:outline-primary
-        pr-2
-        py-1.5
-        bg-white
-        rounded-md
-      "
+      class="w-full border border-gray-600 focus:outline focus:outline-primary px-3 py-1.5 bg-white rounded-md text-sm"
       :class="input_class ? input_class : ''"
     >
-      <option v-for="(option, i) in options" :key="i">{{ option }}</option>
+      <option v-for="(option, i) in options" :key="i" class="px-2 py-1">
+        {{ option }}
+      </option>
     </select>
   </div>
 </template>
@@ -27,10 +23,10 @@ export default {
     icon: Boolean,
     label: String,
     input_class: String,
+    label_class: String,
     options: Array,
   },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

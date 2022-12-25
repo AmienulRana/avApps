@@ -1,14 +1,16 @@
 <template>
-  <div class="flex justify-between items-center mb-5">
-    <label :class="label_class" class="text-sm text-gray-400 w-1/5">{{
-      label
-    }}</label>
-    <div class="w-4/6 relative">
+  <div class="md:flex justify-between items-center mb-5">
+    <label
+      :class="label_class ? label_class : 'w-1/5'"
+      class="text-sm text-gray-400"
+      >{{ label }}</label
+    >
+    <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
-        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-600 rounded-md"
+        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-400 rounded-md"
       >
-        <p>{{ options[0] }}</p>
+        <p></p>
         <font-awesome-icon
           icon="fa-chevron-up w-6 h-6"
           class="duration-500 ease-in-out"
@@ -21,7 +23,7 @@
       >
         <section
           v-if="isOpen"
-          class="bg-white rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
+          class="bg-white overflow-y-auto rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
           :class="position === 'top' ? 'bottom-full' : 'top-full'"
         >
           <div class="px-2 mb-2">
@@ -54,6 +56,7 @@ export default {
     isOpen: Boolean,
     label: String,
     input_class: String,
+    label_class: String,
     options: Array,
     position: {
       type: String,

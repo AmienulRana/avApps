@@ -19,47 +19,58 @@
         Arsip Digital
       </button>
       <span
-        class="
-          absolute
-          top-1/2
-          -translate-y-1/2
-          duration-300
-          rounded-md
-          w-1/2
-          bg-primary
-        "
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
 
     <section class="mt-4" v-if="tab_active === 'data_diri'">
-      <Input label="Nama Depan" input_class="w-4/6" class="mb-2.5" />
-      <Input label="Nama Belakang" input_class="w-4/6" class="mb-2.5" />
-      <Input label="Email" input_class="w-4/6" class="mb-2.5" />
-      <Input label="NIK Ktp" input_class="w-4/6" class="mb-2.5" />
-      <Input label="Phone number" input_class="w-4/6" class="mb-2.5" />
-      <div class="flex justify-between items-center mb-2.5">
-        <label class="text-sm text-gray-400 w-1/5">Jenis Kelamin</label>
-        <div class="flex w-4/6">
+      <Input
+        label="Nama Depan"
+        input_class="md:md:w-4/6 w-full mt-1 w-full mt-1"
+        class="mb-2.5"
+      />
+      <Input
+        label="Nama Belakang"
+        input_class="md:w-4/6 w-full mt-1"
+        class="mb-2.5"
+      />
+      <Input label="Email" input_class="md:w-4/6 w-full mt-1" class="mb-2.5" />
+      <Input
+        label="NIK Ktp"
+        input_class="md:w-4/6 w-full mt-1"
+        class="mb-2.5"
+      />
+      <Input
+        label="Phone number"
+        input_class="md:w-4/6 w-full mt-1"
+        class="mb-2.5"
+      />
+      <div class="md:flex justify-between items-center mb-2.5">
+        <label class="text-sm text-gray-400 md:w-1/5 w-full"
+          >Jenis Kelamin</label
+        >
+        <div class="flex md:w-4/6 w-full mt-1">
           <Radio label="Laki-Laki" class="mr-5" />
           <Radio label="Perempuan" class="mr-5" />
         </div>
       </div>
       <Select
         label="Marital Status"
-        input_class="w-4/6"
+        input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
         :options="['Belum menikah', 'sudah menikah']"
       />
       <Input
         label="Tgl. Lahir"
         type="date"
-        input_class="w-4/6"
+        input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
       />
       <SelectSearch
         :options="['O+', 'O-', 'A+', 'A-']"
         label="Golongan Darah"
+        input_class="w-full md:w-4/6 mt-1"
         position="top"
         :isOpen="show_select === 'gol'"
         @handleShowSelect="show_select = 'gol'"
@@ -74,7 +85,7 @@
       <p class="text-gray-400 text-center">Data kosong</p>
     </section>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
@@ -113,5 +124,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
