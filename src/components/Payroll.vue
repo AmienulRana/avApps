@@ -52,17 +52,24 @@
         </Button>
       </div>
     </section>
-    <section class="mt-4" v-if="tab_active === '2'"></section>
+    <section class="mt-4" v-if="tab_active === '2'">
+      <Allowance />
+    </section>
+    <section class="mt-4" v-if="tab_active === '3'">
+      <Deducation />
+    </section>
   </section>
 </template>
 
 <script>
 import Input from "./Input.vue";
 import Select from "./Select/index.vue";
+import Allowance from "./Allowance.vue";
+import Deducation from "./Deducation.vue";
 
 export default {
   name: "PersonalDetail",
-  components: { Input, Select },
+  components: { Input, Select, Deducation, Allowance },
   data() {
     return {
       indicator_position: {
