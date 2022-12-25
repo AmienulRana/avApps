@@ -33,7 +33,12 @@
           @click.stop
         >
           <div class="relative">
-            <Input :icon="true" input_class="rounded-full" />
+            <Input
+              :icon="true"
+              input_class="rounded-full"
+              @input="handleSearchData($event)"
+              :value="query"
+            />
             <font-awesome-icon
               icon="fa-magnifying-glass"
               class="absolute top-1/2 -translate-y-1/2 left-3 text-primary"
@@ -42,7 +47,7 @@
         </div>
         <ul>
           <li
-            v-for="(option, index) in options"
+            v-for="(option, index) in searchResult"
             :key="index"
             @click="$emit('selected', option)"
             class="px-4 py-2 hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
@@ -81,7 +86,23 @@ export default {
   },
   emits: ["update:activeDropdown", "selected", "clearSelected"],
   data() {
-    return {};
+    return {
+      searchResult: this.options,
+      query: "",
+    };
+  },
+  methods: {
+    handleSearchData(value) {
+      this.query = value;
+      if (this.query.length >= 1) {
+        const result = this.options.filter((option) =>
+          option.toLowerCase().includes(this.query.toLowerCase())
+        );
+        this.searchResult = result;
+      } else {
+        this.searchResult = this.options;
+      }
+    },
   },
 };
 </script>
