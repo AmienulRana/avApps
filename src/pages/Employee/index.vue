@@ -15,21 +15,162 @@
           <font-awesome-icon icon="fa-table" />
         </Button>
         <Dropdown
-          ref="dropdown"
           title="Employment Status"
+          :options="['Permanent', 'Probation', 'Terminated']"
           :showDropdown="activeDropdown === 'employee'"
           @update:activeDropdown="(e) => changeDropdownActive('employee')"
+          @selected="
+            handleFilter(
+              (filter.employment_status = $event),
+              filter.designation,
+              filter.departement,
+              filter.workshifts,
+              filter.role
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.employment_status = $event),
+              filter.designation,
+              filter.departement,
+              filter.workshifts,
+              filter.role
+            )
+          "
+          :selectedOption="filter.employment_status"
         />
         <Dropdown
-          ref="dropdown"
           title="Designation"
+          :options="[
+            'Director',
+            'Chief Technology Officer (CTO) ',
+            'General Manager',
+            'HR Manager',
+            'Project Manager',
+            'Software Enginner',
+            'Technical Lead Enginner',
+          ]"
           :showDropdown="activeDropdown === 'designation'"
+          @selected="
+            handleFilter(
+              filter.employment_status,
+              (filter.designation = $event),
+              filter.departement,
+              filter.workshifts,
+              filter.role
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.employment_status,
+              (filter.designation = $event),
+              filter.departement,
+              filter.workshifts,
+              filter.role
+            )
+          "
+          :selectedOption="filter.designation"
           @update:activeDropdown="changeDropdownActive('designation')"
+        />
+        <Dropdown
+          title="Departement"
+          :showDropdown="activeDropdown === 'departement'"
+          :options="[
+            'Main Departement',
+            'Admin & HRM',
+            'Account',
+            'Development',
+            'Software',
+            'UI & UX',
+          ]"
+          @selected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              (filter.departement = $event),
+              filter.workshifts,
+              filter.role
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              (filter.departement = $event),
+              filter.workshifts,
+              filter.role
+            )
+          "
+          :selectedOption="filter.departement"
+          @update:activeDropdown="changeDropdownActive('departement')"
+        />
+        <Dropdown
+          title="Work Shift"
+          :options="[
+            'Regular work shift',
+            'Demo working shift regular',
+            'Demo working shift schedule',
+          ]"
+          @selected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              filter.departement,
+              (filter.workshifts = $event),
+              filter.role
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              filter.departement,
+              (filter.workshifts = $event),
+              filter.role
+            )
+          "
+          :selectedOption="filter.workshifts"
+          :showDropdown="activeDropdown === 'Work Shift'"
+          @update:activeDropdown="changeDropdownActive('Work Shift')"
+        />
+        <Dropdown
+          title="Role"
+          @selected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              filter.departement,
+              filter.workshifts,
+              (filter.role = $event)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.employment_status,
+              filter.designation,
+              filter.departement,
+              filter.workshifts,
+              (filter.role = $event)
+            )
+          "
+          :options="['App Admin', 'Manager', 'Employee', 'Department Manager']"
+          :selectedOption="filter.role"
+          :showDropdown="activeDropdown === 'Role'"
+          @update:activeDropdown="changeDropdownActive('Role')"
         />
       </section>
       <section class="">
         <p class="text-sm text-gray-300 mt-5 mb-3">
-          Showing 1 to 10 items of 11
+          Showing
+          {{ !employeeFilter ? 1 : employeeFilter.length === 0 ? 0 : 1 }} to
+          {{
+            employeeFilter
+              ? employeeFilter.length
+              : employee.length > 10
+              ? 10
+              : employee.length
+          }}
+          items of {{ employee.length }}
         </p>
         <div
           class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"
@@ -37,7 +178,7 @@
         >
           <section
             class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
-            v-for="(data, index) in new Array(10)"
+            v-for="(data, index) in employeeFilter || employee"
             :key="index"
           >
             <div
@@ -46,22 +187,35 @@
               <h2 class="md:text-base text-sm text-white">AR</h2>
             </div>
             <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
-              Nama Karyawan
+              {{ data.name }}
             </h1>
-            <p class="text-sm md:text-base text-gray-500">Perusahaan</p>
-            <p class="text-xs text-gray-400 my-2 md:my-0">Jabatan</p>
-            <p class="text-sm md:text-base text-gray-500">Id Employee</p>
+            <p class="text-sm md:text-base text-gray-500">{{ data.company }}</p>
+            <p class="text-xs text-gray-400 my-2 md:my-0">
+              {{ data.designation }}
+            </p>
+            <p class="text-sm md:text-base text-gray-500">{{ data.id }}</p>
             <Button
-              class="bg-blue-600 px-4 text-sm py-1 my-2 text-white rounded-full"
+              class="px-4 text-sm py-1 my-2 text-white rounded-full"
+              :class="
+                data.status === 'Permanent'
+                  ? 'bg-blue-500'
+                  : data.status === 'Probation'
+                  ? 'bg-orange-500'
+                  : 'bg-red-600'
+              "
             >
-              Permanent
+              {{ data.status }}
             </Button>
-            <p class="text-sm md:text-base text-gray-400">Departemen</p>
+            <p class="text-sm md:text-base text-gray-400">
+              {{ data.departement }}
+            </p>
             <p class="text-sm md:text-base text-gray-400 my-2 md:my-0">
-              Shift jam kerja
+              {{ data.workshifts }}
             </p>
             <p class="text-sm md:text-base text-blue-600 mt-3">
-              <router-link to="/employee/123">View Details</router-link>
+              <router-link :to="`/employee/${data.id}`"
+                >View Details</router-link
+              >
             </p>
             <Button
               class="absolute top-4 right-4 px-3 bg-blue-100 text-primary rounded-full"
@@ -135,7 +289,10 @@
           </section>
         </div>
 
-        <TableEmployee v-if="layoutData === 'table'" />
+        <TableEmployee
+          v-if="layoutData === 'table'"
+          :employee="!employeeFilter ? employee : employeeFilter"
+        />
       </section>
       <section class="flex justify-between my-6">
         <Pagination
@@ -154,6 +311,7 @@ import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
 import Pagination from "../../components/Paggination.vue";
 import TableEmployee from "../../components/TableEmployee.vue";
+import employee from "../../employee.json";
 
 export default {
   name: "EmployeeIndex",
@@ -167,9 +325,18 @@ export default {
   data() {
     return {
       activeDropdown: "",
+      employee: employee,
       currentPage: 1,
       contactEmployee: 0,
-      layoutData: "card",
+      layoutData: "table",
+      filter: {
+        employment_status: "",
+        designation: "",
+        departement: "",
+        workshifts: "",
+        role: "",
+      },
+      employeeFilter: false,
     };
   },
   methods: {
@@ -194,7 +361,22 @@ export default {
         this.contactEmployee = id;
       }
     },
+    handleFilter(status, designation, departement, workshifts, role) {
+      const filterConditions = [
+        { key: "status", value: status },
+        { key: "designation", value: designation },
+        { key: "departement", value: departement },
+        { key: "workshifts", value: workshifts },
+        { key: "role", value: role },
+      ];
+      const dataFilter = (employee) =>
+        filterConditions.every(
+          ({ key, value }) => value === "" || employee[key] === value
+        );
+      this.employeeFilter = this.employee.filter(dataFilter);
+    },
   },
+  computed: {},
 };
 </script>
 
