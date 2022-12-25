@@ -31,7 +31,7 @@
         :options="['Administration', 'IT']"
         label="Departement"
         position="bottom"
-        input_class="md:4/6 mt-2"
+        input_class="md:w-4/6 mt-2"
         :isOpen="show_select === 'departemen'"
         @handleShowSelect="show_select = 'departemen'"
       />
@@ -39,7 +39,7 @@
         :options="['Project Mananger', 'Developer']"
         label="Jabatan"
         position="bottom"
-        input_class="md:4/6 mt-2"
+        input_class="md:w-4/6 mt-2"
         :isOpen="show_select === 'jabatan'"
         @handleShowSelect="show_select = 'jabatan'"
       />
