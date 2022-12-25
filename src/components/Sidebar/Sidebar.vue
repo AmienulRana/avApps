@@ -22,6 +22,8 @@
           },
           { text: 'jabatan', to: '/organisasi/jabatan' },
         ]"
+        :isOpen="isOpen === 'organisasi'"
+        @click="handleToggleAccordion('organisasi')"
       />
       <SidebarMenuAccordion
         title="Karyawan"
@@ -35,6 +37,8 @@
           { text: 'Peringatan', to: '/designation' },
           { text: 'Mutasi / Resign', to: '/designation' },
         ]"
+        :isOpen="isOpen === 'karyawan'"
+        @click="handleToggleAccordion('karyawan')"
       />
       <SidebarMenuAccordion
         title="Pengajuan"
@@ -45,6 +49,8 @@
             to: '/leave-request',
           },
         ]"
+        :isOpen="isOpen === 'leave'"
+        @click="handleToggleAccordion('leave')"
       />
       <SidebarMenuAccordion
         title="Absensi"
@@ -55,6 +61,8 @@
             to: '/attedance/daily',
           },
         ]"
+        :isOpen="isOpen === 'absen'"
+        @click="handleToggleAccordion('absen')"
       />
       <SidebarMenuAccordion
         title="Payroll"
@@ -65,6 +73,8 @@
             to: '/payroll/nominatif',
           },
         ]"
+        :isOpen="isOpen === 'payroll'"
+        @click="handleToggleAccordion('payroll')"
       />
     </nav>
   </section>
@@ -76,6 +86,20 @@ import SidebarMenuAccordion from "./SidebarMenuAccordion.vue";
 export default {
   name: "SidebarComponent",
   components: { SidebarMenuAccordion },
+  data() {
+    return {
+      isOpen: "",
+    };
+  },
+  methods: {
+    handleToggleAccordion(value) {
+      if (value === this.isOpen) {
+        this.isOpen = "";
+      } else {
+        this.isOpen = value;
+      }
+    },
+  },
 };
 </script>
 
