@@ -2,22 +2,29 @@
   <div class="relative mx-2">
     <Button
       class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm"
-      :class="
+      :class="[
         backgroundTitle
           ? `${backgroundTitle} shadow-none`
-          : 'bg-white hover:bg-gray-50 hover:text-blue-800'
-      "
+          : 'bg-white hover:bg-gray-50 hover:text-blue-800',
+        selectedOption ? 'text-primary bg-gray-50' : '',
+      ]"
       @click.stop="$emit('update:activeDropdown', this.$event)"
     >
       {{ title }}
       <slot name="header"></slot>
+      <font-awesome-icon
+        icon="fa-xmark"
+        class="ml-3 text-primary"
+        v-if="selectedOption"
+        @click.stop="$emit('clearSelected', '')"
+      />
     </Button>
     <Transition
       enter-active-class="animated fadeInDown"
       leave-active-class="animated fadeOutUp"
     >
       <section
-        class="z-10 bg-white absolute top-full left-0 right-auto shadow-md max-h-80 custom-scrollbar w-72 mt-2.5"
+        class="z-10 bg-white absolute top-full overflow-y-auto left-0 right-auto shadow-md max-h-80 custom-scrollbar w-72 mt-2.5"
         v-if="showDropdown"
       >
         <div
@@ -33,6 +40,21 @@
             />
           </div>
         </div>
+        <ul>
+          <li
+            v-for="(option, index) in options"
+            :key="index"
+            @click="$emit('selected', option)"
+            class="px-4 py-2 hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
+            :class="option === selectedOption ? 'bg-primary text-white' : ''"
+          >
+            {{ option }}
+            <font-awesome-icon
+              icon="fa-check"
+              v-if="option === selectedOption"
+            />
+          </li>
+        </ul>
         <slot name="content"></slot>
       </section>
     </Transition>
@@ -54,8 +76,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    options: Array,
+    selectedOption: String,
   },
-  emits: ["update:activeDropdown"],
+  emits: ["update:activeDropdown", "selected", "clearSelected"],
+  data() {
+    return {};
+  },
 };
 </script>
 
