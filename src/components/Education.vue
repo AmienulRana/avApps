@@ -19,15 +19,7 @@
         Pengalaman
       </button>
       <span
-        class="
-          absolute
-          top-1/2
-          -translate-y-1/2
-          duration-300
-          rounded-md
-          w-1/2
-          bg-primary
-        "
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
@@ -64,12 +56,21 @@
         </tbody>
       </table>
       <section class="mt-8">
-        <Input label="Gelar" input_class="w-4/6" class="mb-2.5" />
-        <Input label="Nama Institusi" input_class="w-4/6" class="mb-2.5" />
-        <Input type="number" label="Hasil" input_class="w-4/6" class="mb-2.5" />
+        <Input label="Gelar" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+        <Input
+          label="Nama Institusi"
+          input_class="md:w-4/6 mt-2"
+          class="mb-2.5"
+        />
+        <Input
+          type="number"
+          label="Hasil"
+          input_class="md:w-4/6 mt-2"
+          class="mb-2.5"
+        />
         <Select
           label="Tahun"
-          input_class="w-4/6"
+          input_class="md:w-4/6 mt-2"
           class="mb-2.5"
           :options="['2022', '2021', '2020']"
         />
@@ -84,7 +85,7 @@
       <Experience />
     </section>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
@@ -123,5 +124,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
