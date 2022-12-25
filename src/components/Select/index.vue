@@ -8,6 +8,7 @@
     <select
       class="w-full border border-gray-600 focus:outline focus:outline-primary px-3 py-1.5 bg-white rounded-md text-sm"
       :class="input_class ? input_class : ''"
+      :disabled="disabled"
     >
       <option v-for="(option, i) in options" :key="i" class="px-2 py-1">
         {{ option }}
@@ -25,6 +26,7 @@ export default {
     input_class: String,
     label_class: String,
     options: Array,
+    disabled: Boolean,
   },
 };
 </script>
