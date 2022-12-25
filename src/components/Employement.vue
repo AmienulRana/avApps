@@ -1,10 +1,10 @@
 <template>
   <section class="px-4" @click="show_select = false">
     <section
-      class="bg-gray-100 mt-2 rounded-md px-4 py-1 flex justify-center relative"
+      class="bg-gray-100 mt-2 rounded-md md:px-4 px-2 py-1 flex md:justify-center justify-between relative"
     >
       <button
-        class="w-1/2 h-full py-2 z-10 duration-300 text-sm"
+        class="md:w-1/2 w-max h-full py-2 z-10 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, '1')"
         :class="tab_active === '1' ? 'text-white' : ''"
         ref="first_tab"
@@ -12,15 +12,15 @@
         Employment Data
       </button>
       <button
-        class="w-1/2 z-10 h-full py-2 duration-300 text-sm"
+        class="md:w-1/2 w-max z-10 h-full py-2 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, '2')"
         :class="tab_active === '2' ? 'text-white' : ''"
       >
         Employment Attadance Day
       </button>
       <span
-        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
-        :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md bg-primary"
+        :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;  width:${indicator_position.width}px;`"
       />
     </section>
 
@@ -140,6 +140,7 @@ export default {
       indicator_position: {
         left: 0,
         height: 0,
+        width: 0,
       },
       show_select: false,
       tab_active: "1",
@@ -163,7 +164,10 @@ export default {
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
       const buttonPosition = event.target.offsetLeft;
+      const buttonWidth = event.target.offsetWidth;
+
       this.indicator_position.left = buttonPosition;
+      this.indicator_position.width = buttonWidth;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
     },
@@ -175,9 +179,11 @@ export default {
   },
   mounted() {
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
+    const buttonWidth = this.$refs.first_tab?.offsetWidth;
     const buttonPosition = this.$refs.first_tab?.offsetLeft;
     this.indicator_position.left = buttonPosition;
     this.indicator_position.height = buttonHeight;
+    this.indicator_position.width = buttonWidth;
   },
 };
 </script>
