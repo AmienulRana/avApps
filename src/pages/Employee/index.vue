@@ -328,7 +328,7 @@ export default {
       employee: employee,
       currentPage: 1,
       contactEmployee: 0,
-      layoutData: "table",
+      layoutData: "card",
       filter: {
         employment_status: "",
         designation: "",
