@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr v-for="(employe, index) in employee" :key="index">
           <td class="flex items-center p-3 text-sm">
             <div
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
@@ -22,43 +22,45 @@
               <h2 class="text-md text-white">AR</h2>
             </div>
             <div class="ml-3.5">
-              <h1 class="text-md text-blue-400 mb-0">Nama Karyawan</h1>
-              <p class="text-sm text-gray-400">Jabatan</p>
+              <h1 class="text-md text-blue-400 mb-0">{{ employe.name }}</h1>
+              <p class="text-sm text-gray-400">{{ employe.designation }}</p>
             </div>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Employee Id</p>
+            <p class="text-sm text-gray-400">{{ employe.id }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Employee Status</p>
+            <p class="text-sm text-gray-400">{{ employe.status }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Departement</p>
+            <p class="text-sm text-gray-400">{{ employe.departement }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Work Shifts</p>
+            <p class="text-sm text-gray-400">{{ employe.workshifts }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Joining Date</p>
+            <p class="text-sm text-gray-400">
+              {{ !employe.joining ? "-" : !employe.joining }}
+            </p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm text-gray-400">Role</p>
+            <p class="text-sm text-gray-400">{{ employe.role }}</p>
           </td>
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click="showContactEmployee('tes')"
+              @click="showContactEmployee(employe.id)"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="contactEmployee === 'tes'"
+              v-if="contactEmployee === employe.id"
             >
               <ul>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     View details
@@ -66,7 +68,7 @@
                 </li>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     Edit
@@ -74,7 +76,7 @@
                 </li>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     Assign leave
@@ -82,7 +84,7 @@
                 </li>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     Edit salary
@@ -90,7 +92,7 @@
                 </li>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     Add joining date
@@ -98,19 +100,16 @@
                 </li>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
                   <router-link
-                    to="/detail-employee"
+                    :to="`/detail-employee/${employe.id}`"
                     class="cursor-pointer text-sm"
                   >
                     Terminate
                   </router-link>
                 </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Remove from employee list
-                  </router-link>
+                <li
+                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-red-600"
+                >
+                  Remove from employee list
                 </li>
               </ul>
             </div>
@@ -124,6 +123,23 @@
 <script>
 export default {
   name: "TableEmployee",
+  props: {
+    employee: Array,
+  },
+  data() {
+    return {
+      contactEmployee: null,
+    };
+  },
+  methods: {
+    showContactEmployee(id) {
+      if (this.contactEmployee === id) {
+        this.contactEmployee = false;
+      } else {
+        this.contactEmployee = id;
+      }
+    },
+  },
 };
 </script>
 
