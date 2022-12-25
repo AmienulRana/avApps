@@ -1,12 +1,12 @@
 <template>
-  <section class="min-h-screen bg-primary w-64 px-5 py-5">
+  <section class="min-h-screen bg-primary w-64 px-5 py-5 hidden md:block">
     <nav class="text-center">
       <h1 class="text-2xl text-white">Mufidah Group</h1>
       <span class="w-full h-px bg-white mt-5 opacity-80 block"></span>
 
       <section class="flex items-center text-white text-md my-4">
-        <div class="w-10 h-9 flex items-center justify-center bg-blue-800 mr-3">
-          <font-awesome-icon icon="fa-user-tie" class="text-lg" />
+        <div class="w-10 h-9 flex items-center justify-center bg-blue-500 mr-3">
+          <font-awesome-icon icon="fa-home-alt" class="text-lg" />
         </div>
         <p>Dashboard</p>
       </section>
