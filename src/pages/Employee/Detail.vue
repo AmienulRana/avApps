@@ -1,8 +1,8 @@
 <template>
   <LayoutAdmin>
-    <section class="px-8 mt-6 w-full">
+    <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between">
-        <h1 class="text-2xl">
+        <h1 class="text-lg md:text-2xl">
           Employee Detail |
           <router-link to="/employee" class="text-sm text-primary"
             >Back to all employee</router-link
@@ -11,18 +11,20 @@
       </section>
 
       <section
-        class="bg-white w-full grid shadow-md h-64 grid-cols-3 gap-3 py-3 my-6"
+        class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-3 gap-3 py-3 my-6"
       >
-        <section class="flex px-6 py-4">
+        <section
+          class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
+        >
           <img
             src="@/assets/profile.png"
             alt="profile image"
             class="w-32 h-32 rounded-full"
           />
-          <div class="ml-9">
-            <h1 class="text-xl">Nama Karyawan</h1>
+          <div class="md:ml-9 ml-0 text-center md:text-start">
+            <h1 class="md:text-xl mt-2 text-base">Nama Karyawan</h1>
             <Button
-              class="bg-blue-600 px-4 text-sm py-1 my-2 text-white rounded-full"
+              class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
             >
               Permanent</Button
             >
@@ -31,28 +33,61 @@
             <p class="text-sm text-gray-400">Departemen Manejer</p>
           </div>
         </section>
-        <section class="px-6 py-4 border-x h-max">
+        <section class="md:border-x h-max mb-6">
+          <section class="px-6 py-4">
+            <div class="flex items-center mb-5">
+              <font-awesome-icon
+                icon="fa-briefcase"
+                class="text-2xl w-10 text-primary"
+              />
+              <div class="ml-3">
+                <p class="text-sm text-gray-400">Departemen</p>
+                <p class="text-sm opacity-80">Account</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <font-awesome-icon
+                icon="fa-clock"
+                class="text-2xl w-10 text-primary"
+              />
+              <div class="ml-3">
+                <p class="text-sm text-gray-400">Work Shifts</p>
+                <p class="text-sm opacity-80">Regular work shifts</p>
+              </div>
+            </div>
+          </section>
+          <section class="px-6 md:py-4 md:hidden">
+            <div class="flex items-center mb-5">
+              <font-awesome-icon
+                icon="fa-dollar"
+                class="text-2xl w-10 text-primary"
+              />
+              <div class="ml-3">
+                <p class="text-sm text-gray-400">Salary</p>
+                <p class="text-sm opacity-80">
+                  $ 10,000
+                  <span class="text-primary text-xs">(current)</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <font-awesome-icon
+                icon="fa-calendar"
+                class="text-2xl w-10 text-primary"
+              />
+              <div class="ml-3">
+                <p class="text-sm text-gray-400">Joining date</p>
+                <p class="text-sm opacity-80">Not added yet</p>
+              </div>
+            </div>
+          </section>
+        </section>
+        <section class="px-6 md:py-4 hidden md:block">
           <div class="flex items-center mb-5">
             <font-awesome-icon
-              icon="fa-briefcase"
-              class="text-lg text-primary"
+              icon="fa-dollar"
+              class="text-2xl w-10 text-primary"
             />
-            <div class="ml-3">
-              <p class="text-sm text-gray-400">Departemen</p>
-              <p class="text-sm opacity-80">Account</p>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <font-awesome-icon icon="fa-clock" class="text-lg text-primary" />
-            <div class="ml-3">
-              <p class="text-sm text-gray-400">Work Shifts</p>
-              <p class="text-sm opacity-80">Regular work shifts</p>
-            </div>
-          </div>
-        </section>
-        <section class="px-6 py-4">
-          <div class="flex items-center mb-5">
-            <font-awesome-icon icon="fa-dollar" class="text-lg text-primary" />
             <div class="ml-3">
               <p class="text-sm text-gray-400">Salary</p>
               <p class="text-sm opacity-80">
@@ -64,7 +99,7 @@
           <div class="flex items-center">
             <font-awesome-icon
               icon="fa-calendar"
-              class="text-lg text-primary"
+              class="text-2xl w-10 text-primary"
             />
             <div class="ml-3">
               <p class="text-sm text-gray-400">Joining date</p>
@@ -73,8 +108,10 @@
           </div>
         </section>
       </section>
-      <section class="flex justify-between w-full h-auto mb-6">
-        <section class="w-1/5 bg-white text-center shadow-md">
+      <section
+        class="flex justify-between flex-col md:flex-row w-full h-auto mb-6"
+      >
+        <section class="md:w-1/5 bg-white text-center shadow-md mb-6">
           <font-awesome-icon
             icon="fa-user"
             class="text-2xl text-primary my-10"
@@ -116,7 +153,7 @@
             </li>
           </ul>
         </section>
-        <section class="w-3/4 bg-white">
+        <section class="md:w-3/4 w-full bg-white">
           <PersonalDetail v-if="sideTabActive === 'Personal Detail'" />
           <Employement v-if="sideTabActive === 'Employment'" />
           <Experience v-if="sideTabActive === 'Pendidikan dan Pengalaman'" />
@@ -179,15 +216,14 @@ export default {
         "Deducation dan Allowance",
       ],
       isOpenAccordion: false,
-      sideTabActive: "Deducation",
+      sideTabActive: "Personal Detail",
     };
   },
 };
 </script>
 
-<style scoped>
-</style>
-        <!-- <Accordion headerClass="bg-primary px-2 rounded-md w-max">
+<style scoped></style>
+<!-- <Accordion headerClass="bg-primary px-2 rounded-md w-max">
           <template v-slot:header>
             <Button class="py-1.5 mr-2"> Actions</Button>
           </template>

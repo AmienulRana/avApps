@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center mb-5">
+  <div class="md:flex justify-between items-center mb-5">
     <label
       :class="label_class ? label_class : 'w-1/5'"
       class="text-sm text-gray-400"
@@ -23,7 +23,7 @@
       >
         <section
           v-if="isOpen"
-          class="bg-white rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
+          class="bg-white overflow-y-auto rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
           :class="position === 'top' ? 'bottom-full' : 'top-full'"
         >
           <div class="px-2 mb-2">

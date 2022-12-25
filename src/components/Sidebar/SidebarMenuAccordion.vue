@@ -2,7 +2,7 @@
   <Accordion class="text-white text-md my-4">
     <template v-slot:header>
       <section class="flex items-center">
-        <div class="w-10 h-9 flex items-center justify-center bg-blue-800 mr-3">
+        <div class="w-10 h-9 flex items-center justify-center bg-blue-500 mr-3">
           <font-awesome-icon :icon="icon" class="text-lg" />
         </div>
         <p class="text-sm">{{ title }}</p>
@@ -29,5 +29,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

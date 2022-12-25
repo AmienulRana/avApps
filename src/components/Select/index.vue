@@ -1,7 +1,7 @@
 <template>
-  <div class="flex justify-between items-center mb-5">
+  <div class="md:flex justify-between items-center">
     <label
-      :class="label_class ? label_class : 'w-1/5 text-gray-400'"
+      :class="label_class ? label_class : 'md:w-1/5 text-gray-400'"
       class="text-sm"
       >{{ label }}</label
     >

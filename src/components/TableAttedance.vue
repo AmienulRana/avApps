@@ -21,15 +21,7 @@
         <tr class="border-b">
           <td class="flex items-center p-3 text-sm">
             <div
-              class="
-                w-12
-                h-12
-                flex
-                justify-center
-                items-center
-                rounded-full
-                bg-zinc-400
-              "
+              class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
               <h2 class="text-md text-white">IA</h2>
             </div>
@@ -53,16 +45,7 @@
           </td>
           <td class="p-3 text-sm">
             <p
-              class="
-                flex
-                py-1
-                text-white
-                w-24
-                items-center
-                justify-center
-                rounded-full
-                bg-coral
-              "
+              class="flex py-1 text-white w-24 items-center justify-center rounded-full bg-coral"
             >
               Early
             </p>
@@ -85,29 +68,13 @@
           </td>
           <td class="p-3 text-right relative">
             <Button
-              class="
-                p-3
-                shadow-none
-                rotate-90
-                hover:bg-blue-100
-                text-primary
-                rounded-full
-              "
+              class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
               @click="showContactEmployee('tes')"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
-              class="
-                text-left
-                absolute
-                -top-full
-                right-16
-                rounded-md
-                bg-white
-                shadow-md
-                md:w-max md:h-max
-              "
+              class="text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
               v-if="contactEmployee === 'tes'"
             >
               <ul>

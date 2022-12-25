@@ -19,15 +19,7 @@
         Employment Attadance Day
       </button>
       <span
-        class="
-          absolute
-          top-1/2
-          -translate-y-1/2
-          duration-300
-          rounded-md
-          w-1/2
-          bg-primary
-        "
+        class="absolute top-1/2 -translate-y-1/2 duration-300 rounded-md w-1/2 bg-primary"
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
@@ -68,9 +60,6 @@
           'Project Mananger',
           'Developer',
           'Project Mananger',
-          'Developer',
-          'Project Mananger',
-          'Developer',
         ]"
         label="Atasan Pertama"
         position="top"
@@ -84,9 +73,6 @@
           'Project Mananger',
           'Developer',
           'Project Mananger',
-          'Developer',
-          'Project Mananger',
-          'Developer',
         ]"
         label="Atasan Kedua"
         position="top"
@@ -110,12 +96,15 @@
       </div>
     </section>
     <section class="mt-4" v-if="tab_active === '2'">
-      <Select
-        label="Senin"
-        input_class="w-4/6"
-        class="mb-2.5"
-        :options="shift_data"
-      />
+      <div class="flex items-center mb-2.5">
+        <Select
+          label="Senin"
+          input_class="w-4/6"
+          class="w-full mr-6"
+          :options="shift_data"
+        />
+        <!-- <SwitchButton class="mt-0" /> -->
+      </div>
       <Select
         label="Selasa"
         input_class="w-4/6"
@@ -153,12 +142,13 @@
       </div>
     </section>
   </section>
-</template> 
+</template>
 
 <script>
 import Input from "./Input.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
+// import SwitchButton from "./SwitchButton.vue";
 
 export default {
   name: "PersonalDetail",
@@ -175,6 +165,7 @@ export default {
         "Shift 1 Stationery (08:00 am - 05:00pm)",
         "Shift 2 Stationery",
         "Shift 3 Stationery",
+        "Off day",
       ],
     };
   },
@@ -196,5 +187,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
