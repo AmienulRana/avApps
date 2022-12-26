@@ -14,18 +14,9 @@
         :checked="checked"
       />
       <div
-        class="
-          w-3
-          h-3
-          rounded-full
-          outline outline-offset-3
-          mr-2.5
-          box-border
-          duration-100
-          ease-in
-        "
+        class="w-3 h-3 rounded-full outline outline-offset-3 mr-2.5 box-border duration-100 ease-in"
       ></div>
-      <span class="value">{{ label }}</span>
+      <span class="value text-gray-400">{{ label }}</span>
     </label>
   </div>
 </template>
@@ -44,7 +35,7 @@ export default {
 
 <style scoped>
 .outline {
-  outline: 1px solid #019aff;
+  outline: 1px solid rgb(156 163 175);
 }
 .outline-offset-3 {
   outline-offset: 3px;
