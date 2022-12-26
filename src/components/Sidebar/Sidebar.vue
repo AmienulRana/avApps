@@ -29,13 +29,20 @@
       </section>
       <template v-for="(menu, i) in menuSidebar" :key="i">
         <Accordion
-          class="text-white text-md my-4 m-auto"
+          class="text-white text-md my-4 m-auto relative"
           @click:header="handleToggleAccordion(menu.title)"
           :isOpen="isOpen === menu.title"
           :icon="false"
+          :contentClass="{
+            'absolute top-0 left-16 z-10 min-w-max':
+              this.modeSidebar === 'icon',
+          }"
         >
           <template v-slot:header>
-            <section class="flex items-center justify-between w-full">
+            <section
+              class="flex items-center justify-between w-full"
+              @mouseenter="handleDisplayAccordion(menu.title)"
+            >
               <div class="flex items-center">
                 <div
                   class="w-10 h-9 flex items-center justify-center bg-blue-500 mr-3"
@@ -60,16 +67,26 @@
             </section>
           </template>
           <template v-slot:content>
-            <p
-              class="my-3 text-white list-disc flex items-center"
-              v-for="(submenu, index) in menu.contents"
-              :key="index"
+            <section
+              @mouseleave="this.modeSidebar === 'icon' ? (isOpen = '') : ''"
             >
-              <span class="block bg-white rounded-full mr-2" />
-              <router-link :to="`${submenu.to}`">{{
-                submenu.text
-              }}</router-link>
-            </p>
+              <p
+                class="text-sm duration-300"
+                :class="this.accordionPosition === 'side' ? 'block' : 'hidden'"
+              >
+                {{ menu.title }}
+              </p>
+              <p
+                class="my-3 text-white list-disc flex items-center"
+                v-for="(submenu, index) in menu.contents"
+                :key="index"
+              >
+                <span class="block bg-white rounded-full mr-2" />
+                <router-link :to="`${submenu.to}`">{{
+                  submenu.text
+                }}</router-link>
+              </p>
+            </section>
           </template>
         </Accordion>
       </template>
@@ -89,6 +106,7 @@ export default {
   data() {
     return {
       isOpen: "",
+      accordionPosition: this.modeSidebar === "icon" ? "side" : "down",
       menuSidebar: [
         {
           title: "Departement",
@@ -140,12 +158,25 @@ export default {
   },
   methods: {
     handleToggleAccordion(value) {
-      console.log(this.$route);
       if (value === this.isOpen) {
         this.isOpen = "";
       } else {
         this.isOpen = value;
       }
+    },
+    handleDisplayAccordion(value) {
+      if (this.modeSidebar === "icon") {
+        this.accordionPosition = "side";
+        this.isOpen = value;
+      }
+    },
+    handleCloseAccordion() {
+      // this.modeSidebar === 'icon' ? (isOpen = '') : ''
+      // console.log(event);
+      // if (this.modeSidebar === "icon") {
+      //   this.accordionPosition = "side";
+      //   this.isOpen = value;
+      // }
     },
   },
 };
