@@ -10,11 +10,11 @@
     </template>
     <template v-slot:content>
       <p
-        class="mt-2 text-gray-300 hover:text-white list-disc flex items-center"
+        class="mt-2 text-white list-disc flex items-center"
         v-for="(content, index) in contents"
         :key="index"
       >
-        <span class="block bg-gray-400 rounded-full mr-2" />
+        <span class="block bg-white rounded-full mr-2" />
         <router-link :to="`${content.to}`">{{ content.text }}</router-link>
       </p>
     </template>
@@ -35,14 +35,17 @@ export default {
 </script>
 
 <style scoped>
-p.text-gray-300 {
+p.text-white {
   font-size: 12.5px;
 }
-p.text-gray-300:hover > span {
-  background-color: white !important;
+p.text-white:hover {
+  color: rgb(89, 213, 255);
+}
+p.text-white:hover > span {
+  background-color: rgb(89, 213, 255);
 }
 p > span {
-  min-width: 6px;
-  min-height: 6px;
+  min-width: 4px;
+  min-height: 4px;
 }
 </style>

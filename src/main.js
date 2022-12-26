@@ -32,6 +32,7 @@ import {
   faFile,
   faHomeAlt,
   faCheck,
+  faGraduationCap,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -58,7 +59,9 @@ library.add(
   faTrashAlt,
   faFile,
   faHomeAlt,
-  faCheck
+  faCheck,
+  faGraduationCap,
+  faCreditCard
 );
 
 createApp(App)
