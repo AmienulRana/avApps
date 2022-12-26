@@ -4,7 +4,7 @@
     :class="modeSidebar === 'icon' ? 'w-20' : 'w-64'"
   >
     <nav class="text-center m-auto">
-      <h1 class="text-2xl text-white text-center duration-300 h-8">
+      <h1 class="text-2xl text-white text-center duration-300 h-8 truncate">
         M<span :class="modeSidebar === 'icon' ? 'scale-0 hidden' : ''"
           >ufidah Group</span
         >
