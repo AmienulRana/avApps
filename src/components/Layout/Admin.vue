@@ -1,8 +1,21 @@
 <template>
   <section class="flex bg-primary h-auto">
-    <Sidebar />
+    <Sidebar :modeSidebar="modeSidebar" />
     <main class="relative w-full min-h-screen bg-whitesmoke overflow-x-hidden">
-      <Navbar />
+      <section class="bg-white w-full px-8 py-6 shadow-md flex justify-between">
+        <font-awesome-icon
+          icon="fa-bars"
+          class="w-6 h-6 text-primary"
+          @click="modeSidebar = modeSidebar === 'icon' ? 'full' : 'icon'"
+        />
+        <div class="flex">
+          <font-awesome-icon
+            icon="fa-expand"
+            class="w-6 h-6 text-primary mx-2"
+          />
+          <font-awesome-icon icon="fa-moon" class="w-6 h-6 text-primary mx-2" />
+        </div>
+      </section>
       <slot />
     </main>
   </section>
@@ -10,10 +23,14 @@
 
 <script>
 import Sidebar from "../Sidebar/Sidebar.vue";
-import Navbar from "../Navbar.vue";
 export default {
   name: "LayoutAdmin",
-  components: { Sidebar, Navbar },
+  components: { Sidebar },
+  data() {
+    return {
+      modeSidebar: "full",
+    };
+  },
 };
 </script>
 
