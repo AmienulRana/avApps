@@ -10,7 +10,7 @@
     </template>
     <template v-slot:content>
       <p
-        class="mt-2 text-white list-disc flex items-center"
+        class="my-3 text-white list-disc flex items-center"
         v-for="(content, index) in contents"
         :key="index"
       >
@@ -45,7 +45,7 @@ p.text-white:hover > span {
   background-color: rgb(89, 213, 255);
 }
 p > span {
-  min-width: 4px;
-  min-height: 4px;
+  min-width: 5px;
+  min-height: 5px;
 }
 </style>
