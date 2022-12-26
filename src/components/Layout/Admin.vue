@@ -1,6 +1,8 @@
 <template>
   <section class="flex bg-primary h-auto">
-    <Sidebar :modeSidebar="modeSidebar" />
+    <KeepAlive>
+      <Sidebar :modeSidebar="modeSidebar" />
+    </KeepAlive>
     <main class="relative w-full min-h-screen bg-whitesmoke overflow-x-hidden">
       <section class="bg-white w-full px-8 py-6 shadow-md flex justify-between">
         <font-awesome-icon
