@@ -34,7 +34,7 @@
           :isOpen="isOpen === menu.title"
           :icon="false"
           :contentClass="{
-            'absolute top-0 left-16 z-10 min-w-max':
+            'absolute top-0 z-10 w-60 accordion-content px-6 bg-primary':
               this.modeSidebar === 'icon',
           }"
         >
@@ -67,12 +67,10 @@
             </section>
           </template>
           <template v-slot:content>
-            <section
-              @mouseleave="this.modeSidebar === 'icon' ? (isOpen = '') : ''"
-            >
+            <section @mouseleave="modeSidebar === 'icon' ? (isOpen = '') : ''">
               <p
                 class="text-sm duration-300"
-                :class="this.accordionPosition === 'side' ? 'block' : 'hidden'"
+                :class="modeSidebar === 'icon' ? 'block' : 'hidden'"
               >
                 {{ menu.title }}
               </p>
