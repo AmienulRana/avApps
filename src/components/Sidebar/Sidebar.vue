@@ -12,89 +12,104 @@
           <p class="text-sm">Dashboard</p>
         </router-link>
       </section>
-      <SidebarMenuAccordion
-        title="Organisasi"
-        icon="fa-user-tie"
-        :contents="[
-          {
-            text: 'departemen',
-            to: '/organisasi/departemen',
-          },
-          { text: 'jabatan', to: '/organisasi/jabatan' },
-        ]"
-        :isOpen="isOpen === 'organisasi'"
-        @click="handleToggleAccordion('organisasi')"
-      />
-      <SidebarMenuAccordion
-        title="Karyawan"
-        icon="fa-users"
-        :contents="[
-          {
-            text: 'Data karyawan',
-            to: '/employee',
-          },
-          { text: 'Status Karyawan', to: '/employee-status' },
-          { text: 'Peringatan', to: '/designation' },
-          { text: 'Mutasi / Resign', to: '/designation' },
-        ]"
-        :isOpen="isOpen === 'karyawan'"
-        @click="handleToggleAccordion('karyawan')"
-      />
-      <SidebarMenuAccordion
-        title="Pengajuan"
-        icon="fa-clock"
-        :contents="[
-          { text: 'Leave Request', to: '/leave-request' },
-          { text: 'Overtime Request', to: '/overtime-request' },
-          { text: 'Outside Assignment', to: '/outsign-assignment' },
-          { text: 'Change Work Shift', to: '/change-shift' },
-          { text: 'Change Off Day', to: '/change-off' },
-          { text: 'Need Approval', to: '/need-approval' },
-        ]"
-        :isOpen="isOpen === 'leave'"
-        @click="handleToggleAccordion('leave')"
-      />
-      <SidebarMenuAccordion
-        title="Absensi"
-        icon="fa-calendar"
-        :contents="[
-          {
-            text: 'Daily Log Absensi',
-            to: '/attedance/daily',
-          },
-        ]"
-        :isOpen="isOpen === 'absen'"
-        @click="handleToggleAccordion('absen')"
-      />
-      <SidebarMenuAccordion
-        title="Payroll"
-        icon="fa-credit-card"
-        :contents="[
-          {
-            text: 'Daftar Nominatif Penerima gaji',
-            to: '/payroll/nominatif',
-          },
-        ]"
-        :isOpen="isOpen === 'payroll'"
-        @click="handleToggleAccordion('payroll')"
-      />
+      <template v-for="(menu, i) in menuSidebar" :key="i">
+        <Accordion
+          class="text-white text-md my-4"
+          @click:header="handleToggleAccordion(menu.title)"
+          :isOpen="isOpen === menu.title"
+        >
+          <template v-slot:header>
+            <section class="flex items-center">
+              <div
+                class="w-10 h-9 flex items-center justify-center bg-blue-500 mr-3"
+              >
+                <font-awesome-icon :icon="menu.icon" class="text-lg" />
+              </div>
+              <p class="text-sm">{{ menu.title }}</p>
+            </section>
+          </template>
+          <template v-slot:content>
+            <p
+              class="my-3 text-white list-disc flex items-center"
+              v-for="(submenu, index) in menu.contents"
+              :key="index"
+            >
+              <span class="block bg-white rounded-full mr-2" />
+              <router-link :to="`${submenu.to}`">{{
+                submenu.text
+              }}</router-link>
+            </p>
+          </template>
+        </Accordion>
+      </template>
     </nav>
   </section>
 </template>
 
 <script>
-import SidebarMenuAccordion from "./SidebarMenuAccordion.vue";
+import Accordion from "../Accordion.vue";
 
 export default {
   name: "SidebarComponent",
-  components: { SidebarMenuAccordion },
+  props: {
+    modeSidebar: String,
+  },
+  components: { Accordion },
   data() {
     return {
       isOpen: "",
+      menuSidebar: [
+        {
+          title: "Departement",
+          icon: "fa-user-tie",
+          contents: [
+            { text: "departemen", to: "/organisasi/departemen" },
+            { text: "jabatan", to: "/organisasi/jabatan" },
+          ],
+        },
+        {
+          title: "Karyawan",
+          icon: "fa-users",
+          contents: [
+            { text: "Data karyawan", to: "/employee" },
+            { text: "Status Karyawan", to: "/employee-status" },
+            { text: "Peringatan", to: "/designation" },
+            { text: "Mutasi / Resign", to: "/designation" },
+          ],
+        },
+        {
+          title: "Pengajuan",
+          icon: "fa-clock",
+          contents: [
+            { text: "Leave Request", to: "/leave-request" },
+            { text: "Overtime Request", to: "/overtime-request" },
+            { text: "Outside Assignment", to: "/outsign-assignment" },
+            { text: "Change Work Shift", to: "/change-shift" },
+            { text: "Change Off Day", to: "/change-off" },
+            { text: "Need Approval", to: "/need-approval" },
+          ],
+        },
+        {
+          title: "Absensi",
+          icon: "fa-calendar",
+          contents: [{ text: "Daily Log Absensi", to: "/attedance/daily" }],
+        },
+        {
+          title: "Payroll",
+          icon: "fa-credit-card",
+          contents: [
+            {
+              text: "Daftar Nominatif Penerima gaji",
+              to: "/payroll/nominatif",
+            },
+          ],
+        },
+      ],
     };
   },
   methods: {
     handleToggleAccordion(value) {
+      console.log(this.$route);
       if (value === this.isOpen) {
         this.isOpen = "";
       } else {
@@ -105,4 +120,18 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+p.text-white {
+  font-size: 12.5px;
+}
+p.text-white:hover {
+  color: rgb(89, 213, 255);
+}
+p.text-white:hover > span {
+  background-color: rgb(89, 213, 255);
+}
+p > span {
+  min-width: 5px;
+  min-height: 5px;
+}
+</style>
