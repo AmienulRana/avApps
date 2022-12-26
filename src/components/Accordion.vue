@@ -3,6 +3,7 @@
     <section
       class="flex justify-between items-center cursor-pointer"
       :class="headerClass"
+      @click="$emit('click:header')"
     >
       <slot name="header"></slot>
       <font-awesome-icon
@@ -29,6 +30,7 @@
 export default {
   name: "AccordionComponent",
   props: { headerClass: String, isOpen: Boolean },
+  emits: ["click:header"],
   data() {
     return {
       position: {
