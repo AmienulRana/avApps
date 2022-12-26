@@ -8,7 +8,8 @@
     <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
-        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border border-gray-400 rounded-md"
+        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border rounded-md"
+        :class="{ 'border-primary': isOpen }"
       >
         <p></p>
         <font-awesome-icon
@@ -23,13 +24,13 @@
       >
         <section
           v-if="isOpen"
-          class="bg-white overflow-y-auto rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
+          class="bg-white overflow-y-auto custom-scrollbar rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
           :class="position === 'top' ? 'bottom-full' : 'top-full'"
         >
           <div class="px-2 mb-2">
             <input
               type="text"
-              class="w-full border border-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+              class="w-full border focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
               @click.stop
               @input="handleSearchOption"
             />
