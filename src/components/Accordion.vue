@@ -7,29 +7,31 @@
     >
       <slot name="header"></slot>
       <font-awesome-icon
+        v-if="icon"
         icon="fa-chevron-up w-6 h-6"
         class="duration-500 ease-in-out"
-        :class="isOpen ? '' : 'rotate-180'"
+        :class="[isOpen ? '' : 'rotate-180', iconClass]"
       />
     </section>
-    <!-- <Transition
-      enter-active-class="animated fadeInDown"
-      leave-active-class="animated fadeOutUp"
-    > -->
     <section
       v-if="isOpen"
       class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
+      :class="contentClass"
     >
       <slot name="content"> </slot>
     </section>
-    <!-- </Transition> -->
   </section>
 </template>
 
 <script>
 export default {
   name: "AccordionComponent",
-  props: { headerClass: String, isOpen: Boolean },
+  props: {
+    headerClass: String,
+    isOpen: Boolean,
+    contentClass: String,
+    icon: { type: Boolean, default: true },
+  },
   emits: ["click:header"],
   data() {
     return {
