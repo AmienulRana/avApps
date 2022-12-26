@@ -6,7 +6,7 @@
         <font-awesome-icon
           icon="fa-bars"
           class="w-6 h-6 text-primary"
-          @click="modeSidebar = modeSidebar === 'icon' ? 'full' : 'icon'"
+          @click="handleChangeSidebar"
         />
         <div class="flex">
           <font-awesome-icon
@@ -30,6 +30,16 @@ export default {
     return {
       modeSidebar: "full",
     };
+  },
+  methods: {
+    handleChangeSidebar() {
+      this.modeSidebar = this.modeSidebar === "icon" ? "full" : "icon";
+      localStorage.setItem("modeSidebar", this.modeSidebar);
+    },
+  },
+  mounted() {
+    const modeSidebar = localStorage.getItem("modeSidebar");
+    this.modeSidebar = modeSidebar;
   },
 };
 </script>
