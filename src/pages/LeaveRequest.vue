@@ -54,13 +54,6 @@
         </p>
         <TableLeaveRequest />
       </section>
-      <section class="flex justify-between my-6">
-        <Pagination
-          :total-pages="10"
-          :current-page="currentPage"
-          @page-change="changePage"
-        ></Pagination>
-      </section>
     </section>
   </LayoutAdmin>
   <Modal
@@ -71,12 +64,12 @@
     <section @click="modal.showSelect = false">
       <SelectSearch
         label="Employee"
-        :options="['Farhan']"
+        :options="getAllEmployee"
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
         input_class="w-full mt-2"
-        label_class="w-full"
+        label_class="w-full text-black"
       />
       <Select
         class="flex-col mt-4"
@@ -113,6 +106,14 @@
       <label class="text-sm">Reason Note</label>
       <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
       </textarea>
+      <section class="mt-6">
+        <p class="text-sm">Attachment</p>
+        <section
+          class="w-full border preview-file mt-2 border-dashed border-primary"
+        >
+          <input type="file" multiple class="hidden" id="file" />
+        </section>
+      </section>
     </section>
     <template #footer>
       <section class="flex w-52 justify-between">
@@ -131,13 +132,13 @@
 import LayoutAdmin from "../components/Layout/Admin.vue";
 import Button from "../components/Button.vue";
 import Dropdown from "../components/Dropdown.vue";
-import Pagination from "../components/Paggination.vue";
 import TableLeaveRequest from "../components/TableLeaveRequest.vue";
 import Modal from "../components/Modal.vue";
 import Select from "@/components/Select";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
+import employee from "@/employee.json";
 
 export default {
   name: "EmployeeIndex",
@@ -146,7 +147,6 @@ export default {
     Button,
     TableLeaveRequest,
     Dropdown,
-    Pagination,
     SelectSearch,
     Modal,
     Select,
@@ -159,8 +159,9 @@ export default {
       currentPage: 1,
       contactEmployee: 0,
       layoutData: "card",
+      employee: employee,
       modal: {
-        showModal: false,
+        showModal: true,
         showSelect: false,
       },
     };
@@ -188,7 +189,16 @@ export default {
       }
     },
   },
+  computed: {
+    getAllEmployee() {
+      return this.employee.map((employe) => employe.name);
+    },
+  },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.preview-file {
+  min-height: 300px;
+}
+</style>
