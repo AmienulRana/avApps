@@ -31,6 +31,7 @@
             <input
               type="text"
               class="w-full border focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+              v-model="query"
               @click.stop
               @input="handleSearchOption"
             />
@@ -38,7 +39,7 @@
           <div class="custom-scrollbar max-h-36">
             <p
               class="p-2 cursor-pointer hover:bg-primary hover:text-white"
-              v-for="(option, i) in options"
+              v-for="(option, i) in searchResult"
               :key="i"
             >
               {{ option }}
@@ -68,28 +69,19 @@ export default {
   data() {
     return {
       query: "",
-      search_options: [],
+      searchResult: this.options,
     };
   },
   methods: {
-    handleSearchOption(e) {
-      this.query = e.target.value;
+    handleSearchOption() {
       if (this.query.length >= 1) {
-        const data = this?.options;
-
-        const result = data.filter((item) => item.includes("t"));
-        // const result = this.options.filter((option) =>
-        //   option.includes(this.query.toLowerCase())
-        // );
-        console.log(result);
-        // this.search_options = result;
+        const result = this.options.filter((option) =>
+          option.toLowerCase().includes(this.query.toLowerCase())
+        );
+        this.searchResult = result;
       } else {
-        this.search_options = this.options;
+        this.searchResult = this.options;
       }
-      //   const search = this.options.filter((item) =>
-      //     item.toLowerCase().includes(this.query.toLowerCase())
-      //   );
-      //   console.log(search);
     },
   },
 };
