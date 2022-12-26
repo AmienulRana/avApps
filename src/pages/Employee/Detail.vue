@@ -121,12 +121,13 @@
               class="cursor-pointer text-sm px-4 mb-4 truncate w-full"
               v-for="(title, i) in titleTabs"
               :class="
-                sideTabActive === title ? 'text-primary' : 'text-gray-400'
+                sideTabActive === title.name ? 'text-primary' : 'text-gray-400'
               "
-              @click="sideTabActive = title"
+              @click="sideTabActive = title.name"
               :key="i"
             >
-              {{ title }}
+              <font-awesome-icon :icon="title.icon" class="w-4 h-4 mr-2" />
+              {{ title.name }}
             </li>
           </ul>
         </section>
@@ -177,12 +178,12 @@ export default {
         { text: "Beneficiary badge", to: "/payroll-beneficiary" },
       ],
       titleTabs: [
-        "Personal Detail",
-        "Employment",
-        "Pendidikan dan Pengalaman",
-        "Rekening",
-        "Payroll",
-        "Cuti",
+        { name: "Personal Detail", icon: "fa-user" },
+        { name: "Employment", icon: "fa-user-tie" },
+        { name: "Pendidikan dan Pengalaman", icon: "fa-graduation-cap" },
+        { name: "Rekening", icon: "fa-credit-card" },
+        { name: "Payroll", icon: "fa-dollar" },
+        { name: "Cuti", icon: "fa-calendar" },
       ],
       isOpenAccordion: false,
       sideTabActive: "Personal Detail",
