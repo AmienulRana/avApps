@@ -8,13 +8,13 @@
     <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
-        class="flex justify-between items-center cursor-pointer px-2 py-1.5 border rounded-md"
+        class="flex justify-between items-center cursor-pointer px-4 py-1.5 border rounded-md"
         :class="{ 'border-primary': isOpen }"
       >
-        <p></p>
+        <p>{{ selectedOption }}</p>
         <font-awesome-icon
-          icon="fa-chevron-up w-6 h-6"
-          class="duration-500 ease-in-out"
+          icon="fa-chevron-up"
+          class="duration-500 w-3 h-3 ease-in-out"
           :class="isOpen ? '' : 'rotate-180'"
         />
       </section>
@@ -38,9 +38,11 @@
           </div>
           <div class="custom-scrollbar max-h-36">
             <p
-              class="p-2 cursor-pointer hover:bg-primary hover:text-white"
               v-for="(option, i) in searchResult"
               :key="i"
+              @click="$emit('selected', option)"
+              class="px-4 py-2 text-gray-400 text-sm hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
+              :class="option === selectedOption ? 'bg-primary text-white' : ''"
             >
               {{ option }}
             </p>
@@ -60,12 +62,13 @@ export default {
     input_class: String,
     label_class: String,
     options: Array,
+    selectedOption: String,
     position: {
       type: String,
       default: "bottom",
     },
   },
-  emits: ["handleShowSelect"],
+  emits: ["handleShowSelect", "selected"],
   data() {
     return {
       query: "",
