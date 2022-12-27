@@ -69,13 +69,11 @@
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click="showContactEmployee('tes')"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="contactEmployee === 'tes'"
             >
               <ul>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">

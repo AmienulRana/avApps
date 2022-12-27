@@ -21,3 +21,7 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #7698ff;
 }
+.accordion-content {
+  left: 60px !important;
+  border-radius: 0 5px 5px 0;
+}

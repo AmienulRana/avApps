@@ -54,13 +54,6 @@
         </p>
         <TableLeaveRequest />
       </section>
-      <section class="flex justify-between my-6">
-        <Pagination
-          :total-pages="10"
-          :current-page="currentPage"
-          @page-change="changePage"
-        ></Pagination>
-      </section>
     </section>
   </LayoutAdmin>
   <Modal
@@ -71,13 +64,55 @@
     <section @click="modal.showSelect = false">
       <SelectSearch
         label="Employee"
-        :options="['Farhan']"
+        :options="getAllEmployee"
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
         input_class="w-full mt-2"
-        label_class="w-full"
+        label_class="w-full text-black"
+        :selectedOption="selectedOption"
+        @selected="selectedOption = $event"
       />
+      <section>
+        <p class="text-sm">
+          Leave Ability
+          <span
+            class="text-primary ml-2 cursor-pointer"
+            @click="
+              modal.showAbility = modal.showAbility === 'hide' ? 'show' : 'hide'
+            "
+          >
+            {{ modal.showAbility === "hide" ? "Show" : "Hide" }}
+          </span>
+        </p>
+        <section
+          class="bg-amber-50 mt-4 px-8 py-5 grid grid-cols-2 rounded-md"
+          v-if="modal.showAbility === 'show'"
+        >
+          <div>
+            <p class="text-sm text-gray-400">
+              Cuti Tahunan (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400 my-2">
+              Cuti Menikah (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400">
+              Izin Sakit (Paid): <span class="text-black">0</span>
+            </p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">
+              Izin Sakit (Unpaid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400 my-2">
+              Izin Khusus (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400">
+              Izin Khusus (Unpaid): <span class="text-black">0</span>
+            </p>
+          </div>
+        </section>
+      </section>
       <Select
         class="flex-col mt-4"
         input_class="w-full mt-2"
@@ -97,9 +132,22 @@
           Age <span class="text-gray-400">(Leave duration)</span>
         </p>
         <div class="flex md:px-16">
-          <Radio label="Single Day" />
-          <Radio label="Multi Day" class="mx-8" />
-          <Radio label="Half Day" />
+          <Radio
+            label="Single Day"
+            @change="data.ageDuration = 'Single Day'"
+            :modelValue="data.ageDuration"
+          />
+          <Radio
+            label="Multi Day"
+            class="mx-8"
+            @change="data.ageDuration = 'Multi Day'"
+            :modelValue="data.ageDuration"
+          />
+          <Radio
+            label="Half Day"
+            @change="data.ageDuration = 'Half Day'"
+            :modelValue="data.ageDuration"
+          />
           <Radio label="Hours" class="mx-8" />
         </div>
       </section>
@@ -109,10 +157,58 @@
         label="Enter Date"
         label_class="w-full"
         input_class="mt-2"
+        v-if="data.ageDuration === 'Single Day'"
       />
+      <section
+        class="grid grid-cols-2 gap-4"
+        v-if="data.ageDuration === 'Multi Day'"
+      >
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="Start date"
+          label_class="w-full"
+          input_class="mt-2"
+        />
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="End Date"
+          label_class="w-full"
+          input_class="mt-2"
+        />
+      </section>
+      <section v-if="data.ageDuration === 'Half Day'" class="my-4">
+        <p class="text-sm mb-2">Date</p>
+        <div class="grid grid-cols-2 gap-4 items-center">
+          <Input type="date" class="flex-col mb-0" label_class="w-full" />
+          <div class="flex">
+            <Radio
+              label="First half"
+              class="mx-8 my-0"
+              @change="data.ageDuration = 'Multi Day'"
+              :modelValue="data.ageDuration"
+            />
+            <Radio
+              label="Last half"
+              @change="data.ageDuration = 'Half Day'"
+              :modelValue="data.ageDuration"
+              class="my-0"
+            />
+          </div>
+        </div>
+      </section>
       <label class="text-sm">Reason Note</label>
       <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
       </textarea>
+      <section class="mt-6">
+        <p class="text-sm">Attachment</p>
+        <section
+          class="w-full border preview-file mt-2 border-dashed border-primary"
+        >
+          <input type="file" multiple class="hidden" id="file" />
+        </section>
+      </section>
     </section>
     <template #footer>
       <section class="flex w-52 justify-between">
@@ -131,13 +227,13 @@
 import LayoutAdmin from "../components/Layout/Admin.vue";
 import Button from "../components/Button.vue";
 import Dropdown from "../components/Dropdown.vue";
-import Pagination from "../components/Paggination.vue";
 import TableLeaveRequest from "../components/TableLeaveRequest.vue";
 import Modal from "../components/Modal.vue";
 import Select from "@/components/Select";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
+import employee from "@/employee.json";
 
 export default {
   name: "EmployeeIndex",
@@ -146,7 +242,6 @@ export default {
     Button,
     TableLeaveRequest,
     Dropdown,
-    Pagination,
     SelectSearch,
     Modal,
     Select,
@@ -156,12 +251,16 @@ export default {
   data() {
     return {
       activeDropdown: "",
-      currentPage: 1,
-      contactEmployee: 0,
       layoutData: "card",
+      employee: employee,
+      selectedOption: "",
       modal: {
-        showModal: false,
+        showModal: true,
         showSelect: false,
+        showAbility: "hide",
+      },
+      data: {
+        ageDuration: "Single Day",
       },
     };
   },
@@ -188,7 +287,16 @@ export default {
       }
     },
   },
+  computed: {
+    getAllEmployee() {
+      return this.employee.map((employe) => employe.name);
+    },
+  },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.preview-file {
+  min-height: 300px;
+}
+</style>
