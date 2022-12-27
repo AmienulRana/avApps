@@ -70,7 +70,49 @@
         class="flex-col"
         input_class="w-full mt-2"
         label_class="w-full text-black"
+        :selectedOption="selectedOption"
+        @selected="selectedOption = $event"
       />
+      <section>
+        <p class="text-sm">
+          Leave Ability
+          <span
+            class="text-primary ml-2 cursor-pointer"
+            @click="
+              modal.showAbility = modal.showAbility === 'hide' ? 'show' : 'hide'
+            "
+          >
+            {{ modal.showAbility === "hide" ? "Show" : "Hide" }}
+          </span>
+        </p>
+        <section
+          class="bg-amber-50 mt-4 px-8 py-5 grid grid-cols-2 rounded-md"
+          v-if="modal.showAbility === 'show'"
+        >
+          <div>
+            <p class="text-sm text-gray-400">
+              Cuti Tahunan (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400 my-2">
+              Cuti Menikah (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400">
+              Izin Sakit (Paid): <span class="text-black">0</span>
+            </p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">
+              Izin Sakit (Unpaid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400 my-2">
+              Izin Khusus (Paid): <span class="text-black">0</span>
+            </p>
+            <p class="text-sm text-gray-400">
+              Izin Khusus (Unpaid): <span class="text-black">0</span>
+            </p>
+          </div>
+        </section>
+      </section>
       <Select
         class="flex-col mt-4"
         input_class="w-full mt-2"
@@ -156,13 +198,13 @@ export default {
   data() {
     return {
       activeDropdown: "",
-      currentPage: 1,
-      contactEmployee: 0,
       layoutData: "card",
       employee: employee,
+      selectedOption: "",
       modal: {
-        showModal: true,
+        showModal: false,
         showSelect: false,
+        showAbility: "hide",
       },
     };
   },
