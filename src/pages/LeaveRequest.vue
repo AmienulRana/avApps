@@ -132,9 +132,22 @@
           Age <span class="text-gray-400">(Leave duration)</span>
         </p>
         <div class="flex md:px-16">
-          <Radio label="Single Day" />
-          <Radio label="Multi Day" class="mx-8" />
-          <Radio label="Half Day" />
+          <Radio
+            label="Single Day"
+            @change="data.ageDuration = 'Single Day'"
+            :modelValue="data.ageDuration"
+          />
+          <Radio
+            label="Multi Day"
+            class="mx-8"
+            @change="data.ageDuration = 'Multi Day'"
+            :modelValue="data.ageDuration"
+          />
+          <Radio
+            label="Half Day"
+            @change="data.ageDuration = 'Half Day'"
+            :modelValue="data.ageDuration"
+          />
           <Radio label="Hours" class="mx-8" />
         </div>
       </section>
@@ -144,7 +157,47 @@
         label="Enter Date"
         label_class="w-full"
         input_class="mt-2"
+        v-if="data.ageDuration === 'Single Day'"
       />
+      <section
+        class="grid grid-cols-2 gap-4"
+        v-if="data.ageDuration === 'Multi Day'"
+      >
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="Start date"
+          label_class="w-full"
+          input_class="mt-2"
+        />
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="End Date"
+          label_class="w-full"
+          input_class="mt-2"
+        />
+      </section>
+      <section v-if="data.ageDuration === 'Half Day'" class="my-4">
+        <p class="text-sm mb-2">Date</p>
+        <div class="grid grid-cols-2 gap-4 items-center">
+          <Input type="date" class="flex-col mb-0" label_class="w-full" />
+          <div class="flex">
+            <Radio
+              label="First half"
+              class="mx-8 my-0"
+              @change="data.ageDuration = 'Multi Day'"
+              :modelValue="data.ageDuration"
+            />
+            <Radio
+              label="Last half"
+              @change="data.ageDuration = 'Half Day'"
+              :modelValue="data.ageDuration"
+              class="my-0"
+            />
+          </div>
+        </div>
+      </section>
       <label class="text-sm">Reason Note</label>
       <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
       </textarea>
@@ -202,9 +255,12 @@ export default {
       employee: employee,
       selectedOption: "",
       modal: {
-        showModal: false,
+        showModal: true,
         showSelect: false,
         showAbility: "hide",
+      },
+      data: {
+        ageDuration: "Single Day",
       },
     };
   },
