@@ -183,18 +183,8 @@
         <div class="grid grid-cols-2 gap-4 items-center">
           <Input type="date" class="flex-col mb-0" label_class="w-full" />
           <div class="flex">
-            <Radio
-              label="First half"
-              class="mx-8 my-0"
-              @change="data.ageDuration = 'Multi Day'"
-              :modelValue="data.ageDuration"
-            />
-            <Radio
-              label="Last half"
-              @change="data.ageDuration = 'Half Day'"
-              :modelValue="data.ageDuration"
-              class="my-0"
-            />
+            <Radio label="First half" class="mx-8 my-0" />
+            <Radio label="Last half" class="my-0" />
           </div>
         </div>
       </section>
@@ -204,10 +194,24 @@
       <section class="mt-6">
         <p class="text-sm">Attachment</p>
         <section
-          class="w-full border preview-file mt-2 border-dashed border-primary"
+          @click="openFileInput"
+          class="w-full border preview-file cursor-pointer mt-2 border-dashed border-primary"
         >
-          <input type="file" multiple class="hidden" id="file" />
+          <div class="dragzone flex flex-col justify-center items-center">
+            <font-awesome-icon
+              icon="fa-cloud-arrow-up"
+              class="w-20 h-20 text-primary"
+            />
+            <h2 class="text-gray-400 text-lg">Drag & Drop</h2>
+            <p>or</p>
+            <p class="text-primary">Browse</p>
+          </div>
         </section>
+        <p class="text-xs text-gray-400 mt-1">
+          Allowed file types: jpeg, jpg, gif, png, pdf, zip. (Max file size is
+          2MB)
+        </p>
+        <input type="file" multiple class="hidden" ref="file" />
       </section>
     </section>
     <template #footer>
@@ -286,6 +290,9 @@ export default {
         this.contactEmployee = id;
       }
     },
+    openFileInput() {
+      this.$refs.file.click();
+    },
   },
   computed: {
     getAllEmployee() {
@@ -296,7 +303,8 @@ export default {
 </script>
 
 <style scoped>
-.preview-file {
-  min-height: 300px;
+.preview-file,
+.dragzone {
+  min-height: 260px;
 }
 </style>
