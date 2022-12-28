@@ -85,7 +85,7 @@
                 v-for="(submenu, index) in menu.contents"
                 :key="index"
               >
-                <span class="block bg-white rounded-full mr-2" />
+                <span class="block bg-white rounded-full mr-3" />
                 <router-link :to="`${submenu.to}`">{{
                   submenu.text
                 }}</router-link>
@@ -113,7 +113,7 @@ export default {
       accordionPosition: this.modeSidebar === "icon" ? "side" : "down",
       menuSidebar: [
         {
-          title: "Departement",
+          title: "Organisasi",
           icon: "fa-user-tie",
           contents: [
             { text: "departemen", to: "/organisasi/departemen" },
@@ -186,7 +186,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$route);
     if (this.$route.path === "/") {
       this.isOpen = "";
     } else {
@@ -207,8 +206,8 @@ p.text-white:hover > span {
   background-color: rgb(89, 213, 255);
 }
 p > span {
-  min-width: 5px;
-  min-height: 5px;
+  min-width: 6px;
+  min-height: 6px;
 }
 .bg-icon {
   min-width: 40px;
