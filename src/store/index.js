@@ -3,10 +3,14 @@ import { createStore } from "vuex";
 const store = createStore({
   state() {
     return {
-      sidebarActive: "",
+      sidebarMenuActive: "",
     };
   },
-  mutations: {},
+  mutations: {
+    changeSidebarMenu(state, payload) {
+      state.sidebarMenuActive = payload;
+    },
+  },
   actions: {},
 });
 
