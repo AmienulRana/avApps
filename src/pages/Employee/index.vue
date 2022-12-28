@@ -349,7 +349,7 @@ export default {
         workshifts: "",
         role: "",
       },
-      showModal: true,
+      showModal: false,
       employeeFilter: false,
     };
   },

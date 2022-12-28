@@ -297,7 +297,7 @@ export default {
       layoutData: "card",
       employee: employee,
       modal: {
-        showModal: true,
+        showModal: false,
         showSelect: false,
         showAbility: "hide",
       },
