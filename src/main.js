@@ -2,6 +2,8 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./routes";
 import "./assets/styles/index.css";
+import store from "./store";
+
 import { library } from "@fortawesome/fontawesome-svg-core";
 
 /* import font awesome icon component */
@@ -33,6 +35,7 @@ import {
   faHomeAlt,
   faCheck,
   faGraduationCap,
+  faCloudArrowUp,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -61,10 +64,12 @@ library.add(
   faHomeAlt,
   faCheck,
   faGraduationCap,
-  faCreditCard
+  faCreditCard,
+  faCloudArrowUp
 );
 
 createApp(App)
   .use(router)
+  .use(store)
   .component("font-awesome-icon", FontAwesomeIcon)
   .mount("#app");
