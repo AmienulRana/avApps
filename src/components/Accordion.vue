@@ -13,13 +13,15 @@
         :class="[isOpen ? '' : 'rotate-180', iconClass]"
       />
     </section>
-    <section
-      v-if="isOpen"
-      class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
-      :class="contentClass"
-    >
-      <slot name="content"> </slot>
-    </section>
+    <KeepAlive>
+      <section
+        v-if="isOpen"
+        class="bg-blue-500 rounded-md text-base text-left px-5 mt-2 py-2.5"
+        :class="contentClass"
+      >
+        <slot name="content"> </slot>
+      </section>
+    </KeepAlive>
   </section>
 </template>
 
@@ -27,9 +29,9 @@
 export default {
   name: "AccordionComponent",
   props: {
-    headerClass: String,
+    headerClass: Object,
     isOpen: Boolean,
-    contentClass: String,
+    contentClass: Object,
     icon: { type: Boolean, default: true },
   },
   emits: ["click:header"],
