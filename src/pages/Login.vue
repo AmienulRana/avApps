@@ -1,9 +1,11 @@
 <template>
-  <section class="min-h-screen flex">
-    <section class="w-8/12 min-h-screen relative">
+  <section class="min-h-screen grid grid-cols-8">
+    <section
+      class="min-h-screen hidden md:block relative lg:col-span-6 md:col-span-5"
+    >
       <img
         :src="'images/Background_Login.png'"
-        class="h-screen"
+        class="h-screen w-full"
         :alt="urlImageAlt"
         cache
       />
@@ -19,8 +21,10 @@
         </h1>
       </div>
     </section>
-    <section class="flex flex-col justify-center px-8 w-2/6">
-      <div class="px-4 py-2.5 rounded w-full">
+    <section
+      class="flex flex-col justify-center px-8 min-h-screen lg:col-span-2 md:col-span-3"
+    >
+      <div class="px-4 py-1 rounded w-full">
         <img src="../assets/av_hrs.png" class="w-26 h-12 block m-auto" />
       </div>
       <p class="text-center my-8 opacity-70">
@@ -32,7 +36,7 @@
         <input
           type="text"
           placeholder="Enter Your Email"
-          class="w-full border border-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+          class="w-full mt-2 border outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
           autofocus
         />
       </div>
@@ -41,24 +45,28 @@
         <input
           type="password"
           placeholder="Enter Your Password"
-          class="w-full border border-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+          class="w-full border mt-2 outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
         />
       </div>
-      <Button class="bg-dodgerblue mb-2.5 text-white py-2 rounded-sm">
+      <Button class="bg-dodgerblue mb-2.5 text-white py-2 text-sm rounded-sm">
         Login
       </Button>
-      <Button class="bg-gray-400 text-white py-2 rounded-sm">Register </Button>
+      <Button class="bg-gray-400 text-white py-2 rounded-sm text-sm"
+        >Register
+      </Button>
       <div class="flex justify-between mt-3">
         <div>
           <input type="checkbox" class="mr-2" />
-          <label>Remember me</label>
+          <label class="text-sm">Remember me</label>
         </div>
-        <router-link to="/forgot-password" class="text-dodgerblue underline"
+        <router-link
+          to="/forgot-password"
+          class="text-dodgerblue underline text-sm"
           ><font-awesome-icon icon="fa-lock" class="mr-2" />Forgot
           password</router-link
         >
       </div>
-      <p class="text-gray-400 text-center mt-12">
+      <p class="text-gray-400 text-center mt-8 text-sm">
         Copyright Ⓒ 2022 by ArmadaVision
       </p>
     </section>
