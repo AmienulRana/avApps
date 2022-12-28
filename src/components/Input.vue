@@ -12,7 +12,9 @@
       class="w-full border outline-gray-600 focus:outline focus:outline-primary pr-2 py-1.5 bg-white rounded"
       :class="[icon ? 'pl-8' : 'pl-2', input_class ? input_class : '']"
       autofocus
+      :value="value"
       @input="$emit('input', $event.target.value)"
+      @change="$emit('change', $event.target.value)"
     />
   </div>
 </template>
@@ -30,8 +32,9 @@ export default {
       type: String,
       default: "text",
     },
+    value: String || Number,
   },
-  emits: ["input"],
+  emits: ["input", "change"],
 };
 </script>
 
