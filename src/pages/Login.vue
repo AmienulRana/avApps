@@ -1,9 +1,19 @@
 <template>
   <section class="min-h-screen flex">
     <section class="w-8/12 min-h-screen relative">
-      <img src="../assets/Background_Login.png" class="h-screen" />
+      <img
+        :src="'images/Background_Login.png'"
+        class="h-screen"
+        :alt="urlImageAlt"
+        cache
+      />
       <div class="absolute top-10 left-12">
-        <img src="../assets/av_hrs_putih.png" class="w-40" />
+        <img
+          :src="'/images/av_hrs_putih.png'"
+          :alt="altImageLogo"
+          class="w-40"
+          cache
+        />
         <h1 class="text-white font-bold mt-2 text italic text-xl">
           Manage Attadance, leave and payroll.
         </h1>
@@ -22,15 +32,7 @@
         <input
           type="text"
           placeholder="Enter Your Email"
-          class="
-            w-full
-            border border-gray-600
-            focus:outline focus:outline-primary
-            px-2
-            py-1.5
-            bg-white
-            rounded
-          "
+          class="w-full border border-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
           autofocus
         />
       </div>
@@ -39,15 +41,7 @@
         <input
           type="password"
           placeholder="Enter Your Password"
-          class="
-            w-full
-            border border-gray-600
-            focus:outline focus:outline-primary
-            px-2
-            py-1.5
-            bg-white
-            rounded
-          "
+          class="w-full border border-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
         />
       </div>
       <Button class="bg-dodgerblue mb-2.5 text-white py-2 rounded-sm">
@@ -76,8 +70,13 @@ import Button from "../components/Button.vue";
 export default {
   name: "LoginPage",
   components: { Button },
+  data() {
+    return {
+      altImageLogo: "Logo avapps",
+      urlImageAlt: "Backgound Login Image",
+    };
+  },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
