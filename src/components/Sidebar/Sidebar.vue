@@ -116,8 +116,8 @@ export default {
           title: "Organisasi",
           icon: "fa-user-tie",
           contents: [
-            { text: "departemen", to: "/organisasi/departemen" },
-            { text: "jabatan", to: "/organisasi/jabatan" },
+            { text: "Departemen", to: "/organisasi/departemen" },
+            { text: "Jabatan", to: "/organisasi/jabatan" },
           ],
         },
         {
