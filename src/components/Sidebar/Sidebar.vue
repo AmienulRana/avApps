@@ -116,8 +116,8 @@ export default {
           title: "Organisasi",
           icon: "fa-user-tie",
           contents: [
-            { text: "departemen", to: "/organisasi/departemen" },
-            { text: "jabatan", to: "/organisasi/jabatan" },
+            { text: "Departemen", to: "/organisasi/departemen" },
+            { text: "Jabatan", to: "/organisasi/jabatan" },
           ],
         },
         {
@@ -155,6 +155,28 @@ export default {
               text: "Daftar Nominatif Penerima gaji",
               to: "/payroll/nominatif",
             },
+          ],
+        },
+        {
+          title: "Administration",
+          icon: "fa-briefcase",
+          contents: [
+            { text: "Users & Roles", to: "/administration/user-and-roles" },
+            { text: "Work Shifts", to: "/administration/workshifts" },
+            { text: "Departement", to: "/administration/departement" },
+            { text: "Holiday", to: "/administration/holiday" },
+            { text: "Org. Structure", to: "/administration/structure" },
+            { text: "Announcements", to: "/administration/announcements" },
+          ],
+        },
+        {
+          title: "Settings",
+          icon: "fa-gear",
+          contents: [
+            { text: "App Settings", to: "/setting/app" },
+            { text: "Leave Settings", to: "/setting/leave" },
+            { text: "Attadance Settings", to: "/setting/attadance" },
+            { text: "Payroll Settings", to: "/setting/payroll" },
           ],
         },
       ],

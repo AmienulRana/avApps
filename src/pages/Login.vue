@@ -1,8 +1,6 @@
 <template>
   <section class="min-h-screen grid grid-cols-8">
-    <section
-      class="min-h-screen hidden md:block relative lg:col-span-6 md:col-span-5"
-    >
+    <section class="min-h-screen hidden md:block relative md:col-span-5">
       <img
         :src="'images/Background_Login.png'"
         class="h-screen w-full"
@@ -22,7 +20,7 @@
       </div>
     </section>
     <section
-      class="flex flex-col justify-center px-8 min-h-screen lg:col-span-2 md:col-span-3"
+      class="flex flex-col justify-center px-20 min-h-screen md:col-span-3"
     >
       <div class="px-4 py-1 rounded w-full">
         <img src="../assets/av_hrs.png" class="w-26 h-12 block m-auto" />

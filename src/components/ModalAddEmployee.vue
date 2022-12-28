@@ -1,9 +1,5 @@
 <template>
-  <Modal
-    :showModal="showModal"
-    :title="`Add Employee | ${tabActive}`"
-    @close="closeModal"
-  >
+  <Modal :showModal="showModal" title="Add Employee" @close="closeModal">
     <section class="text-center mb-6">
       <ul class="flex">
         <li
@@ -22,11 +18,8 @@
         <section
           class="px-4"
           @click="show_select = false"
-          v-if="tabActive === 'Personal Detail'"
+          v-if="tabActive === 'Personal'"
         >
-          <section class="mt-2 py-1">
-            <h2>Data diri</h2>
-          </section>
           <section class="mt-4">
             <Input
               label="Nama Depan"
@@ -405,12 +398,7 @@ export default {
         working_days: null,
         working_hours: null,
       },
-      titleTabs: [
-        "Personal Detail",
-        "Employment",
-        "Attadance Day",
-        "Basic Sallary",
-      ],
+      titleTabs: ["Personal", "Employment", "Attadance Day", "Basic Sallary"],
       shift_data: [
         "Shift 1 Stationery (08:00 am - 05:00pm)",
         "Shift 2 Stationery",
@@ -425,7 +413,7 @@ export default {
         { name: "Sabtu", isCuti: false },
         { name: "Minggu", isCuti: false },
       ],
-      tabActive: "Basic Sallary",
+      tabActive: "Personal",
     };
   },
   methods: {

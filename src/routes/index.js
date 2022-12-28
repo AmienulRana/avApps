@@ -6,6 +6,7 @@ import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
 import AttadanceDaily from "../pages/Attadance/Daily.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
+import Jabatan from "../pages/Organisasi/Jabatan.vue";
 
 const routes = [
   { path: "/employee", component: Employee },
@@ -14,6 +15,7 @@ const routes = [
   { path: "/payroll/nominatif", component: PayrollNominatif },
   { path: "/attedance/daily", component: AttadanceDaily },
   { path: "/leave-request", component: LeaveRequest },
+  { path: "/organisasi/jabatan", component: Jabatan },
   {
     path: "/:catchAll(.*)",
     component: NotFound,
