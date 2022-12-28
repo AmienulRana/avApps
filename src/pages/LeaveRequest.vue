@@ -70,10 +70,10 @@
         class="flex-col"
         input_class="w-full mt-2"
         label_class="w-full text-black"
-        :selectedOption="selectedOption"
-        @selected="selectedOption = $event"
+        :selectedOption="data.employee"
+        @selected="data.employee = $event"
       />
-      <section>
+      <section v-if="data.employee">
         <p class="text-sm">
           Leave Ability
           <span
@@ -126,6 +126,8 @@
           'Izin Khusus (Paid)',
           'Izin Khusus (Unpaid)',
         ]"
+        :value="data.leaveType"
+        @change="data.leaveType = $event"
       />
       <section class="flex justify-between items-center mt-4">
         <p class="text-sm">
@@ -189,15 +191,46 @@
         </div>
       </section>
       <label class="text-sm">Reason Note</label>
-      <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
+      <textarea
+        rows="4"
+        class="w-full mt-2 border outline-primary py-4"
+        v-model="data.reasonNote"
+      >
       </textarea>
       <section class="mt-6">
         <p class="text-sm">Attachment</p>
         <section
           @click="openFileInput"
-          class="w-full border preview-file cursor-pointer mt-2 border-dashed border-primary"
+          class="w-full border preview-file cursor-pointer mt-2 pb-7 border-dashed border-primary"
         >
-          <div class="dragzone flex flex-col justify-center items-center">
+          <div
+            v-if="data.attachement.length !== 0"
+            class="md:grid-cols-6 grid grid-cols-2 gap-4 mt-7 px-8"
+          >
+            <div
+              class="relative wrapper-image-prev"
+              v-for="image in data.attachement"
+              :key="image.blobImgUrl"
+              @click.stop
+            >
+              <!-- <div
+                class="absolute duration-300 top-0 text-white flex justify-center py-4 rounded-lg left-0 w-full h-full"
+              >
+                <p>{{ convertToMB(image?.originalFile?.size) }}mb</p>
+              </div> -->
+              <img :src="image?.blobImgUrl" class="w-full h-32 rounded-lg" />
+              <p
+                @click="removeImageFromPreview(image)"
+                class="text-sm text-primary text-center"
+              >
+                Remove file
+              </p>
+            </div>
+          </div>
+          <div
+            class="dragzone flex flex-col justify-center items-center"
+            v-else
+          >
             <font-awesome-icon
               icon="fa-cloud-arrow-up"
               class="w-20 h-20 text-primary"
@@ -211,7 +244,13 @@
           Allowed file types: jpeg, jpg, gif, png, pdf, zip. (Max file size is
           2MB)
         </p>
-        <input type="file" multiple class="hidden" ref="file" />
+        <input
+          type="file"
+          multiple
+          class="hidden"
+          ref="file"
+          @change="viewImage"
+        />
       </section>
     </section>
     <template #footer>
@@ -257,14 +296,17 @@ export default {
       activeDropdown: "",
       layoutData: "card",
       employee: employee,
-      selectedOption: "",
       modal: {
         showModal: true,
         showSelect: false,
         showAbility: "hide",
       },
       data: {
+        employee: "",
         ageDuration: "Single Day",
+        attachement: [],
+        reasonNote: "",
+        leaveType: "",
       },
     };
   },
@@ -279,10 +321,6 @@ export default {
         this.activeDropdown = id;
       }
     },
-    changePage(page) {
-      this.currentPage = page;
-      // kode lain yang akan dieksekusi ketika halaman berubah, seperti mengambil data dari server
-    },
     showContactEmployee(id) {
       if (this.contactEmployee === id) {
         this.contactEmployee = false;
@@ -292,6 +330,24 @@ export default {
     },
     openFileInput() {
       this.$refs.file.click();
+    },
+    handleLeaveRequest() {},
+    viewImage(e) {
+      const files = e.target.files;
+      for (let i = 0; i < files.length; i++) {
+        console.log(files[i]);
+        const file = URL.createObjectURL(files[i]);
+        this.data.attachement.push({
+          blobImgUrl: file,
+          originalFile: files[i],
+        });
+      }
+    },
+    removeImageFromPreview(image) {
+      const file = this.data.attachement.filter(
+        (img) => image.blobImgUrl !== img.blobImgUrl
+      );
+      this.data.attachement = file;
     },
   },
   computed: {
@@ -303,6 +359,17 @@ export default {
 </script>
 
 <style scoped>
+.wrapper-image-prev:hover img {
+  filter: blur(1.5px);
+}
+.wrapper-image-prev div {
+  opacity: 0;
+  z-index: -10;
+}
+.wrapper-image-prev:hover div {
+  opacity: 1;
+  z-index: 10;
+}
 .preview-file,
 .dragzone {
   min-height: 260px;
