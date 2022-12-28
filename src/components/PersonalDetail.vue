@@ -23,36 +23,60 @@
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
-
     <section class="mt-4" v-if="tab_active === 'data_diri'">
       <Input
         label="Nama Depan"
         input_class="md:md:w-4/6 w-full mt-1 w-full mt-1"
         class="mb-2.5"
+        :value="data.first_name"
+        @change="data.first_name = $event"
       />
       <Input
         label="Nama Belakang"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
+        :value="data.last_name"
+        @change="data.last_name = $event"
       />
-      <Input label="Email" input_class="md:w-4/6 w-full mt-1" class="mb-2.5" />
+      <Input
+        label="Email"
+        input_class="md:w-4/6 w-full mt-1"
+        class="mb-2.5"
+        :value="data.email"
+        @change="data.email = $event"
+      />
       <Input
         label="NIK Ktp"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
+        :value="data.nik_ktp"
+        @change="data.nik_ktp = $event"
       />
       <Input
         label="Phone number"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
+        :value="data.phone_number"
+        @change="data.phone_number = $event"
       />
       <div class="md:flex justify-between items-center mb-2.5">
         <label class="text-sm text-gray-400 md:w-1/5 w-full"
           >Jenis Kelamin</label
         >
         <div class="flex md:w-4/6 w-full mt-1">
-          <Radio label="Laki-Laki" class="mr-5" />
-          <Radio label="Perempuan" class="mr-5" />
+          <Radio
+            label="Laki-Laki"
+            class="mr-5"
+            value="Laki-Laki"
+            @change="data.gender = 'Laki-Laki'"
+            :modelValue="data.gender"
+          />
+          <Radio
+            label="Perempuan"
+            class="mr-5"
+            value="Perempuan"
+            @change="data.gender = 'Perempuan'"
+          />
         </div>
       </div>
       <Select
@@ -76,7 +100,10 @@
         @handleShowSelect="show_select = 'gol'"
       />
       <div class="flex justify-end w-full my-4">
-        <Button class="bg-primary text-white w-24 text-sm rounded py-2">
+        <Button
+          class="bg-primary text-white w-24 text-sm rounded py-2"
+          @click="handleAddEmployement"
+        >
           Save
         </Button>
       </div>
@@ -96,11 +123,23 @@ import Radio from "./Radio.vue";
 export default {
   name: "PersonalDetail",
   components: { Input, Select, Radio, SelectSearch },
+  props: { mode: String },
   data() {
     return {
       indicator_position: {
         left: 0,
         height: 0,
+      },
+      data: {
+        first_name: "",
+        last_name: "",
+        email: "",
+        nik_ktp: "",
+        phone_number: null,
+        gender: "",
+        marital_status: "",
+        date_birthday: "",
+        blood_type: "",
       },
       show_select: false,
       tab_active: "data_diri",

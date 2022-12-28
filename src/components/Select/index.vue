@@ -9,8 +9,15 @@
       class="w-full border focus:outline focus:outline-primary px-3 py-1.5 bg-white rounded-md text-sm"
       :class="input_class ? input_class : ''"
       :disabled="disabled"
+      v-model="selectedOption"
+      @change="updateModel"
     >
-      <option v-for="(option, i) in options" :key="i" class="px-2 py-1">
+      <option
+        v-for="(option, i) in options"
+        :key="i"
+        class="px-2 py-1"
+        :value="option"
+      >
         {{ option }}
       </option>
     </select>
@@ -27,6 +34,18 @@ export default {
     label_class: String,
     options: Array,
     disabled: Boolean,
+    value: String,
+  },
+  data() {
+    return {
+      selectedOption: this.value,
+    };
+  },
+  emits: ["change"],
+  methods: {
+    updateModel() {
+      this.$emit("change", this.selectedOption);
+    },
   },
 };
 </script>

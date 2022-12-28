@@ -11,17 +11,23 @@
       </h1>
       <span class="w-full h-px bg-white mt-5 opacity-80 block"></span>
 
-      <section class="flex items-center text-white text-md my-4">
+      <section class="flex relative items-center text-white text-md my-4">
         <div
           class="bg-icon flex items-center justify-center bg-blue-500"
           :class="{ 'mr-3': modeSidebar !== 'icon' }"
         >
           <font-awesome-icon icon="fa-home-alt" class="text-lg" />
         </div>
-        <router-link to="/">
+        <router-link to="/" @click="isOpen = ''">
           <p
             class="text-sm duration-300"
-            :class="modeSidebar === 'icon' ? 'hidden' : ''"
+            :class="[
+              modeSidebar === 'icon' ? 'scale-0 invisible' : '',
+              {
+                'absolute top-0 z-10 w-60 accordion-content px-6 bg-primary':
+                  this.modeSidebar === 'icon',
+              },
+            ]"
           >
             Dashboard
           </p>
@@ -79,7 +85,7 @@
                 v-for="(submenu, index) in menu.contents"
                 :key="index"
               >
-                <span class="block bg-white rounded-full mr-2" />
+                <span class="block bg-white rounded-full mr-3" />
                 <router-link :to="`${submenu.to}`">{{
                   submenu.text
                 }}</router-link>
@@ -103,11 +109,11 @@ export default {
   components: { Accordion },
   data() {
     return {
-      isOpen: "",
+      isOpen: this.$store.state.sidebarMenuActive,
       accordionPosition: this.modeSidebar === "icon" ? "side" : "down",
       menuSidebar: [
         {
-          title: "Departement",
+          title: "Organisasi",
           icon: "fa-user-tie",
           contents: [
             { text: "departemen", to: "/organisasi/departemen" },
@@ -159,7 +165,9 @@ export default {
       if (value === this.isOpen) {
         this.isOpen = "";
       } else {
-        this.isOpen = value;
+        this.$store.commit("changeSidebarMenu", value);
+        this.isOpen = this.$store.state.sidebarMenuActive;
+        localStorage.setItem("sidebarMenuActive", value);
       }
     },
     handleDisplayAccordion(value) {
@@ -177,6 +185,13 @@ export default {
       // }
     },
   },
+  mounted() {
+    if (this.$route.path === "/") {
+      this.isOpen = "";
+    } else {
+      this.isOpen = localStorage.getItem("sidebarMenuActive");
+    }
+  },
 };
 </script>
 
@@ -191,8 +206,8 @@ p.text-white:hover > span {
   background-color: rgb(89, 213, 255);
 }
 p > span {
-  min-width: 5px;
-  min-height: 5px;
+  min-width: 6px;
+  min-height: 6px;
 }
 .bg-icon {
   min-width: 40px;

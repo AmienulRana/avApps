@@ -9,8 +9,8 @@
         :class="tab_active === '1' ? 'text-white' : ''"
         ref="first_tab"
       >
-        Employment Data
-      </button>
+        Employment Data</button
+      >a
       <button
         class="md:w-1/2 w-max z-10 h-full py-2 duration-300 text-sm truncate"
         @click="(e) => handleChangeTab(e, '2')"

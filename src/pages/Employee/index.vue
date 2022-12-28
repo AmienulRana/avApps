@@ -3,7 +3,9 @@
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between items-center">
         <h1 class="md:text-2xl text-lg">All Employees</h1>
-        <Button class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+        <Button
+          class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+          @click="showModal = true"
           >Add Employee</Button
         >
       </section>
@@ -307,6 +309,10 @@
         ></Pagination>
       </section>
     </section>
+    <AddModalEmployee
+      :showModal="showModal"
+      :closeModal="() => (showModal = false)"
+    />
   </LayoutAdmin>
 </template>
 
@@ -317,6 +323,7 @@ import Dropdown from "../../components/Dropdown.vue";
 import Pagination from "../../components/Paggination.vue";
 import TableEmployee from "../../components/TableEmployee.vue";
 import employee from "../../employee.json";
+import AddModalEmployee from "../../components/ModalAddEmployee.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -326,6 +333,7 @@ export default {
     TableEmployee,
     Dropdown,
     Pagination,
+    AddModalEmployee,
   },
   data() {
     return {
@@ -341,6 +349,7 @@ export default {
         workshifts: "",
         role: "",
       },
+      showModal: false,
       employeeFilter: false,
     };
   },
