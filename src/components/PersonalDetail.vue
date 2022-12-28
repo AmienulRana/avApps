@@ -2,6 +2,7 @@
   <section class="px-4" @click="show_select = false">
     <section
       class="bg-gray-100 mt-2 rounded-md px-4 py-1 flex justify-center relative"
+      v-if="mode === 'edit'"
     >
       <button
         class="w-1/2 h-full py-2 z-10 duration-300 text-sm truncate"
@@ -23,7 +24,9 @@
         :style="`left:${indicator_position.left}px; height:${indicator_position.height}px;`"
       />
     </section>
-
+    <section class="mt-2 py-1" v-else-if="mode === 'add'">
+      <h2>Data diri</h2>
+    </section>
     <section class="mt-4" v-if="tab_active === 'data_diri'">
       <Input
         label="Nama Depan"
@@ -96,6 +99,7 @@ import Radio from "./Radio.vue";
 export default {
   name: "PersonalDetail",
   components: { Input, Select, Radio, SelectSearch },
+  props: { mode: String },
   data() {
     return {
       indicator_position: {
