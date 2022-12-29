@@ -21,9 +21,35 @@
           v-if="tabActive === 'Personal'"
         >
           <section class="mt-4">
+            <div class="flex justify-center mb-2.5">
+              <div
+                class="w-32 h-32 bg-gray-50 flex flex-col cursor-pointer justify-center items-center rounded-full border-2 border-gray-300 relative"
+                @click="openFileInput"
+              >
+                <template v-if="!personal.profile">
+                  <font-awesome-icon
+                    icon="fa-camera-alt"
+                    class="text-2xl text-primary"
+                  />
+                  <p class="text-center text-gray-400 mt-2">Update Photo</p>
+                </template>
+                <img
+                  :src="personal.profile"
+                  class="w-full h-ful rounded-full"
+                  alt=""
+                  v-else
+                />
+                <input
+                  type="file"
+                  class="hidden"
+                  ref="file"
+                  @change="viewImage"
+                />
+              </div>
+            </div>
             <Input
               label="Nama Depan"
-              input_class="md:md:w-4/6 w-full mt-1 w-full mt-1"
+              input_class="md:w-4/6 w-full mt-1 w-full mt-1"
               class="mb-2.5"
               :value="personal.first_name"
               @change="personal.first_name = $event"
@@ -360,6 +386,7 @@ export default {
     return {
       show_select: "",
       personal: {
+        profile: null,
         first_name: "",
         last_name: "",
         email: "",
@@ -425,6 +452,14 @@ export default {
       });
       return formatter.format(number);
     },
+    openFileInput() {
+      this.$refs.file.click();
+    },
+    viewImage(e) {
+      const files = e.target.files[0];
+      const file = URL.createObjectURL(files);
+      this.personal.profile = file;
+    },
     handleAddEmployment() {
       const data = {
         personal: this.personal,
@@ -432,7 +467,6 @@ export default {
         attadance: this.attadance_day,
         basic_salary: this.basic_salary,
       };
-      console.log(data);
     },
   },
 };
