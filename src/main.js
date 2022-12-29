@@ -37,6 +37,7 @@ import {
   faGraduationCap,
   faCloudArrowUp,
   faPenToSquare,
+  faCameraAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -67,7 +68,8 @@ library.add(
   faGraduationCap,
   faCreditCard,
   faCloudArrowUp,
-  faPenToSquare
+  faPenToSquare,
+  faCameraAlt
 );
 
 createApp(App)
