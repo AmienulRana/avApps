@@ -17,7 +17,7 @@ const routes = [
   { path: "/attedance/daily", component: AttadanceDaily },
   { path: "/leave-request", component: LeaveRequest },
   { path: "/organisasi/jabatan", component: Jabatan },
-  { path: "/organisasi/departement", component: Departement },
+  { path: "/organisasi/departemen", component: Departement },
   {
     path: "/:catchAll(.*)",
     component: NotFound,
