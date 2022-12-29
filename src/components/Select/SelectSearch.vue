@@ -11,7 +11,9 @@
         class="flex justify-between items-center cursor-pointer px-4 py-1.5 border rounded-md"
         :class="{ 'border-primary': isOpen }"
       >
-        <p>{{ selectedOption }}</p>
+        <p>
+          {{ !selectedOption ? placeholder : selectedOption }}
+        </p>
         <font-awesome-icon
           icon="fa-chevron-up"
           class="duration-500 w-3 h-3 ease-in-out"
@@ -24,7 +26,7 @@
       >
         <section
           v-if="isOpen"
-          class="bg-white overflow-y-auto custom-scrollbar rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
+          class="bg-white overflow-y-auto custom-scrollbar rounded text-base text-left mt-2 py-2.5 absolute left-0 w-96 shadow-md border border-gray-300 z-10"
           :class="position === 'top' ? 'bottom-full' : 'top-full'"
         >
           <div class="px-2 mb-2">
@@ -63,6 +65,7 @@ export default {
     label_class: String,
     options: Array,
     selectedOption: String,
+    placeholder: String,
     position: {
       type: String,
       default: "bottom",
