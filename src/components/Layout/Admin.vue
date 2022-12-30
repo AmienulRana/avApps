@@ -3,7 +3,7 @@
     <KeepAlive>
       <Sidebar :modeSidebar="modeSidebar" />
     </KeepAlive>
-    <main class="relative w-full min-h-screen bg-whitesmoke overflow-x-hidden">
+    <main class="relative w-full min-h-screen bg-whitesmoke main-content">
       <section class="bg-white w-full px-8 py-6 shadow-md flex justify-between">
         <font-awesome-icon
           icon="fa-bars"
@@ -46,4 +46,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.main-content {
+  overflow-x: hidden;
+}
+</style>
