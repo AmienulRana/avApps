@@ -60,16 +60,28 @@
           </div>
         </section>
       </section>
+
+      <section class="grid gap-6 grid-cols-4 mb-6">
+        <EmployementStatistic class="col-span-3" />
+        <section class="col-span-1">
+          <AttedanceStatistic />
+        </section>
+      </section>
     </section>
   </LayoutAdmin>
 </template>
 
 <script>
+import EmployementStatistic from "@/components/EmployementStatistic.vue";
+import AttedanceStatistic from "@/components/AttendanceStatistic.vue";
 import LayoutAdmin from "../components/Layout/Admin.vue";
 
 export default {
-  name: "DepartementPage",
-  components: { LayoutAdmin },
+  name: "DashboardPage",
+  data() {
+    return {};
+  },
+  components: { LayoutAdmin, EmployementStatistic, AttedanceStatistic },
 };
 </script>
 
