@@ -3,7 +3,7 @@
     <section class="min-h-screen hidden md:block relative md:col-span-5">
       <img
         :src="'images/Background_Login.png'"
-        class="h-screen w-full"
+        class="h-full w-full"
         :alt="urlImageAlt"
         cache
       />
