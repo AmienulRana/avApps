@@ -19,7 +19,7 @@
                 <th class="text-left text-sm p-3">Manager</th>
                 <th class="text-left text-sm p-3">Description</th>
                 <th class="text-left text-sm p-3">Status</th>
-                <th class="text-left text-sm p-3">Parent Departement</th>
+                <th class="text-left text-sm p-3">Company</th>
                 <th class="text-left text-sm p-3">Location</th>
                 <th class="text-left text-sm p-3">Created</th>
                 <th class="text-left text-sm p-3">Actions</th>
