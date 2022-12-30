@@ -38,14 +38,68 @@
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['Bulan', '2 Minggu', 'Minggu']"
+        :value="basic_salary.periode"
+        @change="basic_salary.periode = $event"
       />
       <Input
         type="number"
         label="Gaji pokok"
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
+        :value="basic_salary.salary"
+        @input="basic_salary.salary = $event"
         placeholder="Tidak ada perkiraan untuk Project Manager "
       />
+      <section class="flex justify-between items-center">
+        <p class="text-sm text-gray-400 md:w-1/5">Jumlah Hari kerja :</p>
+        <div class="md:w-4/6 mb-2.5">
+          <Input
+            type="number"
+            input_class="md:full mt-2"
+            class="mb-1.5"
+            :value="basic_salary.working_days"
+            @input="basic_salary.working_days = $event"
+          />
+          <p
+            class="text-sm text-gray-400"
+            v-if="basic_salary.working_days && basic_salary.salary"
+          >
+            Gaji per hari:
+            {{
+              formatCurrency(basic_salary.salary / basic_salary.working_days)
+            }}
+          </p>
+        </div>
+      </section>
+      <section class="flex justify-between items-center">
+        <p class="text-sm text-gray-400 md:w-1/5">Jumlah Jam kerja :</p>
+        <div class="md:w-4/6 mb-2.5">
+          <Input
+            type="number"
+            input_class="md:full mt-2"
+            class="mb-1.5"
+            :value="basic_salary.working_hours"
+            @input="basic_salary.working_hours = $event"
+          />
+          <p
+            class="text-sm text-gray-400"
+            v-if="
+              basic_salary.working_days &&
+              basic_salary.salary &&
+              basic_salary.working_hours
+            "
+          >
+            Gaji per jam:
+            {{
+              formatCurrency(
+                basic_salary.salary /
+                  basic_salary.working_days /
+                  basic_salary.working_hours
+              )
+            }}
+          </p>
+        </div>
+      </section>
       <div class="flex justify-end w-full">
         <Button class="bg-primary text-white w-24 text-sm rounded py-2">
           Save
@@ -77,11 +131,25 @@ export default {
         height: 0,
         width: 0,
       },
+      basic_salary: {
+        periode: "",
+        salary: null,
+        working_days: null,
+        working_hours: null,
+      },
       show_select: false,
       tab_active: "1",
     };
   },
   methods: {
+    formatCurrency(number) {
+      const formatter = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(number);
+    },
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
       const buttonWidth = event.target.offsetWidth;
