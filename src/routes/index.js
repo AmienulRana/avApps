@@ -15,18 +15,25 @@ function requiredAuth(to, from, next) {
   const stateIsLoggedIn = store.state.isLoggedIn;
   const localIsLoggedIn = localStorage.getItem("isLoggedIn");
   if (stateIsLoggedIn || localIsLoggedIn) {
-    // Jika sudah, lanjutkan ke halaman yang diminta
     next();
   } else {
-    // Jika belum, redirect ke halaman login
     next({ path: "/login" });
+  }
+}
+function notRequiredAuth(to, from, next) {
+  const stateIsLoggedIn = store.state.isLoggedIn;
+  const localIsLoggedIn = localStorage.getItem("isLoggedIn");
+  if (!stateIsLoggedIn || !localIsLoggedIn) {
+    next();
+  } else {
+    next({ path: "/" });
   }
 }
 
 const routes = [
   { path: "/", component: Home, beforeEnter: requiredAuth },
   { path: "/employee", component: Employee, beforeEnter: requiredAuth },
-  { path: "/login", component: Login },
+  { path: "/login", component: Login, beforeEnter: notRequiredAuth },
   {
     path: "/employee/:id",
     component: EmployeeDetail,
