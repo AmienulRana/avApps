@@ -35,7 +35,7 @@
           class="flex-col"
           label_class="w-full mb-2 text-gray-400"
           :options="['Admin Group', 'App Admin', 'Employee']"
-          @change="login_as = $event"
+          @change="changeAccount($event)"
         />
       </div>
       <div class="mb-5">
@@ -90,6 +90,7 @@ import Button from "../components/Button.vue";
 import { LoginSuperAPI, LoginAdminAPI } from "@/actions/login";
 import Select from "@/components/Select/index.vue";
 import CryptoJS from "crypto-js";
+import { SECRET_KEY } from "@/config";
 
 export default {
   name: "LoginPage",
@@ -104,8 +105,18 @@ export default {
     };
   },
   methods: {
+    changeAccount(role) {
+      this.login_as = role;
+      if (role === "Admin Group") {
+        this.email = "superadmin@demo.com";
+        this.password = "superAdmin123";
+      } else if (role === "App Admin") {
+        this.email = "armadavision@test.com";
+        this.password = "armadaVision123";
+      }
+    },
     encrypt(token) {
-      const secret_key = "mysecret";
+      const secret_key = SECRET_KEY;
       const ciphertext = CryptoJS.AES.encrypt(token, secret_key);
       return ciphertext.toString();
     },
@@ -116,7 +127,7 @@ export default {
         this.$store.state.isLoggedIn = true;
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", encryptedToken);
-        this.$router.push("/");
+        window.location.href = "/";
       } else {
         console.log(response);
       }
@@ -131,7 +142,7 @@ export default {
         this.validationResponse(response);
       } else if (this.login_as === "App Admin") {
         const response = await LoginAdminAPI({ email, password });
-        console.log(response);
+        this.validationResponse(response);
       }
     },
   },
