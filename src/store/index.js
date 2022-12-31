@@ -11,8 +11,8 @@ const store = createStore({
     changeSidebarMenu(state, payload) {
       state.sidebarMenuActive = payload;
     },
-    changeIsLoggedIn(state) {
-      state.isLoggedIn = true;
+    changeIsLoggedIn(state, payload) {
+      state.isLoggedIn = payload;
     },
   },
   actions: {},
