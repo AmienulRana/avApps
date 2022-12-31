@@ -1,9 +1,15 @@
 <template>
   <LayoutAdmin>
     <section class="md:px-8 px-4 mt-6 w-full">
-      <section class="flex justify-between items-center">
+      <div class="flex items-center">
         <h1 class="md:text-2xl text-lg">Dashboard</h1>
-      </section>
+        <ChoiseCompany
+          v-if="superAdmin && !loading.company"
+          @selected:company="dataCompany = $event"
+          :options="options"
+          :dataCompany="dataCompany"
+        />
+      </div>
       <section
         class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 md:gap-8 my-8"
       >
@@ -75,13 +81,43 @@
 import EmployementStatistic from "@/components/EmployementStatistic.vue";
 import AttedanceStatistic from "@/components/AttendanceStatistic.vue";
 import LayoutAdmin from "../components/Layout/Admin.vue";
+import decryptToken from "@/utils/decryptToken";
+import { GetAllCompanyAPI } from "@/actions/company";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
 
 export default {
   name: "DashboardPage",
   data() {
-    return {};
+    return {
+      showSelectCompany: false,
+      superAdmin: false,
+      options: [],
+      dataCompany: {},
+      loading: {
+        company: true,
+      },
+    };
   },
-  components: { LayoutAdmin, EmployementStatistic, AttedanceStatistic },
+  components: {
+    LayoutAdmin,
+    EmployementStatistic,
+    AttedanceStatistic,
+    ChoiseCompany,
+  },
+  methods: {
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.options = response?.data;
+      this.dataCompany = response?.data[0];
+      this.loading.company = false;
+    },
+  },
+  mounted() {
+    // const payload = decrypt
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
+  },
 };
 </script>
 
