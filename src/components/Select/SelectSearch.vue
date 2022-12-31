@@ -11,7 +11,9 @@
         class="flex justify-between items-center cursor-pointer px-4 py-1.5 border rounded-md"
         :class="{ 'border-primary': isOpen }"
       >
-        <p>{{ selectedOption }}</p>
+        <p>
+          {{ !selectedOption ? placeholder : selectedOption }}
+        </p>
         <font-awesome-icon
           icon="fa-chevron-up"
           class="duration-500 w-3 h-3 ease-in-out"
@@ -24,16 +26,20 @@
       >
         <section
           v-if="isOpen"
-          class="bg-white overflow-y-auto custom-scrollbar rounded text-base text-left mt-2 py-2.5 absolute left-0 w-full shadow-md border border-gray-300 z-10"
+          class="bg-white overflow-y-auto custom-scrollbar rounded text-base text-left mt-2 py-2.5 absolute left-0 w-80 shadow-md border border-gray-300 z-10"
           :class="position === 'top' ? 'bottom-full' : 'top-full'"
         >
-          <div class="px-2 mb-2">
+          <div class="px-2 mb-2 relative">
             <input
               type="text"
-              class="w-full border focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+              class="w-full border focus:outline focus:outline-primary pl-10 py-1.5 bg-white rounded-full"
               v-model="query"
               @click.stop
               @input="handleSearchOption"
+            />
+            <font-awesome-icon
+              icon="fa-magnifying-glass"
+              class="absolute top-1/2 -translate-y-1/2 left-5 text-primary"
             />
           </div>
           <div class="custom-scrollbar max-h-36">
@@ -41,8 +47,12 @@
               v-for="(option, i) in searchResult"
               :key="i"
               @click="$emit('selected', option)"
-              class="px-4 py-2 text-gray-400 text-sm hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
-              :class="option === selectedOption ? 'bg-primary text-white' : ''"
+              class="px-4 py-2 text-gray-400 text-sm justify-between items-center duration-100 cursor-pointer flex"
+              :class="
+                option === selectedOption
+                  ? 'bg-primary text-white'
+                  : 'hover:bg-gray-100'
+              "
             >
               {{ option }}
             </p>
@@ -63,6 +73,7 @@ export default {
     label_class: String,
     options: Array,
     selectedOption: String,
+    placeholder: String,
     position: {
       type: String,
       default: "bottom",

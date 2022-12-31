@@ -3,7 +3,7 @@
     <KeepAlive>
       <Sidebar :modeSidebar="modeSidebar" />
     </KeepAlive>
-    <main class="relative w-full min-h-screen bg-whitesmoke overflow-x-hidden">
+    <main class="relative w-full min-h-screen bg-whitesmoke main-content">
       <section class="bg-white w-full px-8 py-6 shadow-md flex justify-between">
         <font-awesome-icon
           icon="fa-bars"
@@ -42,8 +42,21 @@ export default {
   mounted() {
     const modeSidebar = localStorage.getItem("modeSidebar");
     this.modeSidebar = modeSidebar;
+    let currentTime = Date.now();
+
+    // Set a timer for one hour
+    setTimeout(function () {
+      // Remove the JWT token from local storage after one hour
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "/login";
+    }, 3600 * 1000 - (Date.now() - currentTime));
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.main-content {
+  overflow-x: hidden;
+}
+</style>

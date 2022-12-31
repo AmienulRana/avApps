@@ -3,7 +3,7 @@
     <section class="min-h-screen hidden md:block relative md:col-span-5">
       <img
         :src="'images/Background_Login.png'"
-        class="h-screen w-full"
+        class="h-full w-full"
         :alt="urlImageAlt"
         cache
       />
@@ -30,12 +30,22 @@
         Login to your dashboard
       </p>
       <div class="mb-5">
+        <Select
+          label="Login as"
+          class="flex-col"
+          label_class="w-full mb-2 text-gray-400"
+          :options="['Admin Group', 'App Admin', 'Employee']"
+          @change="changeAccount($event)"
+        />
+      </div>
+      <div class="mb-5">
         <label class="text-sm text-gray-400">Email</label>
         <input
           type="text"
           placeholder="Enter Your Email"
           class="w-full mt-2 border outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
           autofocus
+          v-model="email"
         />
       </div>
       <div class="mb-5">
@@ -44,14 +54,18 @@
           type="password"
           placeholder="Enter Your Password"
           class="w-full border mt-2 outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+          v-model="password"
         />
       </div>
-      <Button class="bg-dodgerblue mb-2.5 text-white py-2 text-sm rounded-sm">
+      <Button
+        class="bg-dodgerblue mb-2.5 text-white py-2 text-sm rounded-sm"
+        @click="handleLoginCompany"
+      >
         Login
       </Button>
-      <Button class="bg-gray-400 text-white py-2 rounded-sm text-sm"
+      <!-- <Button class="bg-gray-400 text-white py-2 rounded-sm text-sm"
         >Register
-      </Button>
+      </Button> -->
       <div class="flex justify-between mt-3">
         <div>
           <input type="checkbox" class="mr-2" />
@@ -73,14 +87,64 @@
 
 <script>
 import Button from "../components/Button.vue";
+import { LoginSuperAPI, LoginAdminAPI } from "@/actions/login";
+import Select from "@/components/Select/index.vue";
+import CryptoJS from "crypto-js";
+import { SECRET_KEY } from "@/config";
+
 export default {
   name: "LoginPage",
-  components: { Button },
+  components: { Button, Select },
   data() {
     return {
       altImageLogo: "Logo avapps",
       urlImageAlt: "Backgound Login Image",
+      login_as: "",
+      email: "",
+      password: "",
     };
+  },
+  methods: {
+    changeAccount(role) {
+      this.login_as = role;
+      if (role === "Admin Group") {
+        this.email = "superadmin@demo.com";
+        this.password = "superAdmin123";
+      } else if (role === "App Admin") {
+        this.email = "armadavision@test.com";
+        this.password = "armadaVision123";
+      }
+    },
+    encrypt(token) {
+      const secret_key = SECRET_KEY;
+      const ciphertext = CryptoJS.AES.encrypt(token, secret_key);
+      return ciphertext.toString();
+    },
+    validationResponse(response) {
+      if (response.status === 200) {
+        const { token } = response?.data;
+        const encryptedToken = this.encrypt(token);
+        this.$store.state.isLoggedIn = true;
+        localStorage.setItem("isLoggedIn", true);
+        localStorage.setItem("token", encryptedToken);
+        window.location.href = "/";
+      } else {
+        console.log(response);
+      }
+    },
+    async handleLoginCompany() {
+      const { email, password } = this;
+      if (!this.login_as) {
+        return alert("Select role to Login");
+      }
+      if (this.login_as === "Admin Group") {
+        const response = await LoginSuperAPI({ email, password });
+        this.validationResponse(response);
+      } else if (this.login_as === "App Admin") {
+        const response = await LoginAdminAPI({ email, password });
+        this.validationResponse(response);
+      }
+    },
   },
 };
 </script>

@@ -21,9 +21,12 @@
         <div
           class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:items-center sm:justify-between"
         >
-          <h3 class="text-lg text-gray-900">
-            {{ title }}
-          </h3>
+          <div class="flex items-center">
+            <h3 class="text-lg text-gray-900">
+              {{ title }}
+            </h3>
+            <slot name="header"></slot>
+          </div>
           <div class="sm:ml-3 sm:flex-shrink-0">
             <button
               @click="$emit('close', false)"

@@ -94,6 +94,29 @@
           </template>
         </Accordion>
       </template>
+      <section
+        class="flex relative cursor-pointer items-center text-white text-md my-4"
+        @click="handleLogout"
+      >
+        <div
+          class="bg-icon flex items-center -rotate-180 justify-center bg-blue-500"
+          :class="{ 'mr-3': modeSidebar !== 'icon' }"
+        >
+          <font-awesome-icon icon="fa-right-from-bracket" />
+        </div>
+        <p
+          class="text-sm duration-300"
+          :class="[
+            modeSidebar === 'icon' ? 'scale-0 invisible' : '',
+            {
+              'absolute top-0 z-10 w-60 accordion-content px-6 bg-primary':
+                this.modeSidebar === 'icon',
+            },
+          ]"
+        >
+          Logout
+        </p>
+      </section>
     </nav>
   </section>
 </template>
@@ -198,13 +221,11 @@ export default {
         this.isOpen = value;
       }
     },
-    handleCloseAccordion() {
-      // this.modeSidebar === 'icon' ? (isOpen = '') : ''
-      // console.log(event);
-      // if (this.modeSidebar === "icon") {
-      //   this.accordionPosition = "side";
-      //   this.isOpen = value;
-      // }
+    handleLogout() {
+      this.$store.commit("changeIsLoggedIn", false);
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     },
   },
   mounted() {
