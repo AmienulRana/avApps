@@ -42,6 +42,15 @@ export default {
   mounted() {
     const modeSidebar = localStorage.getItem("modeSidebar");
     this.modeSidebar = modeSidebar;
+    let currentTime = Date.now();
+
+    // Set a timer for one hour
+    setTimeout(function () {
+      // Remove the JWT token from local storage after one hour
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "/login";
+    }, 3600 * 1000 - (Date.now() - currentTime));
   },
 };
 </script>
