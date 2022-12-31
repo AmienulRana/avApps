@@ -2,7 +2,15 @@
   <LayoutAdmin @click="activeDropdown = false">
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between items-center">
-        <h1 class="md:text-2xl text-lg">Designation</h1>
+        <div class="flex items-center">
+          <h1 class="md:text-2xl text-lg">Designation</h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading.company"
+            @selected:company="dataCompany = $event"
+            :options="options"
+            :dataCompany="dataCompany"
+          />
+        </div>
         <Button
           class="bg-primary text-white px-6 py-2 text-sm rounded-md"
           @click="showModal = true"
@@ -22,25 +30,25 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(designation, index) in designations" :key="index">
+              <tr v-for="(des, index) in designations" :key="index">
                 <td class="p-3 text-sm">
-                  <p class="text-sm text-gray-400">{{ designation.name }}</p>
+                  <p class="text-sm text-gray-400">{{ des?.des_name }}</p>
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{
-                      designation.description ? designation.description : "-"
-                    }}
+                    {{ des?.desc ? des?.desc : "-" }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
-                  <p class="text-sm text-gray-400">0</p>
+                  <p class="text-sm text-gray-400">
+                    {{ des?.des_employee_total }}
+                  </p>
                 </td>
                 <td class="p-3 relative">
                   <button class="mr-3">
                     <font-awesome-icon icon="fa-trash-alt" />
                   </button>
-                  <button @click="handleDetailDesignation(designation.id)">
+                  <button @click="handleDetailDesignation(des?._id)">
                     <font-awesome-icon icon="fa-pen-to-square" />
                   </button>
                 </td>
@@ -56,6 +64,14 @@
       :showModal="showModal"
       @close="showModal = false"
     >
+      <template #header>
+        <ChoiseCompany
+          v-if="superAdmin && !loading.company"
+          @selected:company="dataCompany = $event"
+          :options="options"
+          :dataCompany="dataCompany"
+        />
+      </template>
       <section class="mb-10">
         <Input
           label="Name"
@@ -111,6 +127,10 @@ import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "../../components/Input.vue";
+import { GetDesignationAPI, AddDesignationAPI } from "@/actions/designation";
+import decryptToken from "@/utils/decryptToken";
+import { GetAllCompanyAPI } from "@/actions/company";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -118,6 +138,7 @@ export default {
     LayoutAdmin,
     Button,
     Modal,
+    ChoiseCompany,
     Input,
   },
   data() {
@@ -125,48 +146,74 @@ export default {
       showModal: false,
       modalEdit: false,
       name: "",
-      id: "",
       description: "",
       designations: [],
+      superAdmin: false,
+      showSelectCompany: false,
+      options: [],
+      dataCompany: {},
+      loading: {
+        company: true,
+      },
     };
   },
   methods: {
-    handleAddDesignation() {
-      const data = {
-        id: this.designations.length + 1,
-        name: this.name,
-        description: this.description,
-        many_employement: 0,
-      };
-      const checkDuplicate = this.designations.filter(
-        (designation) => designation.name === this.name
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.options = response?.data;
+      this.dataCompany = response?.data[0];
+      this.loading.company = false;
+    },
+    async handleGetDesignation() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDesignationAPI(
+        this.superAdmin ? querySuperAdmin : ""
       );
-      if (!checkDuplicate.length > 0) {
-        this.designations.push(data);
+      console.log(response);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.designations = response.data;
+    },
+    async handleAddDesignation() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const data = {
+        dep_name: this.name,
+        dep_desc: this.description,
+      };
+      const response = await AddDesignationAPI(data, querySuperAdmin);
+      if (response.status === 200) {
+        this.handleGetDesignation();
         this.showModal = false;
-        localStorage.setItem("designation", JSON.stringify(this.designations));
-      } else {
-        alert(`${this.name} Sudah ditambahkan`);
       }
     },
-    handleDetailDesignation(id) {
-      this.showModal = true;
-      this.id = id;
-      this.modalEdit = true;
-      const findDesignation = this.designations.filter(
-        (des) => des.id === id
-      )[0];
-      this.name = findDesignation.name;
-      this.description = findDesignation.description;
+    handleDetailDesignation() {
+      // this.showModal = true;
+      // this.id = id;
+      // this.modalEdit = true;
+      // const findDesignation = this.designations.filter(
+      //   (des) => des.id === id
+      // )[0];
+      // this.name = findDesignation.name;
+      // this.description = findDesignation.description;
     },
     handleEditDesignation() {},
     handleDeleteDesignation() {},
   },
   mounted() {
-    const designationStorage = localStorage.getItem("designation");
-    if (designationStorage) {
-      this.designations = JSON.parse(designationStorage);
-    }
+    // const departement
+    this.handleGetDesignation();
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDesignation();
+      },
+      deep: true,
+    },
   },
 };
 </script>
