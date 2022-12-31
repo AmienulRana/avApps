@@ -2,7 +2,15 @@
   <LayoutAdmin @click="optionsDepartement = null">
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between items-center">
-        <h1 class="md:text-2xl text-lg">Departement</h1>
+        <div class="flex items-center">
+          <h1 class="md:text-2xl text-lg">Departement</h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading.company"
+            @selected:company="dataCompany = $event"
+            :options="options"
+            :dataCompany="dataCompany"
+          />
+        </div>
         <Button
           class="bg-primary text-white px-6 py-2 text-sm rounded-md"
           @click="modal.showModal = true"
@@ -19,7 +27,7 @@
                 <th class="text-left text-sm p-3">Manager</th>
                 <th class="text-left text-sm p-3">Description</th>
                 <th class="text-left text-sm p-3">Status</th>
-                <th class="text-left text-sm p-3">Company</th>
+                <th class="text-left text-sm p-3" v-if="superAdmin">Company</th>
                 <th class="text-left text-sm p-3">Location</th>
                 <th class="text-left text-sm p-3">Created</th>
                 <th class="text-left text-sm p-3">Actions</th>
@@ -28,43 +36,45 @@
             <tbody>
               <tr v-for="(departement, index) in departements" :key="index">
                 <td class="p-3 text-sm">
-                  <p class="text-sm text-gray-400">{{ departement?.name }}</p>
-                </td>
-                <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{ departement?.manager }}
+                    {{ departement?.dep_name }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{
-                      departement?.description ? departement?.description : "-"
-                    }}
+                    {{ departement?.dep_manager }}
+                  </p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm text-gray-400">
+                    {{ departement?.dep_desc ? departement?.dep_desc : "-" }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
                   <p
                     class="text-sm text-white rounded-full min-w-max px-6 py-1"
                     :class="
-                      departement?.status === 'Active'
+                      departement?.dep_status === 'Active'
                         ? 'bg-primary'
                         : 'bg-red-500'
                     "
                   >
-                    {{ departement?.status }}
+                    {{ departement?.dep_status }}
                   </p>
+                </td>
+                <td class="p-3 text-sm" v-if="superAdmin">
+                  <p class="text-sm text-gray-400">
+                    {{ departement?.company_id?.company_name }}
+                  </p>
+                </td>
+                <td class="p-3 text-sm text-gray-400">
+                  {{
+                    departement?.dep_location ? departement?.dep_location : "-"
+                  }}
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{ departement?.parent_departement }}
-                  </p>
-                </td>
-                <td class="p-3 text-sm">
-                  {{ departement?.location ? departement?.location : "-" }}
-                </td>
-                <td class="p-3 text-sm">
-                  <p class="text-sm text-gray-400">
-                    {{ departement?.created }}
+                    {{ departement?.dep_created }}
                   </p>
                 </td>
                 <td class="p-3 text-right relative">
@@ -105,17 +115,24 @@
     </section>
     <Modal
       title="Add Departement"
-      class="md:w-9/12 w-full mx-auto"
+      class="md:w-9/12 w-full mx-auto z-20"
       :showModal="modal.showModal"
       @close="modal.showModal = false"
     >
+      <template #header>
+        <ChoiseCompany
+          v-if="superAdmin && !loading.company"
+          @selected:company="dataCompany = $event"
+          :options="options"
+          :dataCompany="dataCompany"
+        />
+      </template>
       <Input
         label="Name"
         label_class="w-full"
         input_class="w-full mt-2"
         class="flex-col"
         placeholder="Name"
-        :value="name"
         @change="name = $event"
       />
       <SelectSearch
@@ -133,15 +150,6 @@
         label_class="w-full text-black"
         :selectedOption="manager"
         @selected="manager = $event"
-      />
-      <Select
-        class="flex-col mt-4"
-        input_class="w-full mt-2"
-        label_class="w-full"
-        label="Parent Departement"
-        :options="onlyDepartementName"
-        :value="parent_departement"
-        @change="parent_departement = $event"
       />
       <Input
         label="Location"
@@ -189,7 +197,7 @@
           </Button>
           <Button
             class="bg-primary w-24 px-2 py-2 text-white rounded-md"
-            @click="handleAddDesignation"
+            @click="handleAddDepartement"
             :class="!name && 'opacity-70'"
             :disabled="!name"
             v-if="!modalEdit"
@@ -217,8 +225,11 @@ import Button from "../../components/Button.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "../../components/Input.vue";
 import SelectSearch from "../../components/Select/SelectSearch.vue";
-import Select from "../../components/Select/index.vue";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import employee from "@/employee.json";
+import { AddDepartementAPI, GetDepartementAPI } from "@/actions/departement";
+import decryptToken from "@/utils/decryptToken";
+import { GetAllCompanyAPI } from "@/actions/company";
 
 export default {
   name: "DepartementPage",
@@ -228,8 +239,9 @@ export default {
     Modal,
     Input,
     SelectSearch,
-    Select,
+    ChoiseCompany,
   },
+
   data() {
     return {
       modal: {
@@ -240,13 +252,18 @@ export default {
       modalEdit: false,
       optionsDepartement: null,
       name: "",
-      id: "",
       work_shift: "",
       location: "",
-      parent_departement: "",
       employee: employee,
       description: "",
       departements: [],
+      superAdmin: false,
+      showSelectCompany: false,
+      options: [],
+      dataCompany: {},
+      loading: {
+        company: true,
+      },
     };
   },
   methods: {
@@ -258,47 +275,61 @@ export default {
       const formattedDate = `${month}-${day}-${year}`;
       return formattedDate;
     },
-    handleAddDesignation() {
-      const data = {
-        id: this.departements.length + 1,
-        name: this.name,
-        description: this.description,
-        parent_departement: this.parent_departement,
-        work_shift: this.work_shift,
-        manager: this.manager,
-        location: this.location,
-        status: "Active",
-        created: this.dateNow(),
-      };
-      const checkDuplicate = this.departements.filter(
-        (designation) => designation.name === this.name
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.options = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.company = false;
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const response = await GetDepartementAPI(
+        this.superAdmin ? querySuperAdmin : ""
       );
-      if (!checkDuplicate.length > 0) {
-        this.departements.push(data);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.departements = response.data;
+    },
+    async handleAddDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const data = {
+        dep_name: this.name,
+        dep_desc: this.description,
+        dep_workshift: this.work_shift,
+        dep_manager: this.manager,
+        dep_location: this.location,
+        dep_status: "Active",
+        dep_created: this.dateNow(),
+      };
+      const response = await AddDepartementAPI(data, querySuperAdmin);
+      if (response.status === 200) {
+        this.handleGetDepartement();
         this.modal.showModal = false;
-        localStorage.setItem("departements", JSON.stringify(this.departements));
-      } else {
-        alert(`${this.name} Sudah ditambahkan`);
       }
     },
-    handleDetailDesignation(id) {
+    handleDetailDepartement(id) {
       this.showModal = true;
       this.id = id;
       this.modalEdit = true;
-      const findDesignation = this.departements.filter(
-        (des) => des.id === id
-      )[0];
-      this.name = findDesignation.name;
-      this.description = findDesignation.description;
     },
-    handleEditDesignation() {},
-    handleDeleteDesignation() {},
+    handleEditDepartement() {},
+    handleDeleteDepartement() {},
   },
   mounted() {
-    const departementsStorage = localStorage.getItem("departements");
-    if (departementsStorage) {
-      this.departements = JSON.parse(departementsStorage);
-    }
+    // const departement
+    this.handleGetDepartement();
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDepartement();
+      },
+      deep: true,
+    },
   },
   computed: {
     getAllEmployee() {
