@@ -39,6 +39,7 @@ import {
   faPenToSquare,
   faCameraAlt,
   faUserXmark,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -71,7 +72,8 @@ library.add(
   faCloudArrowUp,
   faPenToSquare,
   faCameraAlt,
-  faUserXmark
+  faUserXmark,
+  faRightFromBracket
 );
 
 createApp(App)
