@@ -5,7 +5,7 @@
         <div class="flex items-center">
           <h1 class="md:text-2xl text-lg">Departement</h1>
           <ChoiseCompany
-            v-if="superAdmin && !loading.company"
+            v-if="superAdmin && !loading.departement"
             @selected:company="dataCompany = $event"
             :options="options"
             :dataCompany="dataCompany"
@@ -33,7 +33,7 @@
                 <th class="text-left text-sm p-3">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="!loading.departement">
               <tr v-for="(departement, index) in departements" :key="index">
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
@@ -110,6 +110,12 @@
               </tr>
             </tbody>
           </table>
+          <div
+            class="flex justify-center mt-14 w-full"
+            v-if="loading.departement"
+          >
+            <Loading />
+          </div>
         </section>
       </section>
     </section>
@@ -121,7 +127,7 @@
     >
       <template #header>
         <ChoiseCompany
-          v-if="superAdmin && !loading.company"
+          v-if="superAdmin && !loading.departement"
           @selected:company="dataCompany = $event"
           :options="options"
           :dataCompany="dataCompany"
@@ -226,6 +232,7 @@ import Modal from "../../components/Modal.vue";
 import Input from "../../components/Input.vue";
 import SelectSearch from "../../components/Select/SelectSearch.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import Loading from "@/components/Loading.vue";
 import employee from "@/employee.json";
 import { AddDepartementAPI, GetDepartementAPI } from "@/actions/departement";
 import decryptToken from "@/utils/decryptToken";
@@ -240,6 +247,7 @@ export default {
     Input,
     SelectSearch,
     ChoiseCompany,
+    Loading,
   },
 
   data() {
@@ -262,7 +270,7 @@ export default {
       options: [],
       dataCompany: {},
       loading: {
-        company: true,
+        departement: true,
       },
     };
   },
@@ -279,7 +287,7 @@ export default {
       const response = await GetAllCompanyAPI();
       this.options = response.data;
       this.dataCompany = response.data[0];
-      this.loading.company = false;
+      this.loading.departement = false;
     },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany._id}`;
