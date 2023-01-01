@@ -1,5 +1,18 @@
 <template>
-  <Modal :showModal="showModal" title="Add Employee" @close="closeModal">
+  <Modal
+    :showModal="showModal"
+    title="Add Employee"
+    @close="closeModal"
+    @click="show_select = ''"
+  >
+    <template #header>
+      <ChoiseCompany
+        v-if="superAdmin && !loading.company"
+        @selected:company="dataCompany = $event"
+        :options="options"
+        :dataCompany="dataCompany"
+      />
+    </template>
     <section class="text-center mb-6">
       <ul class="flex">
         <li
@@ -51,15 +64,15 @@
               label="Nama Depan"
               input_class="md:w-4/6 w-full mt-1 w-full mt-1"
               class="mb-2.5"
-              :value="personal.first_name"
-              @change="personal.first_name = $event"
+              :value="personal.emp_firstname"
+              @change="personal.emp_firstname = $event"
             />
             <Input
               label="Nama Belakang"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
-              :value="personal.last_name"
-              @change="personal.last_name = $event"
+              :value="personal.emp_lastname"
+              @change="personal.emp_lastname = $event"
             />
             <Input
               label="Email"
@@ -72,15 +85,15 @@
               label="NIK Ktp"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
-              :value="personal.nik_ktp"
-              @change="personal.nik_ktp = $event"
+              :value="personal.emp_nikktp"
+              @change="personal.emp_nikktp = $event"
             />
             <Input
               label="Phone number"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
-              :value="personal.phone_number"
-              @change="personal.phone_number = $event"
+              :value="personal.emp_phone"
+              @change="personal.emp_phone = $event"
             />
             <div class="md:flex justify-between items-center mb-2.5">
               <label class="text-sm text-gray-400 md:w-1/5 w-full"
@@ -91,15 +104,15 @@
                   label="Laki-Laki"
                   class="mr-5"
                   value="Laki-Laki"
-                  :checked="personal.gender === 'Laki-Laki'"
-                  @change="personal.gender = 'Laki-Laki'"
+                  :checked="personal.emp_gender === 'Laki-Laki'"
+                  @change="personal.emp_gender = 'Laki-Laki'"
                 />
                 <Radio
                   label="Perempuan"
                   class="mr-5"
-                  :checked="personal.gender === 'Perempuan'"
+                  :checked="personal.emp_gender === 'Perempuan'"
                   value="Perempuan"
-                  @change="personal.gender = 'Perempuan'"
+                  @change="personal.emp_gender = 'Perempuan'"
                 />
               </div>
             </div>
@@ -107,8 +120,8 @@
               label="Marital Status"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
-              :value="personal.marital_status"
-              @change="personal.marital_status = $event"
+              :value="personal.emp_marital_status"
+              @change="personal.emp_marital_status = $event"
               :options="['Belum menikah', 'sudah menikah']"
             />
             <Input
@@ -116,18 +129,18 @@
               type="date"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
-              :value="personal.date_birthday"
-              @change="personal.date_birthday = $event"
+              :value="personal.emp_birthday"
+              @change="personal.emp_birthday = $event"
             />
             <SelectSearch
               :options="['O+', 'O-', 'A+', 'A-']"
               label="Golongan Darah"
               input_class="w-full md:w-4/6 mt-1"
               position="top"
-              :selectedOption="personal.blood_type"
+              :selectedOption="personal.emp_blood"
               :isOpen="show_select === 'gol'"
               @handleShowSelect="show_select = 'gol'"
-              @selected="personal.blood_type = $event"
+              @selected="personal.emp_blood = $event"
             />
           </section>
         </section>
@@ -147,38 +160,48 @@
               @change="employment.username = $event"
             />
             <Input
+              label="Password"
+              input_class="md:w-4/6 mt-2"
+              class="mb-2.5"
+              type="password"
+              :value="employment.password"
+              @change="employment.password = $event"
+            />
+            <Input
               label="NIK Karyawan"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.nik_karyawan"
-              @change="employment.nik_karyawan = $event"
+              :value="employment.emp_nik_karyawan"
+              @change="employment.emp_nik_karyawan = $event"
             />
             <SelectSearch
-              :options="['Administration', 'IT']"
+              :options="departement"
               label="Departement"
               position="bottom"
+              property="dep_name"
               input_class="md:w-4/6 mt-2"
               :isOpen="show_select === 'departemen'"
               @handleShowSelect="show_select = 'departemen'"
-              :selectedOption="employment.departement"
-              @selected="employment.departement = $event"
+              :selectedOption="employment.emp_depid"
+              @selected="employment.emp_depid = $event"
             />
             <SelectSearch
-              :options="['Project Mananger', 'Developer']"
+              :options="designation"
               label="Jabatan"
               position="bottom"
+              property="des_name"
               input_class="md:w-4/6 mt-2"
               :isOpen="show_select === 'jabatan'"
               @handleShowSelect="show_select = 'jabatan'"
-              :selectedOption="employment.designation"
-              @selected="employment.designation = $event"
+              :selectedOption="employment.emp_desid"
+              @selected="employment.emp_desid = $event"
             />
             <Select
               label="Status Karyawan"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.status_karyawan"
-              @change="employment.status_karyawan = $event"
+              :value="employment.emp_status"
+              @change="employment.emp_status = $event"
               :options="['Permanent', 'Probation', 'Contract']"
             />
             <Select
@@ -190,36 +213,26 @@
               :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
             />
             <SelectSearch
-              :options="[
-                'Project Mananger',
-                'Developer',
-                'Project Mananger',
-                'Developer',
-                'Project Mananger',
-              ]"
+              :options="designation"
+              property="des_name"
               label="Atasan Pertama"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-1'"
               @handleShowSelect="show_select = 'atasan-1'"
-              :selectedOption="employment.atasan.first"
-              @selected="employment.atasan.first = $event"
+              :selectedOption="employment.emp_fsuperior"
+              @selected="employment.emp_fsuperior = $event"
             />
             <SelectSearch
-              :options="[
-                'Project Mananger',
-                'Developer',
-                'Project Mananger',
-                'Developer',
-                'Project Mananger',
-              ]"
+              :options="designation"
+              property="des_name"
               label="Atasan Kedua"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-2'"
               @handleShowSelect="show_select = 'atasan-2'"
-              :selectedOption="employment.atasan.second"
-              @selected="employment.atasan.second = $event"
+              :selectedOption="employment.emp_ssuperior"
+              @selected="employment.emp_ssuperior = $event"
             />
             <Select
               label="Lokasi Absensi"
@@ -255,16 +268,16 @@
               input_class="md:w-4/6 mt-2 md:mt-0"
               class="w-full mr-6"
               :options="shift_data"
-              :disabled="attadance_day[day.name.toLowerCase()].is_cuti"
+              :disabled="attadance_day[day.name.toLowerCase()].off_day"
               :value="attadance_day[day.name.toLowerCase()].shift"
               @change="attadance_day[day.name.toLowerCase()].shift = $event"
             />
             <SwitchButton
               @update:model="
                 (value) =>
-                  (attadance_day[day.name.toLowerCase()].is_cuti = value)
+                  (attadance_day[day.name.toLowerCase()].off_day = value)
               "
-              :value="attadance_day[day.name.toLowerCase()].is_cuti"
+              :value="attadance_day[day.name.toLowerCase()].off_day"
             />
           </div>
         </section>
@@ -370,6 +383,12 @@ import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
 import Radio from "./Radio.vue";
 import SwitchButton from "./SwitchButton.vue";
+import { AddEmploymentAPI } from "@/actions/employment";
+import { GetDepartementAPI } from "@/actions/departement";
+import { GetAllCompanyAPI } from "@/actions/company";
+import decryptToken from "@/utils/decryptToken";
+import ChoiseCompany from "./ChoiseCompany.vue";
+import { GetDesignationAPI } from "@/actions/designation";
 
 export default {
   name: "ModalAddEmployee",
@@ -380,44 +399,44 @@ export default {
     SelectSearch,
     Radio,
     SwitchButton,
+    ChoiseCompany,
   },
-  props: { showModal: Boolean, closeModal: Function },
+  props: { showModal: Boolean, closeModal: Function, getEmployement: Function },
   data() {
     return {
       show_select: "",
       personal: {
-        profile: null,
-        first_name: "",
-        last_name: "",
+        emp_profile: null,
+        emp_firstname: "",
+        emp_lastname: "",
         email: "",
-        nik_ktp: "",
-        phone_number: null,
-        gender: "",
-        marital_status: "",
-        date_birthday: "",
-        blood_type: "",
+        emp_nikktp: "",
+        emp_phone: null,
+        emp_gender: "",
+        emp_marital_status: "",
+        emp_birthday: "",
+        emp_blood: "",
       },
       employment: {
         username: "",
-        nik_karyawan: "",
-        departement: "",
-        designation: "",
-        status_karyawan: "",
+        password: "",
+        emp_nik_karyawan: "",
+        emp_depid: "",
+        emp_desid: "",
+        emp_status: "",
+        emp_fsuperior: "",
+        emp_ssuperior: "",
         tanggungan: "",
-        atasan: {
-          first: "",
-          second: "",
-        },
-        location: "",
+        emp_location: "",
       },
       attadance_day: {
-        senin: { shift: "", is_cuti: false },
-        selasa: { shift: "", is_cuti: false },
-        rabu: { shift: "", is_cuti: false },
-        kamis: { shift: "", is_cuti: false },
-        jumat: { shift: "", is_cuti: false },
-        sabtu: { shift: "", is_cuti: false },
-        minggu: { shift: "", is_cuti: false },
+        senin: { shift: "", off_day: false },
+        selasa: { shift: "", off_day: false },
+        rabu: { shift: "", off_day: false },
+        kamis: { shift: "", off_day: false },
+        jumat: { shift: "", off_day: false },
+        sabtu: { shift: "", off_day: false },
+        minggu: { shift: "", off_day: false },
       },
       basic_salary: {
         periode: "",
@@ -432,15 +451,23 @@ export default {
         "Shift 3 Stationery",
       ],
       shift_day: [
-        { name: "Senin", isCuti: false },
-        { name: "Selasa", isCuti: false },
-        { name: "Rabu", isCuti: false },
-        { name: "Kamis", isCuti: false },
-        { name: "Jumat", isCuti: false },
-        { name: "Sabtu", isCuti: false },
-        { name: "Minggu", isCuti: false },
+        { name: "Senin", off_day: false },
+        { name: "Selasa", off_day: false },
+        { name: "Rabu", off_day: false },
+        { name: "Kamis", off_day: false },
+        { name: "Jumat", off_day: false },
+        { name: "Sabtu", off_day: false },
+        { name: "Minggu", off_day: false },
       ],
       tabActive: "Personal",
+      departement: [],
+      designation: [],
+      options: [],
+      superAdmin: false,
+      dataCompany: {},
+      loading: {
+        company: true,
+      },
     };
   },
   methods: {
@@ -460,14 +487,70 @@ export default {
       const file = URL.createObjectURL(files);
       this.personal.profile = file;
     },
-    handleAddEmployment() {
-      const data = {
-        personal: this.personal,
-        employment: this.employment,
-        attadance: this.attadance_day,
-        basic_salary: this.basic_salary,
-      };
+    async getCompany() {
+      const response = await GetAllCompanyAPI();
+      this.options = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.company = false;
     },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      if (this?.dataCompany?._id) {
+        const response = await GetDepartementAPI(querySuperAdmin);
+        if (response.status === 401) {
+          return (window.location.href = "/login");
+        }
+        this.departement = response.data;
+      }
+    },
+    async handleGetDesignation() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      if (this?.dataCompany?._id) {
+        const response = await GetDesignationAPI(querySuperAdmin);
+        if (response.status === 401) {
+          return (window.location.href = "/login");
+        }
+        this.designation = response.data;
+      }
+    },
+    async handleAddEmployment() {
+      const employment = {
+        ...this.employment,
+        emp_depid: this.employment.emp_depid?._id,
+        emp_desid: this.employment.emp_desid?._id,
+        emp_fsuperior: this.employment.emp_fsuperior?.des_name,
+        emp_ssuperior: this.employment.emp_ssuperior?.des_name,
+      };
+
+      const data = {
+        ...this.personal,
+        ...employment,
+        attadence: this.attadance_day,
+      };
+      const response = await AddEmploymentAPI(
+        data,
+        `?company=${this.dataCompany?._id}`
+      );
+      if (response.status === 200) {
+        this.getEmployement();
+        this.closeModal();
+      }
+    },
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDepartement();
+        this.handleGetDesignation();
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getCompany();
+    // this.handleGetDepartement();
   },
 };
 </script>
