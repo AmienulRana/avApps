@@ -176,134 +176,139 @@
           }}
           items of {{ employee?.length }} -->
         </p>
-        <div
-          class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"
-          v-if="layoutData === 'card'"
-        >
-          <section
-            class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
-            v-for="(employe, index) in employeeFilter || employee"
-            :key="index"
-          >
-            <div
-              class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
-            >
-              <h2 class="md:text-base text-sm text-white">
-                {{
-                  employe?.emp_fullname.substr(0, 1) +
-                  employe?.emp_fullname.substr(
-                    employe?.emp_fullname.indexOf(" ") + 1,
-                    1
-                  )
-                }}
-              </h2>
-            </div>
-            <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
-              {{ employe?.emp_fullname }}
-            </h1>
-            <p class="text-sm md:text-base text-gray-400" v-if="superAdmin">
-              {{ employe?.company_id?.company_name }}
-            </p>
-            <p class="text-xs text-gray-400 my-2 md:my-2">
-              {{ employe?.emp_desid?.des_name }}
-            </p>
-            <p class="text-sm md:text-base text-gray-400">
-              {{ employe?._id?.split("").splice(11, 7).join("") }}
-            </p>
-            <Button
-              class="px-4 text-sm py-1 my-2 text-white rounded-full"
-              :class="
-                employe?.emp_status === 'Permanent'
-                  ? 'bg-blue-500'
-                  : employe?.emp_status === 'Probation'
-                  ? 'bg-orange-500'
-                  : 'bg-red-600'
-              "
-            >
-              {{ employe?.emp_status }}
-            </Button>
-            <p class="text-sm md:text-base text-gray-400">
-              {{ employe?.emp_depid?.dep_name }}
-            </p>
-            <p class="text-sm md:text-base text-gray-400 my-2 md:my-0">
-              {{ employe.emp_depid?.dep_workshift }}
-            </p>
-            <p class="text-sm md:text-base text-blue-600 mt-3">
-              <router-link :to="`/employee/${employe._id}`"
-                >View Details</router-link
-              >
-            </p>
-            <Button
-              class="absolute top-4 right-4 px-3 bg-blue-100 text-primary rounded-full"
-              @click="showContactEmployee(index + 1)"
-            >
-              <font-awesome-icon icon="fa-ellipsis" />
-            </Button>
-            <div
-              class="absolute top-10 right-6 rounded-md bg-white shadow-md md:w-10/12 md:h-max"
-              v-if="contactEmployee === index + 1"
-            >
-              <ul>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    View details
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Edit
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Assign leave
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Edit salary
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Add joining date
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Terminate
-                  </router-link>
-                </li>
-                <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                  <router-link
-                    to="/detail-employee"
-                    class="cursor-pointer text-sm"
-                  >
-                    Remove from employee list
-                  </router-link>
-                </li>
-              </ul>
-            </div>
-          </section>
+        <div class="flex justify-center mt-24" v-if="loading.employement">
+          <Loading />
         </div>
+        <template v-else>
+          <div
+            class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"
+            v-if="layoutData === 'card'"
+          >
+            <section
+              class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
+              v-for="(employe, index) in employeeFilter || employee"
+              :key="index"
+            >
+              <div
+                class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
+              >
+                <h2 class="md:text-base text-sm text-white">
+                  {{
+                    employe?.emp_fullname.substr(0, 1) +
+                    employe?.emp_fullname.substr(
+                      employe?.emp_fullname.indexOf(" ") + 1,
+                      1
+                    )
+                  }}
+                </h2>
+              </div>
+              <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
+                {{ employe?.emp_fullname }}
+              </h1>
+              <p class="text-sm md:text-base text-gray-400" v-if="superAdmin">
+                {{ employe?.company_id?.company_name }}
+              </p>
+              <p class="text-xs text-gray-400 my-2 md:my-2">
+                {{ employe?.emp_desid?.des_name }}
+              </p>
+              <p class="text-sm md:text-base text-gray-400">
+                {{ employe?._id?.split("").splice(11, 7).join("") }}
+              </p>
+              <Button
+                class="px-4 text-sm py-1 my-2 text-white rounded-full"
+                :class="
+                  employe?.emp_status === 'Permanent'
+                    ? 'bg-blue-500'
+                    : employe?.emp_status === 'Probation'
+                    ? 'bg-orange-500'
+                    : 'bg-red-600'
+                "
+              >
+                {{ employe?.emp_status }}
+              </Button>
+              <p class="text-sm md:text-base text-gray-400">
+                {{ employe?.emp_depid?.dep_name }}
+              </p>
+              <p class="text-sm md:text-base text-gray-400 my-2 md:my-0">
+                {{ employe.emp_depid?.dep_workshift }}
+              </p>
+              <p class="text-sm md:text-base text-blue-600 mt-3">
+                <router-link :to="`/employee/${employe._id}`"
+                  >View Details</router-link
+                >
+              </p>
+              <Button
+                class="absolute top-4 right-4 px-3 bg-blue-100 text-primary rounded-full"
+                @click="showContactEmployee(index + 1)"
+              >
+                <font-awesome-icon icon="fa-ellipsis" />
+              </Button>
+              <div
+                class="absolute top-10 right-6 rounded-md bg-white shadow-md md:w-10/12 md:h-max"
+                v-if="contactEmployee === index + 1"
+              >
+                <ul>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      View details
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Edit
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Assign leave
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Edit salary
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Add joining date
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Terminate
+                    </router-link>
+                  </li>
+                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
+                    <router-link
+                      to="/detail-employee"
+                      class="cursor-pointer text-sm"
+                    >
+                      Remove from employee list
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </template>
 
         <TableEmployee
           v-if="layoutData === 'table'"
@@ -338,6 +343,7 @@ import { GetDepartementAPI } from "@/actions/departement";
 import { GetAllEmployementAPI } from "@/actions/employment";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -348,6 +354,7 @@ export default {
     Dropdown,
     AddModalEmployee,
     ChoiseCompany,
+    Loading,
   },
   data() {
     return {
