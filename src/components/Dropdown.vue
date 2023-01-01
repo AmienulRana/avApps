@@ -53,7 +53,7 @@
             class="px-4 py-2 text-gray-400 text-sm hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
             :class="option === selectedOption ? 'bg-primary text-white' : ''"
           >
-            {{ option }}
+            {{ property ? option[property] : option }}
             <font-awesome-icon
               icon="fa-check"
               v-if="option === selectedOption"
@@ -82,7 +82,8 @@ export default {
       default: true,
     },
     options: Array,
-    selectedOption: String,
+    selectedOption: String || Object,
+    property: String,
   },
   emits: ["update:activeDropdown", "selected", "clearSelected"],
   data() {
@@ -96,12 +97,20 @@ export default {
       this.query = value;
       if (this.query.length >= 1) {
         const result = this.options.filter((option) =>
-          option.toLowerCase().includes(this.query.toLowerCase())
+          option[this.property].toLowerCase().includes(this.query.toLowerCase())
         );
         this.searchResult = result;
       } else {
         this.searchResult = this.options;
       }
+    },
+  },
+  watch: {
+    options: {
+      handler(newData) {
+        this.searchResult = newData;
+      },
+      deep: true,
     },
   },
 };
