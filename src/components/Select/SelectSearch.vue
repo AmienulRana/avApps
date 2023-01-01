@@ -12,7 +12,13 @@
         :class="{ 'border-primary': isOpen }"
       >
         <p>
-          {{ !selectedOption ? placeholder : selectedOption }}
+          {{
+            !selectedOption
+              ? placeholder
+              : property
+              ? selectedOption[property]
+              : selectedOption
+          }}
         </p>
         <font-awesome-icon
           icon="fa-chevron-up"
@@ -49,12 +55,16 @@
               @click="$emit('selected', option)"
               class="px-4 py-2 text-gray-400 text-sm justify-between items-center duration-100 cursor-pointer flex"
               :class="
-                option === selectedOption
+                property
+                  ? option[property] === selectedOption
+                    ? 'bg-primary text-white'
+                    : 'hover:bg-gray-100'
+                  : option === selectedOption
                   ? 'bg-primary text-white'
                   : 'hover:bg-gray-100'
               "
             >
-              {{ option }}
+              {{ property ? option[property] : option }}
             </p>
           </div>
         </section>
@@ -74,6 +84,7 @@ export default {
     options: Array,
     selectedOption: String,
     placeholder: String,
+    property: String,
     position: {
       type: String,
       default: "bottom",
@@ -98,6 +109,15 @@ export default {
       }
     },
   },
+  watch: {
+    options: {
+      handler(newOptions) {
+        this.searchResult = newOptions;
+      },
+      deep: true,
+    },
+  },
+  // mounte
 };
 </script>
 
