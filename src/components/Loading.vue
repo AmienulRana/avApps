@@ -22,8 +22,8 @@ export default {
 }
 
 .dot {
-  width: 15px;
-  height: 15px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   margin: 0 5px;
   animation: bounce 1s infinite;
