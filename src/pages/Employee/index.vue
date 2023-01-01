@@ -2,7 +2,15 @@
   <LayoutAdmin @click="activeDropdown = false">
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between items-center">
-        <h1 class="md:text-2xl text-lg">All Employees</h1>
+        <section class="flex items-center">
+          <h1 class="md:text-2xl text-lg">All Employees</h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading.employement"
+            @selected:company="dataCompany = $event"
+            :options="options"
+            :dataCompany="dataCompany"
+          />
+        </section>
         <Button
           class="bg-primary text-white px-6 py-2 text-sm rounded-md"
           @click="showModal = true"
@@ -43,15 +51,8 @@
         />
         <Dropdown
           title="Designation"
-          :options="[
-            'Director',
-            'Chief Technology Officer (CTO) ',
-            'General Manager',
-            'HR Manager',
-            'Project Manager',
-            'Software Enginner',
-            'Technical Lead Enginner',
-          ]"
+          :options="designation"
+          property="des_name"
           :showDropdown="activeDropdown === 'designation'"
           @selected="
             handleFilter(
@@ -163,16 +164,17 @@
       </section>
       <section class="">
         <p class="text-sm text-gray-300 mt-5 mb-3">
-          Showing
-          {{ !employeeFilter ? 1 : employeeFilter.length === 0 ? 0 : 1 }} to
+          <!-- Showing
+          {{ employeeFilter?.length === 0 ? 0 : 1 }}
+          to
           {{
-            employeeFilter
-              ? employeeFilter.length
-              : employee.length > 10
+            employeeFilter?.length > 0
+              ? employeeFilter?.length
+              : employee?.length > 10
               ? 10
-              : employee.length
+              : employee?.length
           }}
-          items of {{ employee.length }}
+          items of {{ employee?.length }} -->
         </p>
         <div
           class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"
@@ -180,7 +182,7 @@
         >
           <section
             class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
-            v-for="(data, index) in employeeFilter || employee"
+            v-for="(employe, index) in employeeFilter || employee"
             :key="index"
           >
             <div
@@ -188,39 +190,46 @@
             >
               <h2 class="md:text-base text-sm text-white">
                 {{
-                  data.name.substr(0, 1) +
-                  data.name.substr(data.name.indexOf(" ") + 1, 1)
+                  employe?.emp_fullname.substr(0, 1) +
+                  employe?.emp_fullname.substr(
+                    employe?.emp_fullname.indexOf(" ") + 1,
+                    1
+                  )
                 }}
               </h2>
             </div>
             <h1 class="text-sm md:text-base mt-2 md:mb-0 mb-2">
-              {{ data.name }}
+              {{ employe?.emp_fullname }}
             </h1>
-            <p class="text-sm md:text-base text-gray-500">{{ data.company }}</p>
-            <p class="text-xs text-gray-400 my-2 md:my-0">
-              {{ data.designation }}
+            <p class="text-sm md:text-base text-gray-400" v-if="superAdmin">
+              {{ employe?.company_id?.company_name }}
             </p>
-            <p class="text-sm md:text-base text-gray-500">{{ data.id }}</p>
+            <p class="text-xs text-gray-400 my-2 md:my-2">
+              {{ employe?.emp_desid?.des_name }}
+            </p>
+            <p class="text-sm md:text-base text-gray-400">
+              {{ employe?._id?.split("").splice(11, 7).join("") }}
+            </p>
             <Button
               class="px-4 text-sm py-1 my-2 text-white rounded-full"
               :class="
-                data.status === 'Permanent'
+                employe?.emp_status === 'Permanent'
                   ? 'bg-blue-500'
-                  : data.status === 'Probation'
+                  : employe?.emp_status === 'Probation'
                   ? 'bg-orange-500'
                   : 'bg-red-600'
               "
             >
-              {{ data.status }}
+              {{ employe?.emp_status }}
             </Button>
             <p class="text-sm md:text-base text-gray-400">
-              {{ data.departement }}
+              {{ employe?.emp_depid?.dep_name }}
             </p>
             <p class="text-sm md:text-base text-gray-400 my-2 md:my-0">
-              {{ data.workshifts }}
+              {{ employe.emp_depid?.dep_workshift }}
             </p>
             <p class="text-sm md:text-base text-blue-600 mt-3">
-              <router-link :to="`/employee/${data.id}`"
+              <router-link :to="`/employee/${employe._id}`"
                 >View Details</router-link
               >
             </p>
@@ -301,15 +310,16 @@
           :employee="!employeeFilter ? employee : employeeFilter"
         />
       </section>
-      <section class="flex justify-between my-6">
+      <!-- <section class="flex justify-between my-6">
         <Pagination
           :total-pages="10"
           :current-page="currentPage"
           @page-change="changePage"
         ></Pagination>
-      </section>
+      </section> -->
     </section>
     <AddModalEmployee
+      :getEmployement="handleGetEmployement"
       :showModal="showModal"
       :closeModal="() => (showModal = false)"
     />
@@ -320,10 +330,14 @@
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
-import Pagination from "../../components/Paggination.vue";
 import TableEmployee from "../../components/TableEmployee.vue";
-import employee from "../../employee.json";
 import AddModalEmployee from "../../components/ModalAddEmployee.vue";
+import { GetAllCompanyAPI } from "@/actions/company";
+import { GetDesignationAPI } from "@/actions/designation";
+import { GetDepartementAPI } from "@/actions/departement";
+import { GetAllEmployementAPI } from "@/actions/employment";
+import decryptToken from "@/utils/decryptToken";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -332,13 +346,15 @@ export default {
     Button,
     TableEmployee,
     Dropdown,
-    Pagination,
     AddModalEmployee,
+    ChoiseCompany,
   },
   data() {
     return {
       activeDropdown: "",
-      employee: employee,
+      employee: [],
+      designation: [],
+      departement: [],
       currentPage: 1,
       contactEmployee: 0,
       layoutData: "card",
@@ -351,6 +367,12 @@ export default {
       },
       showModal: false,
       employeeFilter: false,
+      options: [],
+      superAdmin: false,
+      dataCompany: {},
+      loading: {
+        employement: true,
+      },
     };
   },
   methods: {
@@ -389,6 +411,55 @@ export default {
         );
       this.employeeFilter = this.employee.filter(dataFilter);
     },
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.options = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.employement = false;
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.departement = response.data;
+    },
+    async handleGetDesignation() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDesignationAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      console.log(response);
+      this.designation = response.data;
+    },
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.employee = response.data;
+    },
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDepartement();
+        this.handleGetDesignation();
+        this.handleGetEmployement();
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
+    // this.handleGetEmployement();
   },
   computed: {},
 };
