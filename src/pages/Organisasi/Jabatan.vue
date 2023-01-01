@@ -5,7 +5,7 @@
         <div class="flex items-center">
           <h1 class="md:text-2xl text-lg">Designation</h1>
           <ChoiseCompany
-            v-if="superAdmin && !loading.company"
+            v-if="superAdmin && !loading.designation"
             @selected:company="dataCompany = $event"
             :options="options"
             :dataCompany="dataCompany"
@@ -29,7 +29,7 @@
                 <th class="text-left text-sm p-3">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="!loading.designation">
               <tr v-for="(des, index) in designations" :key="index">
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">{{ des?.des_name }}</p>
@@ -55,6 +55,12 @@
               </tr>
             </tbody>
           </table>
+          <div
+            class="flex justify-center mt-14 w-full"
+            v-if="loading.designation"
+          >
+            <Loading />
+          </div>
         </section>
       </section>
     </section>
@@ -66,7 +72,7 @@
     >
       <template #header>
         <ChoiseCompany
-          v-if="superAdmin && !loading.company"
+          v-if="superAdmin && !loading.designation"
           @selected:company="dataCompany = $event"
           :options="options"
           :dataCompany="dataCompany"
@@ -131,6 +137,7 @@ import { GetDesignationAPI, AddDesignationAPI } from "@/actions/designation";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -138,6 +145,7 @@ export default {
     LayoutAdmin,
     Button,
     Modal,
+    Loading,
     ChoiseCompany,
     Input,
   },
@@ -153,7 +161,7 @@ export default {
       options: [],
       dataCompany: {},
       loading: {
-        company: true,
+        designation: true,
       },
     };
   },
@@ -162,18 +170,18 @@ export default {
       const response = await GetAllCompanyAPI();
       this.options = response?.data;
       this.dataCompany = response?.data[0];
-      this.loading.company = false;
+      this.loading.designation = false;
     },
     async handleGetDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetDesignationAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
-      console.log(response);
       if (response.status === 401) {
         return (window.location.href = "/login");
       }
       this.designations = response.data;
+      this.loading.designation = false;
     },
     async handleAddDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
