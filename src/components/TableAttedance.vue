@@ -72,7 +72,7 @@
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
-            <div
+            <!-- <div
               class="text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
             >
               <ul>
@@ -133,7 +133,7 @@
                   </router-link>
                 </li>
               </ul>
-            </div>
+            </div> -->
           </td>
         </tr>
       </tbody>
