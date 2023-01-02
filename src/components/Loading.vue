@@ -1,15 +1,18 @@
 <template>
   <div class="loading">
-    <div class="dot bg-primary"></div>
-    <div class="dot bg-primary"></div>
-    <div class="dot bg-primary"></div>
-    <div class="dot bg-primary"></div>
+    <div
+      class="dot"
+      v-for="(dot, i) in new Array(4)"
+      :key="i"
+      :class="dotColor === 'white' ? 'bg-white' : 'bg-primary'"
+    ></div>
   </div>
 </template>
 
 <script>
 export default {
   name: "LoadingComponent",
+  props: { dotColor: String },
 };
 </script>
 
