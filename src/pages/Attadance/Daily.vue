@@ -69,13 +69,7 @@
         </p>
         <TableAttedance />
       </section>
-      <section class="flex justify-between my-6">
-        <Pagination
-          :total-pages="10"
-          :current-page="currentPage"
-          @page-change="changePage"
-        ></Pagination>
-      </section>
+      <section class="flex justify-between my-6"></section>
     </section>
   </LayoutAdmin>
 </template>
@@ -84,7 +78,6 @@
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
-import Pagination from "../../components/Paggination.vue";
 import TableAttedance from "../../components/TableAttedance.vue";
 
 export default {
@@ -94,12 +87,10 @@ export default {
     Button,
     TableAttedance,
     Dropdown,
-    Pagination,
   },
   data() {
     return {
       activeDropdown: "",
-      currentPage: 1,
       contactEmployee: 0,
       layoutData: "card",
     };
@@ -115,10 +106,6 @@ export default {
         this.activeDropdown = id;
       }
     },
-    changePage(page) {
-      this.currentPage = page;
-      // kode lain yang akan dieksekusi ketika halaman berubah, seperti mengambil data dari server
-    },
     showContactEmployee(id) {
       if (this.contactEmployee === id) {
         this.contactEmployee = false;
@@ -130,5 +117,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
