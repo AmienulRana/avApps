@@ -1,5 +1,10 @@
 <template>
-  <LayoutAdmin @click="activeDropdown = false">
+  <LayoutAdmin
+    @click="
+      activeDropdown = false;
+      pagination.changePerPage = false;
+    "
+  >
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex justify-between items-center">
         <section class="flex items-center">
@@ -186,13 +191,19 @@
           >
             <section
               class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
-              v-for="(employe, index) in employeeFilter || employee"
+              v-for="(employe, index) in paginatedItems"
               :key="index"
             >
               <div
                 class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
               >
-                <h2 class="md:text-base text-sm text-white">
+                <img
+                  :src="employe?.emp_profile"
+                  :alt="`Profile
+                ${employe?.emp_fullname}`"
+                  v-if="employe?.emp_profile"
+                />
+                <h2 class="md:text-base text-sm text-white" v-else>
                   {{
                     employe?.emp_fullname.substr(0, 1) +
                     employe?.emp_fullname.substr(
@@ -315,13 +326,58 @@
           :employee="!employeeFilter ? employee : employeeFilter"
         />
       </section>
-      <!-- <section class="flex justify-between my-6">
+      <section
+        class="flex justify-between items-center my-14"
+        v-if="!loading.employement"
+      >
+        <section class="flex items-center">
+          <p class="text-gray-400 mr-2 text-sm">items showing per page</p>
+          <section class="relative">
+            <button
+              class="bg-white w-10 py-1.5 text-gray-400 hover:bg-gray-50 hover:text-primary"
+              @click.stop="pagination.changePerPage = !pagination.changePerPage"
+            >
+              {{ pagination.perPage }}
+            </button>
+            <section
+              class="absolute shadow-md flex-col items-between bottom-full left-0 bg-white w-32 h-38 py-2"
+              v-if="pagination.changePerPage"
+            >
+              <p
+                class="my-2 text-sm hover:bg-gray-50 hover:text-primary text-gray-400 px-2.5 py-1"
+                @click="pagination.perPage = 5"
+              >
+                5
+              </p>
+              <p
+                class="my-2 text-sm hover:bg-gray-50 hover:text-primary text-gray-400 px-2.5 py-1"
+                @click="pagination.perPage = 10"
+              >
+                10
+              </p>
+              <p
+                class="my-2 text-sm hover:bg-gray-50 hover:text-primary text-gray-400 px-2.5 py-1"
+                @click="pagination.perPage = 20"
+              >
+                20
+              </p>
+              <p
+                class="my-2 text-sm hover:bg-gray-50 hover:text-primary text-gray-400 px-2.5 py-1"
+                @click="pagination.perPage = 30"
+              >
+                30
+              </p>
+            </section>
+          </section>
+        </section>
         <Pagination
-          :total-pages="10"
-          :current-page="currentPage"
-          @page-change="changePage"
-        ></Pagination>
-      </section> -->
+          v-if="employee.length > pagination.perPage"
+          v-bind:items="employee"
+          v-bind:per-page="pagination.perPage"
+          v-bind:current-page="pagination.currentPage"
+          @change-page="changePage"
+        />
+      </section>
     </section>
     <AddModalEmployee
       :getEmployement="handleGetEmployement"
@@ -344,6 +400,7 @@ import { GetAllEmployementAPI } from "@/actions/employment";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
+import Pagination from "@/components/Paggination.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -355,16 +412,22 @@ export default {
     AddModalEmployee,
     ChoiseCompany,
     Loading,
+    Pagination,
   },
   data() {
     return {
       activeDropdown: "",
-      employee: [],
       designation: [],
       departement: [],
       currentPage: 1,
       contactEmployee: 0,
       layoutData: "card",
+      employee: [],
+      pagination: {
+        perPage: 5,
+        currentPage: 1,
+        changePerPage: null,
+      },
       filter: {
         employment_status: "",
         designation: "",
@@ -394,8 +457,7 @@ export default {
       }
     },
     changePage(page) {
-      this.currentPage = page;
-      // kode lain yang akan dieksekusi ketika halaman berubah, seperti mengambil data dari server
+      this.pagination.currentPage = page;
     },
     showContactEmployee(id) {
       if (this.contactEmployee === id) {
@@ -469,7 +531,12 @@ export default {
     this.getAllCompany();
     // this.handleGetEmployement();
   },
-  computed: {},
+  computed: {
+    paginatedItems() {
+      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
+      return this.employee.slice(start, start + this.pagination.perPage);
+    },
+  },
 };
 </script>
 
