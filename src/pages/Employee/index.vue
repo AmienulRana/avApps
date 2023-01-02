@@ -198,9 +198,10 @@
                 class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
               >
                 <img
-                  :src="employe?.emp_profile"
+                  :src="`${urlImages}/${employe?.emp_profile}`"
                   :alt="`Profile
                 ${employe?.emp_fullname}`"
+                  class="rounded-full"
                   v-if="employe?.emp_profile"
                 />
                 <h2 class="md:text-base text-sm text-white" v-else>
@@ -401,6 +402,7 @@ import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Paggination.vue";
+import { URL_IMAGES } from "@/config";
 
 export default {
   name: "EmployeeIndex",
@@ -417,6 +419,7 @@ export default {
   data() {
     return {
       activeDropdown: "",
+      urlImages: URL_IMAGES,
       designation: [],
       departement: [],
       currentPage: 1,
