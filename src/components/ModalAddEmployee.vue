@@ -303,7 +303,6 @@
             class="mb-2.5"
             :value="basic_salary.salary"
             @input="basic_salary.salary = $event"
-            placeholder="Tidak ada perkiraan untuk Project Manager "
           />
           <section class="flex justify-between items-center">
             <p class="text-sm text-gray-400 md:w-1/5">Jumlah Hari kerja :</p>
