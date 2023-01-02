@@ -534,6 +534,17 @@ export default {
       if (response.status === 200) {
         this.getEmployement();
         this.closeModal();
+        this.tabActive = "Personal";
+        for (const key in this.personal) {
+          this.personal[key] = "";
+        }
+        for (const key in this.employment) {
+          this.employment[key] = "";
+        }
+        for (const key in this.attadance_day) {
+          this.attadance_day[key].off_day = false;
+          this.attadance_day[key].shift = "";
+        }
       }
     },
   },
