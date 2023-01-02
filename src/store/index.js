@@ -18,6 +18,9 @@ const store = createStore({
     setFile(state, payload) {
       state.file = payload;
     },
+    unSetFile(state) {
+      state.file = null;
+    },
   },
   actions: {},
 });

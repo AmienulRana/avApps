@@ -543,6 +543,7 @@ export default {
         this.getEmployement();
         this.closeModal();
         this.tabActive = "Personal";
+        this.$store.commit("unSetFile");
         for (const key in this.personal) {
           this.personal[key] = "";
         }
