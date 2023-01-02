@@ -438,7 +438,6 @@ export default {
       if (response.status === 401) {
         return (window.location.href = "/login");
       }
-      console.log(response);
       this.designation = response.data;
     },
     async handleGetEmployement() {
@@ -455,9 +454,11 @@ export default {
   watch: {
     dataCompany: {
       handler: function () {
+        this.loading.employement = true;
         this.handleGetDepartement();
         this.handleGetDesignation();
         this.handleGetEmployement();
+        this.loading.employement = false;
       },
       deep: true,
     },
