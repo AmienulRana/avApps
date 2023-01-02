@@ -193,19 +193,3 @@ export default {
 </script>
 
 <style scoped></style>
-<!-- <Accordion headerClass="bg-primary px-2 rounded-md w-max">
-          <template v-slot:header>
-            <Button class="py-1.5 mr-2"> Actions</Button>
-          </template>
-          <template v-slot:content>
-            <p
-              class="mt-2 text-sm"
-              v-for="(content, index) in contents"
-              :key="index"
-            >
-              <router-link :to="`${content.to}`">{{
-                content.text
-              }}</router-link>
-            </p>
-          </template>
-        </Accordion> -->
