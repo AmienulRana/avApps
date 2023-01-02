@@ -60,8 +60,10 @@
       <Button
         class="bg-dodgerblue mb-2.5 text-white py-2 text-sm rounded-sm"
         @click="handleLoginCompany"
+        :disabled="loading"
       >
-        Login
+        <Loading dotColor="white" class="py-1" v-if="loading" />
+        <template v-else>Login</template>
       </Button>
       <!-- <Button class="bg-gray-400 text-white py-2 rounded-sm text-sm"
         >Register
@@ -91,10 +93,11 @@ import { LoginSuperAPI, LoginAdminAPI } from "@/actions/login";
 import Select from "@/components/Select/index.vue";
 import CryptoJS from "crypto-js";
 import { SECRET_KEY } from "@/config";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "LoginPage",
-  components: { Button, Select },
+  components: { Button, Select, Loading },
   data() {
     return {
       altImageLogo: "Logo avapps",
@@ -102,6 +105,7 @@ export default {
       login_as: "",
       email: "",
       password: "",
+      loading: false,
     };
   },
   methods: {
@@ -130,9 +134,11 @@ export default {
         window.location.href = "/";
       } else {
         console.log(response);
+        this.loading = false;
       }
     },
     async handleLoginCompany() {
+      this.loading = true;
       const { email, password } = this;
       if (!this.login_as) {
         return alert("Select role to Login");
