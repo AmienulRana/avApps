@@ -25,18 +25,33 @@
     </section>
 
     <section class="mt-4" v-if="tab_active === '1'">
-      <Input label="Username" input_class="md:w-4/6 mt-2" class="mb-2.5" />
-      <Input label="NIK Karyawan" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+      <Input
+        label="Username"
+        input_class="md:w-4/6 mt-2"
+        class="mb-2.5"
+        :value="data.username"
+      />
+      <Input
+        label="NIK Karyawan"
+        input_class="md:w-4/6 mt-2"
+        class="mb-2.5"
+        :value="data.emp_nik_karyawan"
+      />
       <SelectSearch
-        :options="['Administration', 'IT']"
+        :options="departement"
+        property="dep_name"
         label="Departement"
         position="bottom"
+        :selectedOption="data?.emp_depid"
         input_class="md:w-4/6 mt-2"
         :isOpen="show_select === 'departemen'"
         @handleShowSelect="show_select = 'departemen'"
+        @selected="data.emp_depid = $event"
       />
       <SelectSearch
-        :options="['Project Mananger', 'Developer']"
+        :options="designation"
+        property="des_name"
+        :selectedOption="data?.emp_desid"
         label="Jabatan"
         position="bottom"
         input_class="md:w-4/6 mt-2"
@@ -47,6 +62,7 @@
         label="Status Karyawan"
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
+        :value="data?.emp_status"
         :options="['Permanent', 'Probation', 'Contract']"
       />
       <Select
@@ -56,27 +72,17 @@
         :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
       />
       <SelectSearch
-        :options="[
-          'Project Mananger',
-          'Developer',
-          'Project Mananger',
-          'Developer',
-          'Project Mananger',
-        ]"
+        :options="designation"
         label="Atasan Pertama"
+        :selectedOption="data?.emp_fsuperior"
         input_class="md:w-4/6 mt-2"
         position="top"
         :isOpen="show_select === 'atasan-1'"
         @handleShowSelect="show_select = 'atasan-1'"
       />
       <SelectSearch
-        :options="[
-          'Project Mananger',
-          'Developer',
-          'Project Mananger',
-          'Developer',
-          'Project Mananger',
-        ]"
+        :options="designation"
+        :selectedOption="data?.emp_ssuperior"
         label="Atasan Kedua"
         input_class="md:w-4/6 mt-2"
         position="top"
@@ -105,19 +111,20 @@
       </div>
       <div
         class="flex items-center mb-2.5"
-        v-for="day in shift_day"
-        :key="day.name"
+        v-for="(day, i) in shift_day"
+        :key="i"
       >
         <Select
-          :label="day.name"
+          :label="i"
           input_class="md:w-4/6 mt-2 md:mt-0"
           class="w-full mr-6"
           :options="shift_data"
-          :disabled="day.isCuti"
+          :value="day.shift"
+          :disabled="day.off_day"
         />
         <SwitchButton
-          @update:model="(value) => (day.isCuti = value)"
-          :value="day.isCuti"
+          @update:model="(value) => (day.off_day = value)"
+          :value="day?.off_day"
         />
       </div>
       <div class="flex justify-end w-full mb-4">
@@ -134,9 +141,12 @@ import Input from "./Input.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
 import SwitchButton from "./SwitchButton.vue";
+import { GetDepartementAPI } from "@/actions/departement";
+import { GetDesignationAPI } from "@/actions/designation";
 
 export default {
-  name: "PersonalDetail",
+  name: "EmploymentData",
+  props: { employment: Object },
   components: { Input, Select, SelectSearch, SwitchButton },
   data() {
     return {
@@ -147,20 +157,25 @@ export default {
       },
       show_select: false,
       tab_active: "1",
+      data: {
+        emp_status: this.employment?.emp_status,
+        username: this.employment?.username,
+        emp_nik_karyawan: this.employment?.emp_nik_karyawan,
+        emp_depid: { dep_name: this.employment?.emp_depid?.dep_name },
+        emp_desid: { des_name: this.employment?.emp_desid?.des_name },
+        emp_fsuperior: this.employment?.emp_fsuperior,
+        emp_ssuperior: this.employment?.emp_ssuperior,
+        emp_location: this.employment?.emp_location,
+        company_id: this.employment?.company_id,
+      },
       shift_data: [
         "Shift 1 Stationery (08:00 am - 05:00pm)",
         "Shift 2 Stationery",
         "Shift 3 Stationery",
       ],
-      shift_day: [
-        { name: "Senin", isCuti: false },
-        { name: "Selasa", isCuti: false },
-        { name: "Rabu", isCuti: false },
-        { name: "Kamis", isCuti: false },
-        { name: "Jumat", isCuti: false },
-        { name: "Sabtu", isCuti: false },
-        { name: "Minggu", isCuti: false },
-      ],
+      shift_day: this.employment?.emp_attadance,
+      departement: [],
+      designation: [],
     };
   },
   methods: {
@@ -174,8 +189,35 @@ export default {
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
     },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.data?.company_id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.departement = response.data;
+    },
+    async handleGetDesignation() {
+      const querySuperAdmin = `?company=${this.data?.company_id}`;
+      const response = await GetDesignationAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.designation = response.data;
+    },
+  },
+  watch: {
+    employment: {
+      handler(newData) {
+        this.data = newData;
+        this.shift_day = newData?.emp_attadance;
+      },
+      deep: true,
+    },
   },
   mounted() {
+    this.handleGetDepartement();
+    this.handleGetDesignation();
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
     const buttonWidth = this.$refs.first_tab?.offsetWidth;
     const buttonPosition = this.$refs.first_tab?.offsetLeft;
