@@ -28,15 +28,15 @@
         label="Nama Depan"
         input_class="md:md:w-4/6 w-full mt-1 w-full mt-1"
         class="mb-2.5"
-        :value="data.first_name"
-        @change="data.first_name = $event"
+        :value="data.emp_firstname"
+        @change="data.emp_firstname = $event"
       />
       <Input
         label="Nama Belakang"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
-        :value="data.last_name"
-        @change="data.last_name = $event"
+        :value="data.emp_lastname"
+        @change="data.emp_lastname = $event"
       />
       <Input
         label="Email"
@@ -49,15 +49,15 @@
         label="NIK Ktp"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
-        :value="data.nik_ktp"
-        @change="data.nik_ktp = $event"
+        :value="data.emp_nikktp"
+        @change="data.emp_nikktp = $event"
       />
       <Input
         label="Phone number"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
-        :value="data.phone_number"
-        @change="data.phone_number = $event"
+        :value="data.emp_phone"
+        @change="data.emp_phone = $event"
       />
       <div class="md:flex justify-between items-center mb-2.5">
         <label class="text-sm text-gray-400 md:w-1/5 w-full"
@@ -68,14 +68,15 @@
             label="Laki-Laki"
             class="mr-5"
             value="Laki-Laki"
-            @change="data.gender = 'Laki-Laki'"
-            :modelValue="data.gender"
+            :checked="data.emp_gender === 'Laki-Laki'"
+            @change="data.emp_gender = 'Laki-Laki'"
           />
           <Radio
             label="Perempuan"
             class="mr-5"
             value="Perempuan"
-            @change="data.gender = 'Perempuan'"
+            :checked="data.emp_gender === 'Perempuan'"
+            @change="data.emp_gender = 'Perempuan'"
           />
         </div>
       </div>
@@ -83,6 +84,7 @@
         label="Marital Status"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
+        :value="data.emp_marital_status"
         :options="['Belum menikah', 'sudah menikah']"
       />
       <Input
@@ -90,14 +92,17 @@
         type="date"
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
+        :value="data?.emp_birthday"
       />
       <SelectSearch
         :options="['O+', 'O-', 'A+', 'A-']"
         label="Golongan Darah"
         input_class="w-full md:w-4/6 mt-1"
         position="top"
+        :selectedOption="data?.emp_blood"
         :isOpen="show_select === 'gol'"
         @handleShowSelect="show_select = 'gol'"
+        @selected="data.emp_blood = $event"
       />
       <div class="flex justify-end w-full my-4">
         <Button
@@ -123,7 +128,7 @@ import Radio from "./Radio.vue";
 export default {
   name: "PersonalDetail",
   components: { Input, Select, Radio, SelectSearch },
-  props: { mode: String },
+  props: { mode: String, personalDetail: Object },
   data() {
     return {
       indicator_position: {
@@ -131,15 +136,15 @@ export default {
         height: 0,
       },
       data: {
-        first_name: "",
-        last_name: "",
-        email: "",
-        nik_ktp: "",
-        phone_number: null,
-        gender: "",
-        marital_status: "",
-        date_birthday: "",
-        blood_type: "",
+        emp_firstname: this.personalDetail.emp_firstname,
+        emp_lastname: this.personalDetail.emp_lastname,
+        email: this.personalDetail.email,
+        emp_nikktp: this.personalDetail.emp_nikktp,
+        emp_phone: this.personalDetail.emp_phone,
+        emp_gender: this.personalDetail.emp_gender,
+        emp_marital_status: this.personalDetail.emp_marital_status,
+        emp_birthday: this.personalDetail.emp_birthday,
+        emp_blood: this.personalDetail.emp_blood,
       },
       show_select: false,
       tab_active: "data_diri",
@@ -152,6 +157,15 @@ export default {
       this.indicator_position.left = buttonPosition;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
+    },
+  },
+  watch: {
+    personalDetail: {
+      handler(newData) {
+        console.log(newData);
+        this.data = newData;
+      },
+      deep: true,
     },
   },
   mounted() {
