@@ -30,3 +30,16 @@ export const GetAllEmployementAPI = async (query) => {
     return error.response;
   }
 };
+
+export const DetailEmployementAPI = async (id) => {
+  try {
+    const response = await axios.get(`${URL_API}/employment/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
