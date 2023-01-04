@@ -11,10 +11,10 @@
         />
       </div>
       <section
-        class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 md:gap-8 my-8"
+        class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 lg:gap-8 md:gap-4 my-8"
       >
         <section
-          class="bg-white rounded-md shadow-md w-full p-8 flex items-center"
+          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -27,7 +27,7 @@
           </div>
         </section>
         <section
-          class="bg-white rounded-md shadow-md w-full p-8 flex items-center"
+          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -40,7 +40,7 @@
           </div>
         </section>
         <section
-          class="bg-white rounded-md shadow-md w-full p-8 flex items-center"
+          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -53,7 +53,7 @@
           </div>
         </section>
         <section
-          class="bg-white rounded-md shadow-md w-full p-8 flex items-center"
+          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -67,8 +67,8 @@
         </section>
       </section>
 
-      <section class="grid gap-6 grid-cols-4 mb-6">
-        <EmployementStatistic class="col-span-3" />
+      <section class="md:grid gap-6 grid-cols-4 mb-6">
+        <EmployementStatistic class="col-span-3 mb-10" />
         <section class="col-span-1">
           <AttedanceStatistic />
         </section>
@@ -121,4 +121,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.card-detail-company {
+  margin-bottom: 10px;
+  background: white;
+}
+</style>
