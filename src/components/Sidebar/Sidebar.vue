@@ -1,15 +1,22 @@
 <template>
   <section
-    class="min-h-screen bg-primary px-5 py-5 hidden md:block duration-300"
-    :class="modeSidebar === 'icon' ? 'w-20' : 'w-64'"
+    class="min-h-screen overflow-y-auto h-screen bg-primary px-5 py-5 duration-300 lg:static fixed top-7 md:top-0 left-0 z-10"
+    :class="[
+      modeSidebar === 'icon' ? 'w-20' : 'w-64',
+      showSidebar ? 'translateX-0-custom' : '-translateX-full-custom',
+    ]"
   >
     <nav class="text-center m-auto">
-      <h1 class="text-2xl text-white text-center duration-300 h-8 truncate">
+      <h1
+        class="text-2xl hidden md:block text-white text-center duration-300 h-8 truncate"
+      >
         M<span :class="modeSidebar === 'icon' ? 'scale-0 hidden' : ''"
           >ufidah Group</span
         >
       </h1>
-      <span class="w-full h-px bg-white mt-5 opacity-80 block"></span>
+      <span
+        class="w-full h-px bg-white mt-5 lg:opacity-80 opacity-0 block"
+      ></span>
 
       <section class="flex relative items-center text-white text-md my-4">
         <div
@@ -128,6 +135,7 @@ export default {
   name: "SidebarComponent",
   props: {
     modeSidebar: String,
+    showSidebar: Boolean,
   },
   components: { Accordion },
   data() {
@@ -255,5 +263,13 @@ p > span {
 .bg-icon {
   min-width: 40px;
   min-height: 36px;
+}
+@media (max-width: 1023px) {
+  .-translateX-full-custom {
+    transform: translateX(-100%);
+  }
+  .translateX-0-custom {
+    transform: translateX(0);
+  }
 }
 </style>
