@@ -1,6 +1,6 @@
 <template>
   <section
-    class="min-h-screen custom-srollbar overflow-y-custom h-screen bg-primary px-5 py-5 duration-300 lg:static fixed top-7 md:top-0 left-0 z-10"
+    class="min-h-screen custom-srollbar overflow-y-custom bg-primary px-5 py-5 duration-300 lg:static fixed top-7 md:top-0 left-0 z-10 lg:z-0"
     :class="[
       modeSidebar === 'icon' ? 'w-20' : 'w-64',
       showSidebar ? 'translateX-0-custom' : '-translateX-full-custom',
