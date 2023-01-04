@@ -1,39 +1,28 @@
 <template>
   <nav>
-    <button
-      v-if="currentPage > 1"
-      @click="goToPage(currentPage - 1)"
-      class="p-2 rounded-l-md bg-gray-200 hover:bg-gray-300"
-    >
-      Prev
-    </button>
-    <template v-if="currentPage > 3">
-      <button @click="goToPage(1)" class="p-2">1</button>
-      <span class="p-2">...</span>
-    </template>
-    <template v-for="page in pages" :key="page">
-      <button
-        v-if="page >= currentPage - 2 && page <= currentPage + 2"
-        class="w-9 h-9 rounded-md"
-        :class="['p-2', { 'bg-primary text-white': page === currentPage }]"
-        @click="goToPage(page)"
+    <ul class="flex items-center">
+      <li v-if="currentPage > 1" class="page-item">
+        <button class="text-primary min-w-max" @click.prevent="prevPage">
+          Previous
+        </button>
+      </li>
+      <li
+        v-for="page in pages"
+        :key="page"
+        class="page-item mx-2"
+        :class="{ active: page === currentPage }"
       >
-        {{ page }}
-      </button>
-    </template>
-    <template v-if="currentPage < totalPages - 3">
-      <span class="p-2">...</span>
-      <button @click="goToPage(totalPages)" class="p-2">
-        {{ totalPages }}
-      </button>
-    </template>
-    <button
-      v-if="currentPage < totalPages"
-      @click="goToPage(currentPage + 1)"
-      class="p-2 rounded-r-md bg-gray-200 hover:bg-gray-300"
-    >
-      Next
-    </button>
+        <button
+          class="page-link border-primary border duration-200 text-primary hover:bg-primary hover:text-white rounded-md"
+          @click.prevent="changePage(page)"
+        >
+          {{ page }}
+        </button>
+      </li>
+      <li v-if="currentPage < totalPages" class="page-item">
+        <button class="text-primary" @click.prevent="nextPage">Next</button>
+      </li>
+    </ul>
   </nav>
 </template>
 
@@ -41,16 +30,23 @@
 export default {
   name: "PaginationComponent",
   props: {
-    data: {
+    items: {
       type: Array,
       required: true,
     },
+    perPage: {
+      type: Number,
+      default: 10,
+    },
     currentPage: {
       type: Number,
-      required: true,
+      default: 1,
     },
   },
   computed: {
+    totalPages() {
+      return Math.ceil(this.items.length / this.perPage);
+    },
     pages() {
       const pages = [];
       for (let i = 1; i <= this.totalPages; i++) {
@@ -60,16 +56,33 @@ export default {
     },
   },
   methods: {
-    goToPage(page) {
-      this.$emit("page-change", page);
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.changePage(this.currentPage - 1);
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.changePage(this.currentPage + 1);
+      }
+    },
+    changePage(page) {
+      this.$emit("change-page", page);
     },
   },
 };
 </script>
 
-<style>
-/* Tailwind CSS */
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+<style scoped>
+ul li {
+  min-width: min-content;
+}
+button {
+  width: 35px;
+  height: 30px;
+}
+li.active > button {
+  background: #1976d3;
+  color: white;
+}
 </style>

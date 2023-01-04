@@ -39,7 +39,7 @@
                 class="w-32 h-32 bg-gray-50 flex flex-col cursor-pointer justify-center items-center rounded-full border-2 border-gray-300 relative"
                 @click="openFileInput"
               >
-                <template v-if="!personal.profile">
+                <template v-if="!previewImage">
                   <font-awesome-icon
                     icon="fa-camera-alt"
                     class="text-2xl text-primary"
@@ -47,7 +47,7 @@
                   <p class="text-center text-gray-400 mt-2">Update Photo</p>
                 </template>
                 <img
-                  :src="personal.profile"
+                  :src="previewImage"
                   class="w-full h-ful rounded-full"
                   alt=""
                   v-else
@@ -303,7 +303,6 @@
             class="mb-2.5"
             :value="basic_salary.salary"
             @input="basic_salary.salary = $event"
-            placeholder="Tidak ada perkiraan untuk Project Manager "
           />
           <section class="flex justify-between items-center">
             <p class="text-sm text-gray-400 md:w-1/5">Jumlah Hari kerja :</p>
@@ -405,8 +404,8 @@ export default {
   data() {
     return {
       show_select: "",
+      previewImage: null,
       personal: {
-        emp_profile: null,
         emp_firstname: "",
         emp_lastname: "",
         email: "",
@@ -483,9 +482,12 @@ export default {
       this.$refs.file.click();
     },
     viewImage(e) {
-      const files = e.target.files[0];
-      const file = URL.createObjectURL(files);
-      this.personal.profile = file;
+      const files = e.target?.files[0];
+      this.$store.commit("setFile", files);
+      if (files) {
+        const file = URL.createObjectURL(files);
+        this.previewImage = file;
+      }
     },
     async getCompany() {
       const response = await GetAllCompanyAPI();
@@ -525,15 +527,32 @@ export default {
       const data = {
         ...this.personal,
         ...employment,
-        attadence: this.attadance_day,
       };
+      const formData = new FormData();
+      formData.append("profile", this.$store.state.file);
+      formData.append("attadance", JSON.stringify(this.attadance_day));
+      for (const key in data) {
+        formData.append(key, data[key]);
+      }
       const response = await AddEmploymentAPI(
-        data,
+        formData,
         `?company=${this.dataCompany?._id}`
       );
       if (response.status === 200) {
         this.getEmployement();
         this.closeModal();
+        this.tabActive = "Personal";
+        this.$store.commit("unSetFile");
+        for (const key in this.personal) {
+          this.personal[key] = "";
+        }
+        for (const key in this.employment) {
+          this.employment[key] = "";
+        }
+        for (const key in this.attadance_day) {
+          this.attadance_day[key].off_day = false;
+          this.attadance_day[key].shift = "";
+        }
       }
     },
   },

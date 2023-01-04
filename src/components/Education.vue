@@ -36,47 +36,85 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr v-for="(education, index) in educations" :key="index">
             <td class="p-3 text-sm">
-              <p class="text-sm text-gray-400">Employee Id</p>
+              <p class="text-sm text-gray-400">{{ education?.empedu_type }}</p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm text-gray-400">Employee Status</p>
+              <p class="text-sm text-gray-400">
+                {{ education?.empedu_institute }}
+              </p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm text-gray-400">Departement</p>
+              <p class="text-sm text-gray-400">
+                {{ education?.empedu_result }}
+              </p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm text-gray-400">2022</p>
+              <p class="text-sm text-gray-400">{{ education?.empedu_year }}</p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm text-gray-400">Actions</p>
+              <button
+                class="mr-3"
+                @click="handleDeleteEducation(education?._id)"
+              >
+                <font-awesome-icon icon="fa-trash-alt" class="text-red-500" />
+              </button>
+              <button @click="handleDetailEducation(education)">
+                <font-awesome-icon
+                  icon="fa-pen-to-square"
+                  class="text-primary"
+                />
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
       <section class="mt-8">
-        <Input label="Gelar" input_class="md:w-4/6 mt-2" class="mb-2.5" />
+        <Input
+          label="Gelar"
+          input_class="md:w-4/6 mt-2"
+          class="mb-2.5"
+          @change="data.empedu_type = $event"
+          :value="data.empedu_type"
+        />
         <Input
           label="Nama Institusi"
           input_class="md:w-4/6 mt-2"
           class="mb-2.5"
+          @change="data.empedu_institute = $event"
+          :value="data.empedu_institute"
         />
         <Input
           type="number"
           label="Hasil"
           input_class="md:w-4/6 mt-2"
           class="mb-2.5"
+          @change="data.empedu_result = $event"
+          :value="data.empedu_result"
         />
         <Select
           label="Tahun"
           input_class="md:w-4/6 mt-2"
           class="mb-2.5"
           :options="['2022', '2021', '2020']"
+          @change="data.empedu_year = $event"
+          :value="data.empedu_year"
         />
         <div class="flex justify-end w-full my-4">
-          <Button class="bg-primary text-white w-24 text-sm rounded py-2">
+          <Button
+            class="bg-primary text-white w-24 text-sm rounded py-2"
+            @click="handleAddEducation"
+            v-if="!edit"
+          >
             Save
+          </Button>
+          <Button
+            class="bg-primary text-white w-24 text-sm rounded py-2"
+            @click="handleEditEducation"
+            v-else
+          >
+            Edit
           </Button>
         </div>
       </section>
@@ -92,6 +130,12 @@ import Input from "./Input.vue";
 import Select from "./Select";
 import Button from "./Button.vue";
 import Experience from "./Experience.vue";
+import {
+  AddEducationAPI,
+  GetEducationAPI,
+  EditEducationAPI,
+  DeleteEducationAPI,
+} from "@/actions/education";
 
 export default {
   name: "EducationComponent",
@@ -104,6 +148,15 @@ export default {
       },
       show_select: false,
       tab_active: "1",
+      educations: [],
+      edit: false,
+      data: {
+        empedu_institute: "",
+        empedu_result: null,
+        empedu_type: "",
+        empedu_year: "",
+        empedu_id: null,
+      },
     };
   },
   methods: {
@@ -114,12 +167,73 @@ export default {
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
     },
+    clearInputValue() {
+      for (const key in this.data) {
+        this.data[key] = "";
+      }
+    },
+    async handleAddEducation() {
+      const data = {
+        ...this.data,
+        emp_result: Number(this.data.empedu_result),
+        emp_id: this.$route.params.id,
+      };
+      const response = await AddEducationAPI(data);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      if (response.status === 200) {
+        this.handleGetEducation();
+        this.clearInputValue();
+      }
+    },
+    async handleGetEducation() {
+      const { id } = this.$route.params;
+      const response = await GetEducationAPI(id);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.educations = response?.data;
+    },
+    handleDetailEducation(education) {
+      this.edit = true;
+      this.data.empedu_id = education?._id;
+      this.data.empedu_institute = education?.empedu_institute;
+      this.data.empedu_result = education?.empedu_result;
+      this.data.empedu_type = education?.empedu_type;
+      this.data.empedu_year = education?.empedu_year;
+    },
+    async handleEditEducation() {
+      const id = this.data.empedu_id;
+      const data = {
+        ...this.data,
+        emp_result: Number(this.data.empedu_result),
+      };
+      const response = await EditEducationAPI(id, data);
+      if (response.status === 401) {
+        return (window.location.href = "/");
+      }
+      if (response.status === 200) {
+        this.handleGetEducation();
+        this.clearInputValue();
+      }
+    },
+    async handleDeleteEducation(id) {
+      const response = await DeleteEducationAPI(id);
+      if (response.status === 401) {
+        return (window.location.href = "/");
+      }
+      if (response.status === 200) {
+        this.handleGetEducation();
+      }
+    },
   },
   mounted() {
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
     const buttonPosition = this.$refs.first_tab?.offsetLeft;
     this.indicator_position.left = buttonPosition;
     this.indicator_position.height = buttonHeight;
+    this.handleGetEducation();
   },
 };
 </script>

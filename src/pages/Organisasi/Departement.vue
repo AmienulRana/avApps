@@ -5,7 +5,7 @@
         <div class="flex items-center">
           <h1 class="md:text-2xl text-lg">Departement</h1>
           <ChoiseCompany
-            v-if="superAdmin && !loading.company"
+            v-if="superAdmin && !loading.departement"
             @selected:company="dataCompany = $event"
             :options="options"
             :dataCompany="dataCompany"
@@ -28,12 +28,13 @@
                 <th class="text-left text-sm p-3">Description</th>
                 <th class="text-left text-sm p-3">Status</th>
                 <th class="text-left text-sm p-3" v-if="superAdmin">Company</th>
+                <th class="text-left text-sm p-3">Work Shift</th>
                 <th class="text-left text-sm p-3">Location</th>
                 <th class="text-left text-sm p-3">Created</th>
                 <th class="text-left text-sm p-3">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="!loading.departement">
               <tr v-for="(departement, index) in departements" :key="index">
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
@@ -67,6 +68,11 @@
                     {{ departement?.company_id?.company_name }}
                   </p>
                 </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm text-gray-400">
+                    {{ departement?.dep_workshift || "-" }}
+                  </p>
+                </td>
                 <td class="p-3 text-sm text-gray-400">
                   {{
                     departement?.dep_location ? departement?.dep_location : "-"
@@ -85,43 +91,39 @@
                     <font-awesome-icon icon="fa-ellipsis" />
                   </Button>
                   <div
-                    class="text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
+                    class="action_dep text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
                     v-if="optionsDepartement === index"
                   >
                     <ul>
-                      <li
-                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400"
-                      >
+                      <li @click="handleDetailDepartement(departement?._id)">
                         Edit
                       </li>
-                      <li
-                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400"
-                      >
-                        De-activate
-                      </li>
-                      <li
-                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400"
-                      >
-                        Move Employee
-                      </li>
+                      <li>De-activate</li>
+                      <li>Move Employee</li>
                     </ul>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
+          <div
+            class="flex justify-center mt-14 w-full"
+            v-if="loading.departement"
+          >
+            <Loading />
+          </div>
         </section>
       </section>
     </section>
     <Modal
-      title="Add Departement"
+      :title="`${modal.edit ? 'Edit' : 'Add'} Departement`"
       class="md:w-9/12 w-full mx-auto z-20"
       :showModal="modal.showModal"
       @close="modal.showModal = false"
     >
       <template #header>
         <ChoiseCompany
-          v-if="superAdmin && !loading.company"
+          v-if="superAdmin && !loading.departement"
           @selected:company="dataCompany = $event"
           :options="options"
           :dataCompany="dataCompany"
@@ -133,11 +135,12 @@
         input_class="w-full mt-2"
         class="flex-col"
         placeholder="Name"
+        :value="name"
         @change="name = $event"
       />
       <SelectSearch
         label="Manager"
-        placeholder="Choose a manager"
+        :placeholder="manager || 'Choose a manager'"
         :options="getAllEmployee"
         :isOpen="modal.showSelect === 'choose_manager'"
         @handleShowSelect="
@@ -162,7 +165,7 @@
       />
       <SelectSearch
         label="Work Shift"
-        placeholder="Choose a Work shift"
+        :placeholder="work_shift || 'Choose a Work shift'"
         :options="[
           'Regular work shift',
           'demo working shift regular',
@@ -200,14 +203,14 @@
             @click="handleAddDepartement"
             :class="!name && 'opacity-70'"
             :disabled="!name"
-            v-if="!modalEdit"
+            v-if="!modal.edit"
           >
             Save
           </Button>
           <Button
             v-else
             class="bg-primary w-24 px-2 py-2 text-white rounded-md"
-            @click="handleEditDesignation"
+            @click="handleEditDepartement"
             :class="!name && 'opacity-70'"
             :disabled="!name"
           >
@@ -226,8 +229,14 @@ import Modal from "../../components/Modal.vue";
 import Input from "../../components/Input.vue";
 import SelectSearch from "../../components/Select/SelectSearch.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import Loading from "@/components/Loading.vue";
 import employee from "@/employee.json";
-import { AddDepartementAPI, GetDepartementAPI } from "@/actions/departement";
+import {
+  AddDepartementAPI,
+  GetDepartementAPI,
+  DetailDepartementAPI,
+  EditDepartementAPI,
+} from "@/actions/departement";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
 
@@ -240,6 +249,7 @@ export default {
     Input,
     SelectSearch,
     ChoiseCompany,
+    Loading,
   },
 
   data() {
@@ -247,9 +257,10 @@ export default {
       modal: {
         showModal: false,
         showSelect: null,
+        edit: false,
       },
+      id_dep: "",
       manager: "",
-      modalEdit: false,
       optionsDepartement: null,
       name: "",
       work_shift: "",
@@ -262,7 +273,7 @@ export default {
       options: [],
       dataCompany: {},
       loading: {
-        company: true,
+        departement: true,
       },
     };
   },
@@ -279,7 +290,7 @@ export default {
       const response = await GetAllCompanyAPI();
       this.options = response.data;
       this.dataCompany = response.data[0];
-      this.loading.company = false;
+      this.loading.departement = false;
     },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany._id}`;
@@ -289,6 +300,7 @@ export default {
       if (response.status === 401) {
         return (window.location.href = "/login");
       }
+      console.log(response);
       this.departements = response.data;
     },
     async handleAddDepartement() {
@@ -303,25 +315,50 @@ export default {
         dep_created: this.dateNow(),
       };
       const response = await AddDepartementAPI(data, querySuperAdmin);
-      if (response.status === 200) {
-        this.handleGetDepartement();
-        this.modal.showModal = false;
+      if (response.status === 401) {
+        return (window.location.href = "/login");
       }
+      this.handleGetDepartement();
+      this.modal.showModal = false;
     },
-    handleDetailDepartement(id) {
-      this.showModal = true;
-      this.id = id;
-      this.modalEdit = true;
+    async handleDetailDepartement(id) {
+      this.modal.showModal = true;
+      this.modal.edit = true;
+      this.superAdmin = false;
+      this.id_dep = id;
+      const response = await DetailDepartementAPI(id);
+
+      this.name = response?.data?.dep_name;
+      this.description = response?.data?.dep_desc;
+      this.work_shift = response?.data?.dep_workshift;
+      this.manager = response?.data?.dep_manager;
+      this.location = response?.data?.dep_location;
     },
-    handleEditDepartement() {},
+    async handleEditDepartement() {
+      const data = {
+        dep_name: this.name,
+        dep_desc: this.description,
+        dep_workshift: this.work_shift,
+        dep_manager: this.manager,
+        dep_location: this.location,
+      };
+      const response = await EditDepartementAPI(this.id_dep, data);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      } else if (response.status === 200) {
+        this.handleGetDepartement();
+      }
+      this.modal.showModal = false;
+      console.log(response);
+    },
     handleDeleteDepartement() {},
   },
   mounted() {
     // const departement
-    this.handleGetDepartement();
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
+    this.handleGetDepartement();
   },
   watch: {
     dataCompany: {
@@ -342,4 +379,14 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<!-- px-4 py-2 hover:bg-gray-100 hover:text-blue-400 -->
+<style scoped>
+.action_dep ul li {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: rgb(192, 192, 192);
+}
+.action_dep ul li:hover {
+  color: rgb(71, 166, 255);
+}
+</style>

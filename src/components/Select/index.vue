@@ -16,6 +16,7 @@
         v-for="(option, i) in options"
         :key="i"
         class="px-2 py-1"
+        :selected="option === selectedOption"
         :value="option"
       >
         {{ option }}

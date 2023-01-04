@@ -9,8 +9,8 @@
     <input
       :type="type"
       :placeholder="placeholder"
-      class="w-full border outline-gray-600 focus:outline focus:outline-primary pr-2 py-1.5 bg-white rounded"
-      :class="[icon ? 'pl-8' : 'pl-2', input_class ? input_class : '']"
+      class="w-full text-sm border outline-gray-600 focus:outline focus:outline-primary pr-4 py-1.5 bg-white rounded"
+      :class="[icon ? 'pl-8' : 'pl-4', input_class ? input_class : '']"
       autofocus
       :value="value"
       @input="$emit('input', $event.target.value)"
