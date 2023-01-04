@@ -1,7 +1,9 @@
 <template>
   <section class="w-full bg-white px-4 py-6 wrapper-bar-donught">
-    <div class="flex justify-between items-center mb-5 border-b pb-5">
-      <h1 class="text-xl">Total Attedance</h1>
+    <div
+      class="flex justify-center md:justify-start items-center mb-5 border-b pb-5"
+    >
+      <h1 class="md:text-xl">Total Attedance</h1>
     </div>
     <div class="h-72">
       <doughnut :data="chartData" :options="options"></doughnut>
