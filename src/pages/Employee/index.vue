@@ -6,7 +6,7 @@
     "
   >
     <section class="md:px-8 px-4 mt-6 w-full">
-      <section class="flex justify-between items-center">
+      <section class="flex justify-between items-center flex-wrap">
         <section class="flex items-center">
           <h1 class="md:text-2xl text-lg">All Employees</h1>
           <ChoiseCompany
@@ -17,7 +17,7 @@
           />
         </section>
         <Button
-          class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+          class="bg-primary text-white px-6 py-2 text-sm rounded-md mt-2 md:mt-0"
           @click="showModal = true"
           >Add Employee</Button
         >
@@ -328,12 +328,12 @@
         />
       </section>
       <section
-        class="flex justify-between items-center my-14"
+        class="flex justify-between items-center my-14 flex-wrap"
         v-if="!loading.employement"
       >
         <section class="flex items-center">
           <p class="text-gray-400 mr-2 text-sm">items showing per page</p>
-          <section class="relative">
+          <section class="relative mb-4">
             <button
               class="bg-white w-10 py-1.5 text-gray-400 hover:bg-gray-50 hover:text-primary"
               @click.stop="pagination.changePerPage = !pagination.changePerPage"
