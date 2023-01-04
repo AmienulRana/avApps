@@ -193,6 +193,7 @@ export default {
       if (response.status === 200) {
         this.handleGetExperience();
         this.clearInputValue();
+        this.edit = false;
       }
     },
     async handleDeleteExperience(id) {

@@ -216,6 +216,7 @@ export default {
       if (response.status === 200) {
         this.handleGetEducation();
         this.clearInputValue();
+        this.edit = false;
       }
     },
     async handleDeleteEducation(id) {
