@@ -1,7 +1,7 @@
 <template>
   <LayoutAdmin @click="activeDropdown = false">
     <section class="md:px-8 px-4 mt-6 w-full">
-      <section class="flex justify-between items-center">
+      <section class="flex justify-between items-center flex-wrap">
         <div class="flex items-center">
           <h1 class="md:text-2xl text-lg">Designation</h1>
           <ChoiseCompany
@@ -12,7 +12,7 @@
           />
         </div>
         <Button
-          class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+          class="bg-primary text-white px-6 py-2 text-sm rounded-md mt-2 md:mt-0"
           @click="showModal = true"
           >Add Designation</Button
         >
@@ -46,10 +46,16 @@
                 </td>
                 <td class="p-3 relative">
                   <button class="mr-3">
-                    <font-awesome-icon icon="fa-trash-alt" />
+                    <font-awesome-icon
+                      icon="fa-trash-alt"
+                      class="text-red-500"
+                    />
                   </button>
                   <button @click="handleDetailDesignation(des?._id)">
-                    <font-awesome-icon icon="fa-pen-to-square" />
+                    <font-awesome-icon
+                      icon="fa-pen-to-square"
+                      class="text-primary"
+                    />
                   </button>
                 </td>
               </tr>
