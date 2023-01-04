@@ -3,14 +3,17 @@
     <KeepAlive>
       <Sidebar :modeSidebar="modeSidebar" :showSidebar="showSidebar" />
     </KeepAlive>
-    <main class="relative w-full min-h-screen bg-whitesmoke main-content">
+    <main
+      class="relative w-full min-h-screen bg-whitesmoke main-content"
+      @click="showSidebar = false"
+    >
       <section
         class="bg-white w-full px-8 py-6 shadow-md flex justify-between z-20 fixed lg:static"
       >
         <font-awesome-icon
           icon="fa-bars"
           class="w-6 h-6 text-primary lg:hidden"
-          @click="showSidebar = !showSidebar"
+          @click.stop="showSidebar = !showSidebar"
         />
         <font-awesome-icon
           icon="fa-bars"
