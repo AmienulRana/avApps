@@ -102,6 +102,7 @@ import {
   EditExperienceAPI,
   DeleteExperienceAPI,
 } from "@/actions/experience";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "ExperienceComponent",
@@ -118,6 +119,10 @@ export default {
       },
       edit: false,
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     changeFormatMonth(dateString) {
@@ -147,6 +152,15 @@ export default {
         this.data[key] = "";
       }
     },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
     async handleAddExperience() {
       const data = {
         ...this.data,
@@ -162,6 +176,7 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetExperience();
+        this.showMessageStatus(response);
         this.clearInputValue();
       }
     },
@@ -193,6 +208,7 @@ export default {
       if (response.status === 200) {
         this.handleGetExperience();
         this.clearInputValue();
+        this.showMessageStatus(response);
         this.edit = false;
       }
     },
@@ -203,6 +219,7 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetExperience();
+        this.showMessageStatus(response);
       }
     },
   },
