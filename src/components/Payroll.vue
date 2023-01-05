@@ -123,6 +123,7 @@ import Select from "./Select/index.vue";
 import Allowance from "./Allowance.vue";
 import Deducation from "./Deducation.vue";
 import { AddSalaryAPI, GetSalaryAPI } from "@/actions/salary";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "PersonalDetail",
@@ -145,6 +146,10 @@ export default {
       tab_active: "1",
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     formatCurrency(number) {
       const formatter = new Intl.NumberFormat("id-ID", {
@@ -157,6 +162,15 @@ export default {
     clearInputValue() {
       for (const key in this.data) {
         this.data[key] = "";
+      }
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
       }
     },
     async handleAddSalary() {
@@ -174,9 +188,10 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetSalary();
+        this.showMessageStatus(response);
         this.clearInputValue();
       }
-      this.loading = true;
+      this.loading = false;
     },
     async handleGetSalary() {
       const { id } = this.$route.params;
