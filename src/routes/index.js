@@ -6,6 +6,7 @@ import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
 import AttadanceDaily from "../pages/Attadance/Daily.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
+import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
 import Home from "../pages/Home.vue";
@@ -52,6 +53,11 @@ const routes = [
   {
     path: "/leave-request",
     component: LeaveRequest,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/overtime-request",
+    component: OvertimeRequest,
     beforeEnter: requiredAuth,
   },
   {
