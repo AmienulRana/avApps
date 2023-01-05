@@ -79,6 +79,7 @@
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleAddExperience"
         v-if="!edit"
+        :disabled="loading || !data.empexp_company"
       >
         Save
       </Button>
@@ -86,6 +87,7 @@
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleEditExperience"
         v-else
+        :disabled="loading"
       >
         Edit
       </Button>
@@ -110,6 +112,7 @@ export default {
   data() {
     return {
       experiences: [],
+      loading: false,
       data: {
         empexp_company: "",
         empexp_comp_position: "",
@@ -162,6 +165,7 @@ export default {
       }
     },
     async handleAddExperience() {
+      this.loading = true;
       const data = {
         ...this.data,
         empexp_company: this.data?.empexp_company,
@@ -179,6 +183,7 @@ export default {
         this.showMessageStatus(response);
         this.clearInputValue();
       }
+      this.loading = false;
     },
     async handleGetExperience() {
       const { id } = this.$route.params;
@@ -197,6 +202,7 @@ export default {
       this.data.empexp_startdate = experience?.empexp_startdate;
     },
     async handleEditExperience() {
+      this.loading = true;
       const id = this.data.emp_id;
       const data = {
         ...this.data,
@@ -211,6 +217,7 @@ export default {
         this.showMessageStatus(response);
         this.edit = false;
       }
+      this.loading = false;
     },
     async handleDeleteExperience(id) {
       const response = await DeleteExperienceAPI(id);
