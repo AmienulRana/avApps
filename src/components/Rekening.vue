@@ -65,12 +65,14 @@
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleAddBank"
         v-if="!edit"
+        :disabled="loading || !data.bi_holder_name"
       >
         Save
       </Button>
       <Button
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleEditBank"
+        :disabled="loading"
         v-else
       >
         Edit
@@ -89,12 +91,15 @@ import {
   DeleteBankAPI,
 } from "@/actions/bank";
 
+import { useToast } from "vue-toastification";
+
 export default {
   name: "BankComponent",
   components: { Input, Button },
   data() {
     return {
       edit: false,
+      loading: false,
       data: {
         emp_id: "",
         bi_holder_name: "",
@@ -104,13 +109,27 @@ export default {
       banks: [],
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     clearInputValue() {
       for (const key in this.data) {
         this.data[key] = "";
       }
     },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
     async handleAddBank() {
+      this.loading = true;
       const data = {
         emp_id: this.$route.params.id,
         bi_holder_name: this.data?.bi_holder_name,
@@ -123,8 +142,10 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetBank();
+        this.showMessageStatus(response);
         this.clearInputValue();
       }
+      this.loading = false;
     },
     async handleGetBank() {
       const { id } = this.$route.params;
@@ -142,6 +163,7 @@ export default {
       this.data.bi_account_number = bank?.bi_account_number;
     },
     async handleEditBank() {
+      this.loading = true;
       const id = this.data.emp_id;
       const data = {
         ...this.data,
@@ -153,8 +175,10 @@ export default {
       if (response.status === 200) {
         this.handleGetBank();
         this.clearInputValue();
+        this.showMessageStatus(response);
         this.edit = false;
       }
+      this.loading = false;
     },
     async handleDeleteBank(id) {
       const response = await DeleteBankAPI(id);
@@ -163,6 +187,7 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetBank();
+        this.showMessageStatus(response);
       }
     },
   },
