@@ -11,7 +11,7 @@
         />
       </div>
       <section
-        class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 lg:gap-8 md:gap-4 my-8"
+        class="grid flex-wrap lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 lg:gap-8 md:gap-4 my-8"
       >
         <section
           class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
