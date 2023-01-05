@@ -8,6 +8,9 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import Toast from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
 
 /* import specific icons */
 import {
@@ -78,6 +81,7 @@ library.add(
 
 createApp(App)
   .use(router)
+  .use(Toast)
   .use(store)
   .component("font-awesome-icon", FontAwesomeIcon)
   .mount("#app");

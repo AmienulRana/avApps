@@ -1,7 +1,7 @@
 <template>
   <LayoutAdmin @click="optionsDepartement = null">
-    <section class="md:px-8 px-4 mt-6 w-full">
-      <section class="flex justify-between items-center">
+    <section class="md:px-8 px-4 my-6 w-full">
+      <section class="flex justify-between flex-wrap items-center">
         <div class="flex items-center">
           <h1 class="md:text-2xl text-lg">Departement</h1>
           <ChoiseCompany
@@ -12,7 +12,7 @@
           />
         </div>
         <Button
-          class="bg-primary text-white px-6 py-2 text-sm rounded-md"
+          class="bg-primary text-white px-6 py-2 text-sm rounded-md mt-2"
           @click="modal.showModal = true"
           >Add Departement</Button
         >
@@ -91,10 +91,10 @@
                     <font-awesome-icon icon="fa-ellipsis" />
                   </Button>
                   <div
-                    class="action_dep text-left absolute -top-full right-16 rounded-md bg-white shadow-md md:w-max md:h-max"
+                    class="action_dep text-left absolute -top-full right-16 rounded-md bg-white shadow-md w-52 md:w-max md:h-max"
                     v-if="optionsDepartement === index"
                   >
-                    <ul>
+                    <ul class="text-sm">
                       <li @click="handleDetailDepartement(departement?._id)">
                         Edit
                       </li>

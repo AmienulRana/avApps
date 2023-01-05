@@ -1,13 +1,23 @@
 <template>
   <section class="flex bg-primary h-auto">
     <KeepAlive>
-      <Sidebar :modeSidebar="modeSidebar" />
+      <Sidebar :modeSidebar="modeSidebar" :showSidebar="showSidebar" />
     </KeepAlive>
-    <main class="relative w-full min-h-screen bg-whitesmoke main-content">
-      <section class="bg-white w-full px-8 py-6 shadow-md flex justify-between">
+    <main
+      class="relative w-full min-h-screen bg-whitesmoke main-content"
+      @click="showSidebar = false"
+    >
+      <section
+        class="bg-white w-full px-8 py-6 shadow-md flex justify-between z-20 fixed lg:static"
+      >
         <font-awesome-icon
           icon="fa-bars"
-          class="w-6 h-6 text-primary"
+          class="w-6 h-6 text-primary lg:hidden"
+          @click.stop="showSidebar = !showSidebar"
+        />
+        <font-awesome-icon
+          icon="fa-bars"
+          class="w-6 h-6 text-primary hidden lg:block"
           @click="handleChangeSidebar"
         />
         <div class="flex">
@@ -18,7 +28,9 @@
           <font-awesome-icon icon="fa-moon" class="w-6 h-6 text-primary mx-2" />
         </div>
       </section>
-      <slot />
+      <section class="mt-24 lg:mt-0">
+        <slot />
+      </section>
     </main>
   </section>
 </template>
@@ -31,6 +43,7 @@ export default {
   data() {
     return {
       modeSidebar: "full",
+      showSidebar: false,
     };
   },
   methods: {

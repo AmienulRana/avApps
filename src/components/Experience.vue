@@ -79,6 +79,7 @@
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleAddExperience"
         v-if="!edit"
+        :disabled="loading || !data.empexp_company"
       >
         Save
       </Button>
@@ -86,6 +87,7 @@
         class="bg-primary text-white w-24 text-sm rounded py-2"
         @click="handleEditExperience"
         v-else
+        :disabled="loading"
       >
         Edit
       </Button>
@@ -102,6 +104,7 @@ import {
   EditExperienceAPI,
   DeleteExperienceAPI,
 } from "@/actions/experience";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "ExperienceComponent",
@@ -109,6 +112,7 @@ export default {
   data() {
     return {
       experiences: [],
+      loading: false,
       data: {
         empexp_company: "",
         empexp_comp_position: "",
@@ -118,6 +122,10 @@ export default {
       },
       edit: false,
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     changeFormatMonth(dateString) {
@@ -147,7 +155,17 @@ export default {
         this.data[key] = "";
       }
     },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
     async handleAddExperience() {
+      this.loading = true;
       const data = {
         ...this.data,
         empexp_company: this.data?.empexp_company,
@@ -162,8 +180,10 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetExperience();
+        this.showMessageStatus(response);
         this.clearInputValue();
       }
+      this.loading = false;
     },
     async handleGetExperience() {
       const { id } = this.$route.params;
@@ -182,6 +202,7 @@ export default {
       this.data.empexp_startdate = experience?.empexp_startdate;
     },
     async handleEditExperience() {
+      this.loading = true;
       const id = this.data.emp_id;
       const data = {
         ...this.data,
@@ -193,7 +214,10 @@ export default {
       if (response.status === 200) {
         this.handleGetExperience();
         this.clearInputValue();
+        this.showMessageStatus(response);
+        this.edit = false;
       }
+      this.loading = false;
     },
     async handleDeleteExperience(id) {
       const response = await DeleteExperienceAPI(id);
@@ -202,6 +226,7 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetExperience();
+        this.showMessageStatus(response);
       }
     },
   },

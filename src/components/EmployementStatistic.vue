@@ -1,7 +1,9 @@
 <template>
   <section class="w-full bg-white px-8 py-6 wrapper-bar-chart">
-    <div class="flex justify-between items-center mb-5 border-b pb-5">
-      <h1 class="text-xl">Employee Statistics</h1>
+    <div
+      class="flex justify-between flex-col md:flex-row items-center mb-5 border-b pb-5"
+    >
+      <h1 class="md:text-xl mb-5">Employee Statistics</h1>
       <div class="flex cursor-pointer">
         <p
           class="text-xs"

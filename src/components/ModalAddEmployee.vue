@@ -238,8 +238,8 @@
               label="Lokasi Absensi"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.lokasi"
-              @change="employment.lokasi = $event"
+              :value="employment.emp_location"
+              @change="employment.emp_location = $event"
               :options="[
                 'Mufidah Stationery',
                 'Mufidah Terminal Print',
@@ -388,6 +388,7 @@ import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "./ChoiseCompany.vue";
 import { GetDesignationAPI } from "@/actions/designation";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "ModalAddEmployee",
@@ -469,6 +470,10 @@ export default {
       },
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     formatCurrency(number) {
       const formatter = new Intl.NumberFormat("id-ID", {
@@ -487,6 +492,30 @@ export default {
       if (files) {
         const file = URL.createObjectURL(files);
         this.previewImage = file;
+      }
+    },
+    clearInputValue() {
+      for (const key in this.personal) {
+        this.personal[key] = "";
+      }
+      for (const key in this.employment) {
+        this.employment[key] = "";
+      }
+      for (const key in this.basic_salary) {
+        this.basic_salary[key] = "";
+      }
+      for (const key in this.attadance_day) {
+        this.attadance_day[key].off_day = false;
+        this.attadance_day[key].shift = "";
+      }
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
       }
     },
     async getCompany() {
@@ -523,6 +552,12 @@ export default {
         emp_fsuperior: this.employment.emp_fsuperior?.des_name,
         emp_ssuperior: this.employment.emp_ssuperior?.des_name,
       };
+      const salary = {
+        emp_salary: Number(this.basic_salary.salary),
+        emp_working_days: Number(this.basic_salary.working_days),
+        emp_working_hours: Number(this.basic_salary.working_hours),
+        emp_periode: this.basic_salary.periode,
+      };
 
       const data = {
         ...this.personal,
@@ -531,9 +566,12 @@ export default {
       const formData = new FormData();
       formData.append("profile", this.$store.state.file);
       formData.append("attadance", JSON.stringify(this.attadance_day));
+      formData.append("basic_salary", JSON.stringify(salary));
       for (const key in data) {
         formData.append(key, data[key]);
       }
+
+      // console.log(salary);
       const response = await AddEmploymentAPI(
         formData,
         `?company=${this.dataCompany?._id}`
@@ -543,17 +581,9 @@ export default {
         this.closeModal();
         this.tabActive = "Personal";
         this.$store.commit("unSetFile");
-        for (const key in this.personal) {
-          this.personal[key] = "";
-        }
-        for (const key in this.employment) {
-          this.employment[key] = "";
-        }
-        for (const key in this.attadance_day) {
-          this.attadance_day[key].off_day = false;
-          this.attadance_day[key].shift = "";
-        }
+        this.clearInputValue();
       }
+      this.showMessageStatus(response);
     },
   },
   watch: {

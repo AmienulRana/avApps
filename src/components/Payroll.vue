@@ -38,16 +38,16 @@
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
         :options="['Bulan', '2 Minggu', 'Minggu']"
-        :value="basic_salary.periode"
-        @change="basic_salary.periode = $event"
+        :value="data?.emp_periode"
+        @change="data.emp_periode = $event"
       />
       <Input
         type="number"
         label="Gaji pokok"
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
-        :value="basic_salary.salary"
-        @input="basic_salary.salary = $event"
+        :value="data?.emp_salary"
+        @input="data.emp_salary = $event"
         placeholder="Tidak ada perkiraan untuk Project Manager "
       />
       <section class="flex justify-between items-center">
@@ -57,17 +57,15 @@
             type="number"
             input_class="md:full mt-2"
             class="mb-1.5"
-            :value="basic_salary.working_days"
-            @input="basic_salary.working_days = $event"
+            :value="data?.emp_working_days"
+            @input="data.emp_working_days = $event"
           />
           <p
             class="text-sm text-gray-400"
-            v-if="basic_salary.working_days && basic_salary.salary"
+            v-if="data?.emp_working_days && data?.emp_salary"
           >
             Gaji per hari:
-            {{
-              formatCurrency(basic_salary.salary / basic_salary.working_days)
-            }}
+            {{ formatCurrency(data?.emp_salary / data?.emp_working_days) }}
           </p>
         </div>
       </section>
@@ -78,30 +76,34 @@
             type="number"
             input_class="md:full mt-2"
             class="mb-1.5"
-            :value="basic_salary.working_hours"
-            @input="basic_salary.working_hours = $event"
+            :value="data?.emp_working_hours"
+            @input="data.emp_working_hours = $event"
           />
           <p
             class="text-sm text-gray-400"
             v-if="
-              basic_salary.working_days &&
-              basic_salary.salary &&
-              basic_salary.working_hours
+              data?.emp_working_days &&
+              data?.emp_salary &&
+              data?.emp_working_hours
             "
           >
             Gaji per jam:
             {{
               formatCurrency(
-                basic_salary.salary /
-                  basic_salary.working_days /
-                  basic_salary.working_hours
+                data?.emp_salary /
+                  data?.emp_working_days /
+                  data?.emp_working_hours
               )
             }}
           </p>
         </div>
       </section>
       <div class="flex justify-end w-full">
-        <Button class="bg-primary text-white w-24 text-sm rounded py-2">
+        <Button
+          class="bg-primary text-white w-24 text-sm rounded py-2 mb-8"
+          @click="handleAddSalary"
+          :disabled="loading"
+        >
           Save
         </Button>
       </div>
@@ -120,6 +122,8 @@ import Input from "./Input.vue";
 import Select from "./Select/index.vue";
 import Allowance from "./Allowance.vue";
 import Deducation from "./Deducation.vue";
+import { AddSalaryAPI, GetSalaryAPI } from "@/actions/salary";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "PersonalDetail",
@@ -131,15 +135,20 @@ export default {
         height: 0,
         width: 0,
       },
-      basic_salary: {
-        periode: "",
-        salary: null,
-        working_days: null,
-        working_hours: null,
+      data: {
+        emp_salary: 0,
+        emp_working_hours: 0,
+        emp_working_days: 0,
+        emp_periode: "",
       },
+      loading: false,
       show_select: false,
       tab_active: "1",
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     formatCurrency(number) {
@@ -149,6 +158,50 @@ export default {
         minimumFractionDigits: 0,
       });
       return formatter.format(number);
+    },
+    clearInputValue() {
+      for (const key in this.data) {
+        this.data[key] = "";
+      }
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
+    async handleAddSalary() {
+      this.loading = true;
+      const data = {
+        emp_salary: this.data?.emp_salary,
+        emp_working_days: this.data?.emp_working_days,
+        emp_working_hours: this.data?.emp_working_hours,
+        emp_periode: this.data?.emp_periode,
+        emp_id: this.$route.params.id,
+      };
+      const response = await AddSalaryAPI(data);
+      if (response?.status === 401) {
+        return (window.location.href = "/login");
+      }
+      if (response?.status === 200) {
+        this.handleGetSalary();
+        this.showMessageStatus(response);
+        this.clearInputValue();
+      }
+      this.loading = false;
+    },
+    async handleGetSalary() {
+      const { id } = this.$route.params;
+      const response = await GetSalaryAPI(id);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      if (response.status === 200) {
+        this.data = response?.data;
+      }
     },
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
@@ -167,6 +220,8 @@ export default {
     this.indicator_position.left = buttonPosition;
     this.indicator_position.height = buttonHeight;
     this.indicator_position.width = buttonWidth;
+
+    this.handleGetSalary();
   },
 };
 </script>

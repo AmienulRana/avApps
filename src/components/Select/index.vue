@@ -43,6 +43,14 @@ export default {
     };
   },
   emits: ["change"],
+  watch: {
+    value: {
+      handler(newData) {
+        this.selectedOption = newData;
+      },
+      deep: true,
+    },
+  },
   methods: {
     updateModel() {
       this.$emit("change", this.selectedOption);

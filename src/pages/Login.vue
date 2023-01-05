@@ -1,6 +1,8 @@
 <template>
-  <section class="min-h-screen grid grid-cols-8">
-    <section class="min-h-screen hidden md:block relative md:col-span-5">
+  <section class="min-h-screen md:grid grid-cols-8">
+    <section
+      class="min-h-screen hidden md:block relative lg:col-span-5 md:col-span-4"
+    >
       <img
         :src="'images/Background_Login.png'"
         class="h-full w-full"
@@ -11,21 +13,21 @@
         <img
           :src="'/images/av_hrs_putih.png'"
           :alt="altImageLogo"
-          class="w-40"
+          class="lg:w-40 md:w-28"
           cache
         />
-        <h1 class="text-white font-bold mt-2 text italic text-xl">
+        <h1 class="text-white font-bold mt-2 text italic lg:text-xl">
           Manage Attadance, leave and payroll.
         </h1>
       </div>
     </section>
     <section
-      class="flex flex-col justify-center px-20 min-h-screen md:col-span-3"
+      class="flex flex-col justify-center py-5 md:py-0 px-10 md:px-14 lg:px-20 min-h-screen lg:col-span-3 md:col-span-4"
     >
-      <div class="px-4 py-1 rounded w-full">
+      <div class="px-4 py-1 mt-10 rounded w-full">
         <img src="../assets/av_hrs.png" class="w-26 h-12 block m-auto" />
       </div>
-      <p class="text-center my-8 opacity-70">
+      <p class="text-center md:my-8 my-4 opacity-70">
         Hai! <br />
         Login to your dashboard
       </p>
@@ -80,8 +82,8 @@
           password</router-link
         >
       </div>
-      <p class="text-gray-400 text-center mt-8 text-sm">
-        Copyright Ⓒ 2022 by ArmadaVision
+      <p class="text-gray-400 text-center mt-8 mb-5 text-sm">
+        Copyright Ⓒ {{ new Date().getFullYear() }} by ArmadaVision
       </p>
     </section>
   </section>
@@ -94,6 +96,7 @@ import Select from "@/components/Select/index.vue";
 import CryptoJS from "crypto-js";
 import { SECRET_KEY } from "@/config";
 import Loading from "@/components/Loading.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "LoginPage",
@@ -107,6 +110,10 @@ export default {
       password: "",
       loading: false,
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     changeAccount(role) {
@@ -129,11 +136,14 @@ export default {
         const { token } = response?.data;
         const encryptedToken = this.encrypt(token);
         this.$store.state.isLoggedIn = true;
+        this.toast.success(response?.data?.message);
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", encryptedToken);
         window.location.href = "/";
       } else {
-        console.log(response);
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
         this.loading = false;
       }
     },

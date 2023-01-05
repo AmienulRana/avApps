@@ -11,7 +11,7 @@
       </section>
 
       <section
-        class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-3 gap-3 py-3 my-6"
+        class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
       >
         <section
           class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
@@ -282,6 +282,9 @@ export default {
       const { id } = this.$route.params;
       const response = await DetailEmployementAPI(id);
       const data = response?.data;
+      if (response?.status === 401) {
+        return (window.location.href = "/");
+      }
       this.handleAssignPersonalData(data);
       this.handleAssignEmploymentData(data);
     },
