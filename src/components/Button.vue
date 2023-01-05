@@ -11,4 +11,8 @@ export default {
 </script>
 
 <style scoped>
+button[disabled] {
+  pointer-events: none;
+  opacity: 0.7;
+}
 </style>
