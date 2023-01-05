@@ -388,6 +388,7 @@ import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "./ChoiseCompany.vue";
 import { GetDesignationAPI } from "@/actions/designation";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "ModalAddEmployee",
@@ -469,6 +470,10 @@ export default {
       },
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     formatCurrency(number) {
       const formatter = new Intl.NumberFormat("id-ID", {
@@ -502,6 +507,15 @@ export default {
       for (const key in this.attadance_day) {
         this.attadance_day[key].off_day = false;
         this.attadance_day[key].shift = "";
+      }
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
       }
     },
     async getCompany() {
@@ -569,6 +583,7 @@ export default {
         this.$store.commit("unSetFile");
         this.clearInputValue();
       }
+      this.showMessageStatus(response);
     },
   },
   watch: {
