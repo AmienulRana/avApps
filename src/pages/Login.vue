@@ -96,6 +96,7 @@ import Select from "@/components/Select/index.vue";
 import CryptoJS from "crypto-js";
 import { SECRET_KEY } from "@/config";
 import Loading from "@/components/Loading.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "LoginPage",
@@ -109,6 +110,10 @@ export default {
       password: "",
       loading: false,
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     changeAccount(role) {
@@ -131,10 +136,14 @@ export default {
         const { token } = response?.data;
         const encryptedToken = this.encrypt(token);
         this.$store.state.isLoggedIn = true;
+        this.toast.success(response?.data?.message);
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", encryptedToken);
         window.location.href = "/";
       } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
         this.loading = false;
       }
     },
