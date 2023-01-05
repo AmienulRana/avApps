@@ -106,12 +106,14 @@
             class="bg-primary text-white w-24 text-sm rounded py-2"
             @click="handleAddEducation"
             v-if="!edit"
+            :disabled="loading || !data.empedu_type"
           >
             Save
           </Button>
           <Button
             class="bg-primary text-white w-24 text-sm rounded py-2"
             @click="handleEditEducation"
+            :disabled="loading"
             v-else
           >
             Edit
@@ -152,6 +154,7 @@ export default {
       tab_active: "1",
       educations: [],
       edit: false,
+      loading: false,
       data: {
         empedu_institute: "",
         empedu_result: null,
@@ -188,6 +191,7 @@ export default {
       }
     },
     async handleAddEducation() {
+      this.loading = true;
       const data = {
         ...this.data,
         emp_result: Number(this.data.empedu_result),
@@ -202,6 +206,7 @@ export default {
         this.showMessageStatus(response);
         this.clearInputValue();
       }
+      this.loading = false;
     },
     async handleGetEducation() {
       const { id } = this.$route.params;
@@ -220,6 +225,8 @@ export default {
       this.data.empedu_year = education?.empedu_year;
     },
     async handleEditEducation() {
+      this.loading = true;
+
       const id = this.data.empedu_id;
       const data = {
         ...this.data,
@@ -235,6 +242,7 @@ export default {
         this.showMessageStatus(response);
         this.edit = false;
       }
+      this.loading = false;
     },
     async handleDeleteEducation(id) {
       const response = await DeleteEducationAPI(id);
