@@ -130,6 +130,8 @@ import Input from "./Input.vue";
 import Select from "./Select";
 import Button from "./Button.vue";
 import Experience from "./Experience.vue";
+import { useToast } from "vue-toastification";
+
 import {
   AddEducationAPI,
   GetEducationAPI,
@@ -159,6 +161,10 @@ export default {
       },
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
@@ -166,6 +172,15 @@ export default {
       this.indicator_position.left = buttonPosition;
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
     },
     clearInputValue() {
       for (const key in this.data) {
@@ -184,6 +199,7 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetEducation();
+        this.showMessageStatus(response);
         this.clearInputValue();
       }
     },
@@ -216,6 +232,7 @@ export default {
       if (response.status === 200) {
         this.handleGetEducation();
         this.clearInputValue();
+        this.showMessageStatus(response);
         this.edit = false;
       }
     },
@@ -226,6 +243,7 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetEducation();
+        this.showMessageStatus(response);
       }
     },
   },
