@@ -297,4 +297,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.profile {
+  min-width: 128px;
+  min-height: 128px;
+}
+</style>
