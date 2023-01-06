@@ -42,6 +42,13 @@
             </h1>
             <Button
               class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
+              :class="
+                employment?.emp_status === 'Permanent'
+                  ? 'bg-blue-500'
+                  : employment?.emp_status === 'Probation'
+                  ? 'bg-orange-500'
+                  : 'bg-red-600'
+              "
             >
               {{ employment?.emp_status }}</Button
             >
