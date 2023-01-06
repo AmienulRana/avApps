@@ -9,8 +9,14 @@
           >
         </h1>
       </section>
-
       <section
+        class="bg-white w-full shadow-md md:h-64 py-3 my-6"
+        v-if="loading"
+      >
+        <Loading />
+      </section>
+      <section
+        v-else
         class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
       >
         <section
@@ -187,6 +193,7 @@
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import PersonalDetail from "../../components/PersonalDetail.vue";
+import Loading from "../../components/Loading.vue";
 import Employement from "../../components/Employement.vue";
 import Experience from "../../components/Education.vue";
 import Rekening from "../../components/Rekening.vue";
@@ -207,6 +214,7 @@ export default {
     Rekening,
     Payroll,
     Cuti,
+    Loading,
   },
   data() {
     return {
@@ -228,6 +236,7 @@ export default {
         { name: "Cuti", icon: "fa-calendar" },
       ],
       isOpenAccordion: false,
+      loading: true,
       urlImageServer: URL_IMAGES,
       sideTabActive: "Personal Detail",
       personal_detail: {
@@ -296,6 +305,7 @@ export default {
       }
       this.handleAssignPersonalData(data);
       this.handleAssignEmploymentData(data);
+      this.loading = false;
     },
   },
   mounted() {
