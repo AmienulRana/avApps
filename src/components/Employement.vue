@@ -142,12 +142,31 @@
         />
       </div>
       <div class="flex justify-end w-full mb-4">
-        <Button class="bg-primary text-white w-24 text-sm rounded py-2">
-          Tes
+        <Button
+          class="bg-primary text-white w-24 text-sm rounded py-2"
+          @click="showModal = true"
+        >
+          Save
         </Button>
       </div>
     </section>
   </section>
+  <Modal :showModal="showModal" @close="showModal = false" class="z-30">
+    <section class="bg-red-100 w-full rounded h-32 px-10 pt-5">
+      <p class="text-red-500">
+        You cannot change shifts directly here, if you want to change shifts
+        please visit the "Change Work Shift" page
+      </p>
+    </section>
+    <template #footer>
+      <Button
+        class="bg-primary w-24 py-1.5 text-white rounded"
+        @click="showModal = false"
+      >
+        Close
+      </Button>
+    </template>
+  </Modal>
 </template>
 
 <script>
@@ -160,11 +179,12 @@ import { GetDepartementAPI } from "@/actions/departement";
 import { GetDesignationAPI } from "@/actions/designation";
 import { EditEmployementAPI } from "@/actions/employment";
 import { useToast } from "vue-toastification";
+import Modal from "./Modal.vue";
 
 export default {
   name: "EmploymentData",
   props: { employment: Object, handleDetailEmployment: Function },
-  components: { Input, Select, SelectSearch, SwitchButton, Button },
+  components: { Input, Select, SelectSearch, SwitchButton, Button, Modal },
   data() {
     return {
       indicator_position: {
@@ -174,6 +194,7 @@ export default {
       },
       loading: false,
       show_select: false,
+      showModal: false,
       tab_active: "1",
       data: {
         emp_status: this.employment?.emp_status,
