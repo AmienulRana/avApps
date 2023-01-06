@@ -151,7 +151,7 @@
       <div
         class="flex bg-icon w-10 h-10 p-2 rounded-full bg-gray-100 justify-center items-center"
       >
-        <font-awesome-icon icon="fa-check" class="text-xl text-gray-400" />
+        <font-awesome-icon icon="fa-xmark" class="text-xl text-gray-400" />
       </div>
       <section class="relative px-10 border-l-2 h-52 ml-10">
         <div

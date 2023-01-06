@@ -151,14 +151,14 @@
       <div
         class="flex bg-icon w-10 h-10 p-2 rounded-full bg-gray-100 justify-center items-center"
       >
-        <font-awesome-icon icon="fa-check" class="text-xl text-gray-400" />
+        <font-awesome-icon icon="fa-xmark" class="text-xl text-gray-400" />
       </div>
       <section class="relative px-10 border-l-2 h-52 ml-10">
         <div
           class="indicator p-2 w-3 h-3 rounded-full bg-gray-100 absolute top-0 -left-2"
         ></div>
         <div class="bg-gray-100 px-4 py-2 rounded w-52 text-gray-400">
-          <p class="text-sm flex items-center">Approve Atasan 1</p>
+          <p class="text-sm flex items-center">Not Approve Atasan 1</p>
           <p class="text-sm mt-1">01 Dec, 22</p>
         </div>
       </section>
