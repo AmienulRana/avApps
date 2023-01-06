@@ -155,7 +155,11 @@
     <section class="bg-red-100 w-full rounded h-32 px-10 pt-5">
       <p class="text-red-500">
         You cannot change shifts directly here, if you want to change shifts
-        please visit the "Change Work Shift" page
+        please visit the
+        <router-link to="/change-shift" class="underline">
+          "Change Work Shift"
+        </router-link>
+        page
       </p>
     </section>
     <template #footer>
