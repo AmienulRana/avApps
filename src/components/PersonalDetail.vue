@@ -86,6 +86,7 @@
         class="mb-2.5"
         :value="data.emp_marital_status"
         :options="['Belum menikah', 'sudah menikah']"
+        @change="data.emp_marital_status = $event"
       />
       <Input
         label="Tgl. Lahir"
@@ -93,6 +94,7 @@
         input_class="md:w-4/6 w-full mt-1"
         class="mb-2.5"
         :value="data?.emp_birthday"
+        @change="data.emp_birthday = $event"
       />
       <SelectSearch
         :options="['O+', 'O-', 'A+', 'A-']"
@@ -107,7 +109,8 @@
       <div class="flex justify-end w-full my-4">
         <Button
           class="bg-primary text-white w-24 text-sm rounded py-2"
-          @click="handleAddEmployement"
+          @click="handleEditEmployement"
+          :disabled="loading"
         >
           Save
         </Button>
@@ -124,17 +127,24 @@ import Input from "./Input.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
 import Radio from "./Radio.vue";
+import { EditPersonalEmployementAPI } from "@/actions/employment";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "PersonalDetail",
   components: { Input, Select, Radio, SelectSearch },
-  props: { mode: String, personalDetail: Object },
+  props: {
+    mode: String,
+    personalDetail: Object,
+    handleDetailEmployment: Function,
+  },
   data() {
     return {
       indicator_position: {
         left: 0,
         height: 0,
       },
+      loading: false,
       data: {
         emp_firstname: this.personalDetail.emp_firstname,
         emp_lastname: this.personalDetail.emp_lastname,
@@ -150,6 +160,10 @@ export default {
       tab_active: "data_diri",
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;
@@ -158,11 +172,31 @@ export default {
       this.indicator_position.height = buttonHeight;
       this.tab_active = tab;
     },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.handleDetailEmployment();
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
+    async handleEditEmployement() {
+      this.loading = true;
+      const { id } = this.$route.params;
+      const response = await EditPersonalEmployementAPI(id, this.data);
+      console.log(response);
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      this.showMessageStatus(response);
+      this.loading = false;
+    },
   },
   watch: {
     personalDetail: {
       handler(newData) {
-        console.log(newData);
         this.data = newData;
       },
       deep: true,
