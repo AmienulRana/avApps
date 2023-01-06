@@ -124,6 +124,7 @@
 
 <script>
 import Input from "./Input.vue";
+import Button from "./Button.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
 import Radio from "./Radio.vue";
@@ -132,7 +133,7 @@ import { useToast } from "vue-toastification";
 
 export default {
   name: "PersonalDetail",
-  components: { Input, Select, Radio, SelectSearch },
+  components: { Input, Select, Radio, SelectSearch, Button },
   props: {
     mode: String,
     personalDetail: Object,
