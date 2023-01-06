@@ -19,12 +19,12 @@
           <img
             :src="`${urlImageServer}/${personal_detail.emp_profile}`"
             alt="profile image"
-            class="w-32 h-32 rounded-full"
+            class="profile w-32 h-32 rounded-full"
             v-if="personal_detail?.emp_profile"
           />
           <div
             v-else
-            class="w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
+            class="profile w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
           >
             <h2 class="text-3xl text-white">
               {{
@@ -160,10 +160,12 @@
           <PersonalDetail
             v-if="sideTabActive === 'Personal Detail'"
             :personalDetail="personal_detail"
+            :handleDetailEmployment="handleDetailEmployment.bind(this)"
           />
           <Employement
             v-if="sideTabActive === 'Employment'"
             :employment="employment"
+            :handleDetailEmployment="handleDetailEmployment.bind(this)"
           />
           <Experience v-if="sideTabActive === 'Pendidikan dan Pengalaman'" />
           <Rekening v-if="sideTabActive === 'Rekening'" />
