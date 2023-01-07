@@ -6,6 +6,7 @@ const store = createStore({
       sidebarMenuActive: "",
       isLoggedIn: false,
       file: null,
+      currentPage: 1,
     };
   },
   mutations: {
@@ -14,6 +15,9 @@ const store = createStore({
     },
     changeIsLoggedIn(state, payload) {
       state.isLoggedIn = payload;
+    },
+    changeCurrentPage(state, payload) {
+      state.currentPage = payload;
     },
     setFile(state, payload) {
       state.file = payload;
