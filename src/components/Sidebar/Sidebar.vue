@@ -47,7 +47,7 @@
           :isOpen="isOpen === menu.title"
           :icon="false"
           :contentClass="{
-            'absolute top-0 z-10 w-60 accordion-content px-6 bg-primary':
+            'absolute top-0 z-20 w-60 accordion-content px-6 bg-primary':
               this.modeSidebar === 'icon',
           }"
         >
@@ -167,7 +167,7 @@ export default {
           contents: [
             { text: "Leave Request", to: "/leave-request" },
             { text: "Overtime Request", to: "/overtime-request" },
-            { text: "Outside Assignment", to: "/outsign-assignment" },
+            { text: "Outside Assignment", to: "/outside-assignment" },
             { text: "Change Work Shift", to: "/change-shift" },
             { text: "Change Off Day", to: "/change-off" },
             { text: "Need Approval", to: "/need-approval" },
@@ -194,9 +194,7 @@ export default {
           contents: [
             { text: "Users & Roles", to: "/administration/user-and-roles" },
             { text: "Work Shifts", to: "/administration/workshifts" },
-            { text: "Departement", to: "/administration/departement" },
             { text: "Holiday", to: "/administration/holiday" },
-            { text: "Org. Structure", to: "/administration/structure" },
             { text: "Announcements", to: "/administration/announcements" },
           ],
         },
@@ -224,6 +222,7 @@ export default {
       }
     },
     handleDisplayAccordion(value) {
+      console.log("tes");
       if (this.modeSidebar === "icon") {
         this.accordionPosition = "side";
         this.isOpen = value;
