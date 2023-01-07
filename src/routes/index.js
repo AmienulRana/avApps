@@ -6,6 +6,10 @@ import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
 import AttadanceDaily from "../pages/Attadance/Daily.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
+import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
+import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
+import ChangeWorkShift from "../pages/Pengajuan/ChangeWorkShift.vue";
+import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
 import Home from "../pages/Home.vue";
@@ -52,6 +56,26 @@ const routes = [
   {
     path: "/leave-request",
     component: LeaveRequest,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/overtime-request",
+    component: OvertimeRequest,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/outside-assignment",
+    component: OutsideAssignment,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/change-shift",
+    component: ChangeWorkShift,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/change-off",
+    component: ChangeOffDay,
     beforeEnter: requiredAuth,
   },
   {

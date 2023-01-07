@@ -9,8 +9,14 @@
           >
         </h1>
       </section>
-
       <section
+        class="bg-white w-full shadow-md md:h-64 py-3 my-6"
+        v-if="loading"
+      >
+        <Loading />
+      </section>
+      <section
+        v-else
         class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
       >
         <section
@@ -19,12 +25,12 @@
           <img
             :src="`${urlImageServer}/${personal_detail.emp_profile}`"
             alt="profile image"
-            class="w-32 h-32 rounded-full"
+            class="profile w-32 h-32 rounded-full"
             v-if="personal_detail?.emp_profile"
           />
           <div
             v-else
-            class="w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
+            class="profile w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
           >
             <h2 class="text-3xl text-white">
               {{
@@ -42,6 +48,13 @@
             </h1>
             <Button
               class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
+              :class="
+                employment?.emp_status === 'Permanent'
+                  ? 'bg-blue-500'
+                  : employment?.emp_status === 'Probation'
+                  ? 'bg-orange-500'
+                  : 'bg-red-600'
+              "
             >
               {{ employment?.emp_status }}</Button
             >
@@ -160,10 +173,12 @@
           <PersonalDetail
             v-if="sideTabActive === 'Personal Detail'"
             :personalDetail="personal_detail"
+            :handleDetailEmployment="handleDetailEmployment.bind(this)"
           />
           <Employement
             v-if="sideTabActive === 'Employment'"
             :employment="employment"
+            :handleDetailEmployment="handleDetailEmployment.bind(this)"
           />
           <Experience v-if="sideTabActive === 'Pendidikan dan Pengalaman'" />
           <Rekening v-if="sideTabActive === 'Rekening'" />
@@ -178,6 +193,7 @@
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import PersonalDetail from "../../components/PersonalDetail.vue";
+import Loading from "../../components/Loading.vue";
 import Employement from "../../components/Employement.vue";
 import Experience from "../../components/Education.vue";
 import Rekening from "../../components/Rekening.vue";
@@ -198,6 +214,7 @@ export default {
     Rekening,
     Payroll,
     Cuti,
+    Loading,
   },
   data() {
     return {
@@ -219,6 +236,7 @@ export default {
         { name: "Cuti", icon: "fa-calendar" },
       ],
       isOpenAccordion: false,
+      loading: true,
       urlImageServer: URL_IMAGES,
       sideTabActive: "Personal Detail",
       personal_detail: {
@@ -287,6 +305,7 @@ export default {
       }
       this.handleAssignPersonalData(data);
       this.handleAssignEmploymentData(data);
+      this.loading = false;
     },
   },
   mounted() {
@@ -295,4 +314,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.profile {
+  min-width: 128px;
+  min-height: 128px;
+}
+</style>

@@ -22,7 +22,7 @@
             <font-awesome-icon icon="fa-user" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">14</p>
+            <p class="text-sm">{{ data.total_employment }}</p>
             <p class="text-xs text-gray-400">Total employees</p>
           </div>
         </section>
@@ -35,7 +35,7 @@
             <font-awesome-icon icon="fa-home-alt" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">7</p>
+            <p class="text-sm">{{ data.total_departement }}</p>
             <p class="text-xs text-gray-400">Total departement</p>
           </div>
         </section>
@@ -48,7 +48,7 @@
             <font-awesome-icon icon="fa-pen-to-square" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">2</p>
+            <p class="text-sm">0</p>
             <p class="text-xs text-gray-400">Total leave request</p>
           </div>
         </section>
@@ -68,7 +68,10 @@
       </section>
 
       <section class="md:grid gap-6 grid-cols-4 mb-6">
-        <EmployementStatistic class="col-span-3 mb-10" />
+        <EmployementStatistic
+          class="col-span-3 mb-10"
+          :total_employment_status="data.total_employment_status"
+        />
         <section class="col-span-1">
           <AttedanceStatistic />
         </section>
@@ -82,7 +85,7 @@ import EmployementStatistic from "@/components/EmployementStatistic.vue";
 import AttedanceStatistic from "@/components/AttendanceStatistic.vue";
 import LayoutAdmin from "../components/Layout/Admin.vue";
 import decryptToken from "@/utils/decryptToken";
-import { GetAllCompanyAPI } from "@/actions/company";
+import { GetAllCompanyAPI, GetDahsboardAPI } from "@/actions/company";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 
 export default {
@@ -93,8 +96,14 @@ export default {
       superAdmin: false,
       options: [],
       dataCompany: {},
+      loadingData: true,
       loading: {
         company: true,
+      },
+      data: {
+        total_employment: 0,
+        total_departement: 0,
+        total_employment_status: [],
       },
     };
   },
@@ -111,12 +120,35 @@ export default {
       this.dataCompany = response?.data[0];
       this.loading.company = false;
     },
+    async handleGetDashboard() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDahsboardAPI(querySuperAdmin);
+      const { data } = response;
+      if (response.status === 401) {
+        return (window.location.href = "/login");
+      }
+      if (response.status === 200) {
+        this.data.total_departement = data.total_departement;
+        this.data.total_employment = data.total_employment;
+        this.data.total_employment_status = data.employment_status;
+      }
+      console.log(response);
+    },
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDashboard();
+      },
+      deep: true,
+    },
   },
   mounted() {
     // const payload = decrypt
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
+    // this.handleGetDashboard();
   },
 };
 </script>

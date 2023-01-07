@@ -43,3 +43,35 @@ export const DetailEmployementAPI = async (id) => {
     return error.response;
   }
 };
+export const EditPersonalEmployementAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/employment/personal-detail/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+export const EditEmployementAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/employment/employment-detail/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
