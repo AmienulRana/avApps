@@ -14,3 +14,15 @@ export const GetAllCompanyAPI = async () => {
     return error.response;
   }
 };
+export const GetDahsboardAPI = async (query) => {
+  try {
+    const response = await axios.get(`${URL_API}/company/dashboard${query}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
