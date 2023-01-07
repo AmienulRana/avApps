@@ -1,5 +1,5 @@
 <template>
-  <section class="flex bg-primary h-auto">
+  <section class="flex bg-primary h-auto" @click="showDropdown = false">
     <KeepAlive>
       <Sidebar :modeSidebar="modeSidebar" :showSidebar="showSidebar" />
     </KeepAlive>
@@ -8,7 +8,7 @@
       @click="showSidebar = false"
     >
       <section
-        class="bg-white w-full px-8 py-6 shadow-md flex justify-between z-20 fixed lg:static"
+        class="bg-white w-full px-8 py-6 shadow-md flex justify-between items-center z-20 fixed lg:static"
       >
         <font-awesome-icon
           icon="fa-bars"
@@ -20,12 +20,16 @@
           class="w-6 h-6 text-primary hidden lg:block"
           @click="handleChangeSidebar"
         />
-        <div class="flex">
+        <div class="flex items-center">
           <font-awesome-icon
             icon="fa-expand"
             class="w-6 h-6 text-primary mx-2"
           />
           <font-awesome-icon icon="fa-moon" class="w-6 h-6 text-primary mx-2" />
+          <NavbarProfile
+            @click="showDropdown = $event"
+            :showDropdown="showDropdown"
+          />
         </div>
       </section>
       <section class="mt-24 lg:mt-0">
@@ -37,13 +41,15 @@
 
 <script>
 import Sidebar from "../Sidebar/Sidebar.vue";
+import NavbarProfile from "../NavbarProfile.vue";
 export default {
   name: "LayoutAdmin",
-  components: { Sidebar },
+  components: { Sidebar, NavbarProfile },
   data() {
     return {
       modeSidebar: "full",
       showSidebar: false,
+      showDropdown: false,
     };
   },
   methods: {
