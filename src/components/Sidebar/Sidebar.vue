@@ -176,7 +176,20 @@ export default {
         {
           title: "Absensi",
           icon: "fa-calendar",
-          contents: [{ text: "Daily Log Absensi", to: "/attedance/daily" }],
+          contents: [
+            { text: "Daily Log Absensi", to: "/attedance/daily" },
+
+            { text: "Attendace Detail", to: "/attedance/detail" },
+            {
+              text: "Setting Cuti Bersama / Off Days",
+              to: "/attedance/setting-cuti",
+            },
+            {
+              text: "Setting Potongan Absensi",
+              to: "/attedance/setting-absensi",
+            },
+            { text: "Setting Work Shift", to: "/attedance/setting-workshift" },
+          ],
         },
         {
           title: "Payroll",
