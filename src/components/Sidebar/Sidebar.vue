@@ -206,7 +206,6 @@ export default {
           icon: "fa-briefcase",
           contents: [
             { text: "Users & Roles", to: "/administration/user-and-roles" },
-            { text: "Work Shifts", to: "/administration/workshifts" },
             { text: "Holiday", to: "/administration/holiday" },
             { text: "Announcements", to: "/administration/announcements" },
           ],
