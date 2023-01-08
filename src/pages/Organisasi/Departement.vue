@@ -358,7 +358,6 @@ export default {
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
-    this.handleGetDepartement();
   },
   watch: {
     dataCompany: {
