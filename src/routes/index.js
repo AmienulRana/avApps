@@ -6,6 +6,7 @@ import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
 import AttadanceDaily from "../pages/Attadance/Daily.vue";
 import SettingWorkShift from "../pages/Attadance/SettingWorkshift.vue";
+import SettingCuti from "../pages/Attadance/SettingCuti.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
 import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
 import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
@@ -57,6 +58,11 @@ const routes = [
   {
     path: "/attedance/setting-workshift",
     component: SettingWorkShift,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/attedance/setting-cuti",
+    component: SettingCuti,
     beforeEnter: requiredAuth,
   },
   {
