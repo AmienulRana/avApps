@@ -120,57 +120,9 @@
       </div>
     </section>
     <section class="mt-4" v-if="tab_active === '2'">
-      <div class="mb-2">
-        <p class="text-end text-sm text-gray-400">Off day</p>
-      </div>
-      <div
-        class="flex items-center mb-2.5"
-        v-for="(day, i) in shift_day"
-        :key="i"
-      >
-        <Select
-          :label="i"
-          input_class="md:w-4/6 mt-2 md:mt-0"
-          class="w-full mr-6"
-          :options="shift_data"
-          :value="day.shift"
-          :disabled="day.off_day"
-        />
-        <SwitchButton
-          @update:model="(value) => (day.off_day = value)"
-          :value="day?.off_day"
-        />
-      </div>
-      <div class="flex justify-end w-full mb-4">
-        <Button
-          class="bg-primary text-white w-24 text-sm rounded py-2"
-          @click="showModal = true"
-        >
-          Save
-        </Button>
-      </div>
+      <EmployementShift :emp_attadance="employment?.emp_attadance" />
     </section>
   </section>
-  <Modal :showModal="showModal" @close="showModal = false" class="z-30">
-    <section class="bg-red-100 w-full rounded h-32 px-10 pt-5">
-      <p class="text-red-500">
-        You cannot change shifts directly here, if you want to change shifts
-        please visit the
-        <router-link to="/change-shift" class="underline">
-          "Change Work Shift"
-        </router-link>
-        page
-      </p>
-    </section>
-    <template #footer>
-      <Button
-        class="bg-primary w-24 py-1.5 text-white rounded"
-        @click="showModal = false"
-      >
-        Close
-      </Button>
-    </template>
-  </Modal>
 </template>
 
 <script>
@@ -178,17 +130,16 @@ import Input from "./Input.vue";
 import Button from "./Button.vue";
 import Select from "./Select/index.vue";
 import SelectSearch from "./Select/SelectSearch";
-import SwitchButton from "./SwitchButton.vue";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetDesignationAPI } from "@/actions/designation";
 import { EditEmployementAPI } from "@/actions/employment";
 import { useToast } from "vue-toastification";
-import Modal from "./Modal.vue";
+import EmployementShift from "./EmploymentShift.vue";
 
 export default {
   name: "EmploymentData",
   props: { employment: Object, handleDetailEmployment: Function },
-  components: { Input, Select, SelectSearch, SwitchButton, Button, Modal },
+  components: { Input, Select, SelectSearch, Button, EmployementShift },
   data() {
     return {
       indicator_position: {
@@ -218,12 +169,6 @@ export default {
         company_id: this.employment?.company_id,
         emp_tanggungan: this.employment?.emp_tanggungan,
       },
-      shift_data: [
-        "Shift 1 Stationery (08:00 am - 05:00pm)",
-        "Shift 2 Stationery",
-        "Shift 3 Stationery",
-      ],
-      shift_day: this.employment?.emp_attadance,
       departement: [],
       designation: [],
     };

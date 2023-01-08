@@ -200,7 +200,7 @@
                 <img
                   :src="`${urlImages}/${employe?.emp_profile}`"
                   :alt="`Profile
-                ${employe?.emp_fullname}`"
+                  ${employe?.emp_fullname}`"
                   class="rounded-full"
                   v-if="employe?.emp_profile"
                 />
@@ -428,7 +428,7 @@ export default {
       employee: [],
       pagination: {
         perPage: 5,
-        currentPage: 1,
+        currentPage: this.$store.state.currentPage,
         changePerPage: null,
       },
       filter: {
@@ -460,7 +460,8 @@ export default {
       }
     },
     changePage(page) {
-      this.pagination.currentPage = page;
+      this.$store.commit("changeCurrentPage", page);
+      this.pagination.currentPage = this.$store.state.currentPage;
     },
     showContactEmployee(id) {
       if (this.contactEmployee === id) {
@@ -522,6 +523,7 @@ export default {
         this.loading.employement = true;
         this.handleGetDepartement();
         this.handleGetDesignation();
+        // if()
         this.handleGetEmployement();
         this.loading.employement = false;
       },

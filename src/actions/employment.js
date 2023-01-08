@@ -75,3 +75,19 @@ export const EditEmployementAPI = async (id, payload) => {
     return error.response;
   }
 };
+export const EditWorkShiftAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/employment/employment-workshift/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};

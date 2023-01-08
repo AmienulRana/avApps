@@ -367,6 +367,7 @@
         <Button
           class="bg-green-500 min-w-max px-2 py-2 text-white rounded-md"
           @click="handleAddEmployment"
+          :disabled="loadingAdd"
         >
           Tambah Karyawan
         </Button>
@@ -404,6 +405,7 @@ export default {
   props: { showModal: Boolean, closeModal: Function, getEmployement: Function },
   data() {
     return {
+      loadingAdd: false,
       show_select: "",
       previewImage: null,
       personal: {
@@ -545,6 +547,7 @@ export default {
       }
     },
     async handleAddEmployment() {
+      this.loading = true;
       const employment = {
         ...this.employment,
         emp_depid: this.employment.emp_depid?._id,
@@ -578,12 +581,12 @@ export default {
       );
       if (response.status === 200) {
         this.getEmployement();
-        this.closeModal();
         this.tabActive = "Personal";
         this.$store.commit("unSetFile");
         this.clearInputValue();
       }
       this.showMessageStatus(response);
+      this.loading = true;
     },
   },
   watch: {

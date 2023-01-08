@@ -31,7 +31,7 @@
             <th class="text-left text-sm p-3">Gelar</th>
             <th class="text-left text-sm p-3">Nama Institusi</th>
             <th class="text-left text-sm p-3">Hasil</th>
-            <th class="text-left text-sm p-3">Tahun</th>
+            <th class="text-left text-sm p-3">Tahun Lulus</th>
             <th class="text-left text-sm p-3">Actions</th>
           </tr>
         </thead>
@@ -93,11 +93,11 @@
           @change="data.empedu_result = $event"
           :value="data.empedu_result"
         />
-        <Select
-          label="Tahun"
+        <Input
+          type="date"
+          label="Tahun Lulus"
           input_class="md:w-4/6 mt-2"
           class="mb-2.5"
-          :options="['2022', '2021', '2020']"
           @change="data.empedu_year = $event"
           :value="data.empedu_year"
         />
@@ -129,7 +129,6 @@
 
 <script>
 import Input from "./Input.vue";
-import Select from "./Select";
 import Button from "./Button.vue";
 import Experience from "./Experience.vue";
 import { useToast } from "vue-toastification";
@@ -143,7 +142,7 @@ import {
 
 export default {
   name: "EducationComponent",
-  components: { Input, Select, Button, Experience },
+  components: { Input, Button, Experience },
   data() {
     return {
       indicator_position: {

@@ -70,42 +70,7 @@
         :selectedOption="data.employee"
         @selected="data.employee = $event"
       />
-      <section class="flex justify-between items-center mt-4">
-        <p class="text-sm">
-          Age <span class="text-gray-400">(Leave duration)</span>
-        </p>
-        <div class="flex md:px-16">
-          <Radio
-            label="Single Day"
-            @change="data.ageDuration = 'Single Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio
-            label="Multi Day"
-            class="mx-8"
-            @change="data.ageDuration = 'Multi Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio
-            label="Half Day"
-            @change="data.ageDuration = 'Half Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio label="Hours" class="mx-8" />
-        </div>
-      </section>
-      <Input
-        type="date"
-        class="flex-col mt-4"
-        label="Enter Date"
-        label_class="w-full"
-        input_class="mt-2"
-        v-if="data.ageDuration === 'Single Day'"
-      />
-      <section
-        class="grid grid-cols-2 gap-4"
-        v-if="data.ageDuration === 'Multi Day'"
-      >
+      <section class="grid grid-cols-2 gap-4">
         <Input
           type="date"
           class="flex-col mt-4"
@@ -120,16 +85,6 @@
           label_class="w-full"
           input_class="mt-2"
         />
-      </section>
-      <section v-if="data.ageDuration === 'Half Day'" class="my-4">
-        <p class="text-sm mb-2">Date</p>
-        <div class="grid grid-cols-2 gap-4 items-center">
-          <Input type="date" class="flex-col mb-0" label_class="w-full" />
-          <div class="flex">
-            <Radio label="First half" class="mx-8 my-0" />
-            <Radio label="Last half" class="my-0" />
-          </div>
-        </div>
       </section>
       <label class="text-sm">Reason Note</label>
       <textarea
@@ -159,7 +114,6 @@ import Dropdown from "../../components/Dropdown.vue";
 import TableOutsideAssignment from "../../components/TableOutsideAssignment.vue";
 import Modal from "../../components/Modal.vue";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
-import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
 import employee from "@/employee.json";
 
@@ -172,7 +126,6 @@ export default {
     Dropdown,
     SelectSearch,
     Modal,
-    Radio,
     Input,
   },
   data() {

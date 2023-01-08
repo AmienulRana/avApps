@@ -54,11 +54,16 @@
     </section>
   </LayoutAdmin>
   <Modal
-    title="Assign Leave"
+    title="Overtime Request"
     :showModal="modal.showModal"
     @close="modal.showModal = false"
   >
-    <section @click="modal.showSelect = false">
+    <section
+      @click="
+        modal.showSelect = false;
+        modal.showTime = false;
+      "
+    >
       <SelectSearch
         label="Employee"
         :options="getAllEmployee"
@@ -70,122 +75,24 @@
         :selectedOption="data.employee"
         @selected="data.employee = $event"
       />
-      <section v-if="data.employee">
-        <p class="text-sm">
-          Leave Ability
-          <span
-            class="text-primary ml-2 cursor-pointer"
-            @click="
-              modal.showAbility = modal.showAbility === 'hide' ? 'show' : 'hide'
-            "
-          >
-            {{ modal.showAbility === "hide" ? "Show" : "Hide" }}
-          </span>
-        </p>
-        <section
-          class="bg-amber-50 mt-4 px-8 py-5 grid grid-cols-2 rounded-md"
-          v-if="modal.showAbility === 'show'"
-        >
-          <div>
-            <p class="text-sm text-gray-400">
-              Cuti Tahunan (Paid): <span class="text-black">0</span>
-            </p>
-            <p class="text-sm text-gray-400 my-2">
-              Cuti Menikah (Paid): <span class="text-black">0</span>
-            </p>
-            <p class="text-sm text-gray-400">
-              Izin Sakit (Paid): <span class="text-black">0</span>
-            </p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-400">
-              Izin Sakit (Unpaid): <span class="text-black">0</span>
-            </p>
-            <p class="text-sm text-gray-400 my-2">
-              Izin Khusus (Paid): <span class="text-black">0</span>
-            </p>
-            <p class="text-sm text-gray-400">
-              Izin Khusus (Unpaid): <span class="text-black">0</span>
-            </p>
-          </div>
-        </section>
-      </section>
-      <Select
-        class="flex-col mt-4"
-        input_class="w-full mt-2"
-        label_class="w-full"
-        label="Leave type"
-        :options="[
-          'Cuti Tahunan (Paid)',
-          'Cuti Menikah (Paid)',
-          'Izin Sakit (Paid)',
-          'Izin Sakit (Unpaid)',
-          'Izin Khusus (Paid)',
-          'Izin Khusus (Unpaid)',
-        ]"
-        :value="data.leaveType"
-        @change="data.leaveType = $event"
-      />
-      <section class="flex justify-between items-center mt-4">
-        <p class="text-sm">
-          Age <span class="text-gray-400">(Leave duration)</span>
-        </p>
-        <div class="flex md:px-16">
-          <Radio
-            label="Single Day"
-            @change="data.ageDuration = 'Single Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio
-            label="Multi Day"
-            class="mx-8"
-            @change="data.ageDuration = 'Multi Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio
-            label="Half Day"
-            @change="data.ageDuration = 'Half Day'"
-            :modelValue="data.ageDuration"
-          />
-          <Radio label="Hours" class="mx-8" />
-        </div>
-      </section>
       <Input
         type="date"
         class="flex-col mt-4"
         label="Enter Date"
         label_class="w-full"
         input_class="mt-2"
-        v-if="data.ageDuration === 'Single Day'"
       />
-      <section
-        class="grid grid-cols-2 gap-4"
-        v-if="data.ageDuration === 'Multi Day'"
-      >
-        <Input
-          type="date"
-          class="flex-col mt-4"
-          label="Start date"
-          label_class="w-full"
-          input_class="mt-2"
+      <section class="my-4 flex justify-between">
+        <InputTime
+          label="Start Time"
+          :isOpen="modal.showTime === 'start'"
+          @showTime="modal.showTime = 'start'"
         />
-        <Input
-          type="date"
-          class="flex-col mt-4"
-          label="End Date"
-          label_class="w-full"
-          input_class="mt-2"
+        <InputTime
+          label="End Time"
+          :isOpen="modal.showTime === 'end'"
+          @showTime="modal.showTime = 'end'"
         />
-      </section>
-      <section v-if="data.ageDuration === 'Half Day'" class="my-4">
-        <p class="text-sm mb-2">Date</p>
-        <div class="grid grid-cols-2 gap-4 items-center">
-          <Input type="date" class="flex-col mb-0" label_class="w-full" />
-          <div class="flex">
-            <Radio label="First half" class="mx-8 my-0" />
-            <Radio label="Last half" class="my-0" />
-          </div>
-        </div>
       </section>
       <label class="text-sm">Reason Note</label>
       <textarea
@@ -194,61 +101,6 @@
         v-model="data.reasonNote"
       >
       </textarea>
-      <section class="mt-6">
-        <p class="text-sm">Attachment</p>
-        <section
-          @click="openFileInput"
-          class="w-full border preview-file cursor-pointer mt-2 pb-7 border-dashed border-primary"
-        >
-          <div
-            v-if="data.attachement.length !== 0"
-            class="md:grid-cols-6 grid grid-cols-2 gap-4 mt-7 px-8"
-          >
-            <div
-              class="relative wrapper-image-prev"
-              v-for="image in data.attachement"
-              :key="image.blobImgUrl"
-              @click.stop
-            >
-              <!-- <div
-                  class="absolute duration-300 top-0 text-white flex justify-center py-4 rounded-lg left-0 w-full h-full"
-                >
-                  <p>{{ convertToMB(image?.originalFile?.size) }}mb</p>
-                </div> -->
-              <img :src="image?.blobImgUrl" class="w-full h-32 rounded-lg" />
-              <p
-                @click="removeImageFromPreview(image)"
-                class="text-sm text-primary text-center"
-              >
-                Remove file
-              </p>
-            </div>
-          </div>
-          <div
-            class="dragzone flex flex-col justify-center items-center"
-            v-else
-          >
-            <font-awesome-icon
-              icon="fa-cloud-arrow-up"
-              class="w-20 h-20 text-primary"
-            />
-            <h2 class="text-gray-400 text-lg">Drag & Drop</h2>
-            <p>or</p>
-            <p class="text-primary">Browse</p>
-          </div>
-        </section>
-        <p class="text-xs text-gray-400 mt-1">
-          Allowed file types: jpeg, jpg, gif, png, pdf, zip. (Max file size is
-          2MB)
-        </p>
-        <input
-          type="file"
-          multiple
-          class="hidden"
-          ref="file"
-          @change="viewImage"
-        />
-      </section>
     </section>
     <template #footer>
       <section class="flex w-52 justify-between">
@@ -269,10 +121,9 @@ import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
 import TableRequestOvertime from "../../components/TableRequestOvertime.vue";
 import Modal from "../../components/Modal.vue";
-import Select from "@/components/Select";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
-import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
+import InputTime from "@/components/InputTime.vue";
 import employee from "@/employee.json";
 
 export default {
@@ -284,9 +135,8 @@ export default {
     Dropdown,
     SelectSearch,
     Modal,
-    Select,
-    Radio,
     Input,
+    InputTime,
   },
   data() {
     return {
@@ -296,11 +146,10 @@ export default {
       modal: {
         showModal: false,
         showSelect: false,
-        showAbility: "hide",
+        showTime: "",
       },
       data: {
         employee: "",
-        ageDuration: "Single Day",
         reasonNote: "",
         leaveType: "",
       },
