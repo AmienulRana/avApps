@@ -531,7 +531,8 @@ export default {
       if (this?.dataCompany?._id) {
         const response = await GetDepartementAPI(querySuperAdmin);
         if (response.status === 401) {
-          return (window.location.href = "/login");
+          this.$router.push("/login");
+          this.$store.commit("changeIsLoggedIn", false);
         }
         this.departement = response.data;
       }
@@ -541,7 +542,8 @@ export default {
       if (this?.dataCompany?._id) {
         const response = await GetDesignationAPI(querySuperAdmin);
         if (response.status === 401) {
-          return (window.location.href = "/login");
+          this.$router.push("/login");
+          this.$store.commit("changeIsLoggedIn", false);
         }
         this.designation = response.data;
       }

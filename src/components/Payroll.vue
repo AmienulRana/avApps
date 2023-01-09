@@ -184,7 +184,8 @@ export default {
       };
       const response = await AddSalaryAPI(data);
       if (response?.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
         this.handleGetSalary();
@@ -197,7 +198,8 @@ export default {
       const { id } = this.$route.params;
       const response = await GetSalaryAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.data = response?.data;

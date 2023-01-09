@@ -176,7 +176,8 @@ export default {
       };
       const response = await AddExperienceAPI(data);
       if (response?.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
         this.handleGetExperience();
@@ -189,7 +190,8 @@ export default {
       const { id } = this.$route.params;
       const response = await GetExperienceAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.experiences = response?.data;
     },

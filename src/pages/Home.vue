@@ -125,14 +125,14 @@ export default {
       const response = await GetDahsboardAPI(querySuperAdmin);
       const { data } = response;
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.data.total_departement = data.total_departement;
         this.data.total_employment = data.total_employment;
         this.data.total_employment_status = data.employment_status;
       }
-      console.log(response);
     },
   },
   watch: {
