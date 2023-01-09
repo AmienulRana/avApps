@@ -234,7 +234,6 @@ export default {
       }
     },
     handleDisplayAccordion(value) {
-      console.log("tes");
       if (this.modeSidebar === "icon") {
         this.accordionPosition = "side";
         this.isOpen = value;
@@ -242,9 +241,10 @@ export default {
     },
     handleLogout() {
       this.$store.commit("changeIsLoggedIn", false);
+      this.$store.commit("setToken", undefined);
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      this.$router.push("/login");
     },
   },
   mounted() {
