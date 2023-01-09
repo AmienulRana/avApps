@@ -48,7 +48,7 @@
                 </template>
                 <img
                   :src="previewImage"
-                  class="w-full h-ful rounded-full"
+                  class="w-full h-full rounded-full"
                   alt=""
                   v-else
                 />
@@ -549,7 +549,7 @@ export default {
       }
     },
     async handleAddEmployment() {
-      this.loading = true;
+      this.loadingAdd = true;
       const employment = {
         ...this.employment,
         emp_depid: this.employment.emp_depid?._id,
@@ -588,7 +588,7 @@ export default {
         this.clearInputValue();
       }
       this.showMessageStatus(response);
-      this.loading = true;
+      this.loadingAdd = true;
     },
   },
   watch: {
