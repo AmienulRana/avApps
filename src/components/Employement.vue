@@ -202,7 +202,8 @@ export default {
       const querySuperAdmin = `?company=${this.data?.company_id}`;
       const response = await GetDepartementAPI(querySuperAdmin);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.departement = response.data;
     },
@@ -210,7 +211,8 @@ export default {
       const querySuperAdmin = `?company=${this.data?.company_id}`;
       const response = await GetDesignationAPI(querySuperAdmin);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.designation = response.data;
     },
@@ -224,7 +226,8 @@ export default {
       const { id } = this.$route.params;
       const response = await EditEmployementAPI(id, data);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.showMessageStatus(response);
       this.loading = false;

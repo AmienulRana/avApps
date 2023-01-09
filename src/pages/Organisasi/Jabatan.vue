@@ -184,7 +184,8 @@ export default {
         this.superAdmin ? querySuperAdmin : ""
       );
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.designations = response.data;
       this.loading.designation = false;

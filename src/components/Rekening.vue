@@ -138,7 +138,8 @@ export default {
       };
       const response = await AddBankAPI(data);
       if (response?.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
         this.handleGetBank();
@@ -151,7 +152,8 @@ export default {
       const { id } = this.$route.params;
       const response = await GetBankAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.banks = response?.data;
     },
@@ -170,7 +172,8 @@ export default {
       };
       const response = await EditBankAPI(id, data);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetBank();
@@ -183,7 +186,8 @@ export default {
     async handleDeleteBank(id) {
       const response = await DeleteBankAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetBank();

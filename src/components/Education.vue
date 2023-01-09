@@ -198,7 +198,7 @@ export default {
       };
       const response = await AddEducationAPI(data);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
       }
       if (response.status === 200) {
         this.handleGetEducation();
@@ -211,7 +211,7 @@ export default {
       const { id } = this.$route.params;
       const response = await GetEducationAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.educations = response?.data;
     },

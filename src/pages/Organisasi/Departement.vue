@@ -344,12 +344,12 @@ export default {
       };
       const response = await EditDepartementAPI(this.id_dep, data);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$store.commit("changeIsLoggedIn", false);
+        this.$router.push("/login");
       } else if (response.status === 200) {
         this.handleGetDepartement();
       }
       this.modal.showModal = false;
-      console.log(response);
     },
     handleDeleteDepartement() {},
   },
@@ -358,7 +358,6 @@ export default {
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
-    this.handleGetDepartement();
   },
   watch: {
     dataCompany: {

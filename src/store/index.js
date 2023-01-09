@@ -6,6 +6,7 @@ const store = createStore({
       sidebarMenuActive: "",
       isLoggedIn: false,
       file: null,
+      token: null,
       currentPage: 1,
     };
   },
@@ -24,6 +25,9 @@ const store = createStore({
     },
     unSetFile(state) {
       state.file = null;
+    },
+    setToken(state, payload) {
+      state.token = payload;
     },
   },
   actions: {},

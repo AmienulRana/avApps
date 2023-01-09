@@ -189,7 +189,8 @@ export default {
       const response = await EditPersonalEmployementAPI(id, this.data);
       console.log(response);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       this.showMessageStatus(response);
       this.loading = false;

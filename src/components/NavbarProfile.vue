@@ -61,6 +61,7 @@ export default {
   methods: {
     handleLogout() {
       this.$store.commit("changeIsLoggedIn", false);
+      this.$store.commit("setToken", undefined);
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("token");
       this.$router.push("/login");

@@ -137,9 +137,10 @@ export default {
         const encryptedToken = this.encrypt(token);
         this.$store.state.isLoggedIn = true;
         this.toast.success(response?.data?.message);
+        this.$store.commit("setToken", token);
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", encryptedToken);
-        window.location.href = "/";
+        this.$router.push("/");
       } else {
         if (response.data.message) {
           this.toast.error(response?.data?.message);
