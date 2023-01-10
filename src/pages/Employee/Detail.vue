@@ -300,8 +300,8 @@ export default {
       const { id } = this.$route.params;
       const response = await DetailEmployementAPI(id);
       const data = response?.data;
-      if (response?.status === 401) {
-        return (window.location.href = "/");
+      if (response.status === 401) {
+        return this.$router.push("/login");
       }
       this.handleAssignPersonalData(data);
       this.handleAssignEmploymentData(data);
