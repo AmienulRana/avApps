@@ -214,6 +214,10 @@ export default {
           title: "Settings",
           icon: "fa-gear",
           contents: [
+            {
+              text: "Allowance & Deduction Settings",
+              to: "/setting/allowance-deduction",
+            },
             { text: "App Settings", to: "/setting/app" },
             { text: "Leave Settings", to: "/setting/leave" },
             { text: "Attadance Settings", to: "/setting/attadance" },
