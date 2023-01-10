@@ -335,7 +335,6 @@ export default {
     viewImage(e) {
       const files = e.target.files;
       for (let i = 0; i < files.length; i++) {
-        console.log(files[i]);
         const file = URL.createObjectURL(files[i]);
         this.data.attachement.push({
           blobImgUrl: file,

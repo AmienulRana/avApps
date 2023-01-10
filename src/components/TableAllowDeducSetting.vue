@@ -95,8 +95,7 @@ export default {
   methods: {
     async updateStatus(value, dataAd) {
       dataAd.ad_status = value;
-      const response = await ChangeStatusAllowDeductAPI(dataAd?._id);
-      console.log(response);
+      await ChangeStatusAllowDeductAPI(dataAd?._id);
     },
   },
 };
