@@ -11,7 +11,6 @@ export const AddDepartementAPI = async (payload, query) => {
         headers: {
           Authorization: `Bearer ${tokenDecrypted()}`,
         },
-        secure: true,
       }
     );
     return response;
@@ -24,7 +23,6 @@ export const GetDepartementAPI = async (query) => {
     const response = await axios.get(`${URL_API}/departement${query}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
-        secure: true,
       },
     });
     return response;
@@ -34,9 +32,7 @@ export const GetDepartementAPI = async (query) => {
 };
 export const DetailDepartementAPI = async (id) => {
   try {
-    const response = await axios.get(`${URL_API}/departement/${id}`, {
-      secure: true,
-    });
+    const response = await axios.get(`${URL_API}/departement/${id}`);
     return response;
   } catch (error) {
     return error.response;
@@ -48,7 +44,6 @@ export const EditDepartementAPI = async (id, payload) => {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
-      secure: true,
     });
     return response;
   } catch (error) {
