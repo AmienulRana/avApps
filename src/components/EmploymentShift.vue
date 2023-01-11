@@ -14,9 +14,9 @@
         class="w-full mr-6"
         property="shift_desc"
         :options="shift_data"
-        :value="day.shift"
+        :value="day.shift_desc"
         :disabled="day.off_day"
-        @change="day.shift = $event"
+        @change="day.shift_desc = $event"
       />
       <SwitchButton
         @update:model="(value) => (day.off_day = value)"
@@ -49,31 +49,38 @@ export default {
       shift_data: [],
       shift_day: {
         senin: {
-          shift: this.emp_attadance.senin?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.senin?.shift?.shift_desc,
+          shift: this.emp_attadance.senin?.shift?._id,
           off_day: this.emp_attadance.senin.off_day,
         },
         selasa: {
-          shift: this.emp_attadance.selasa?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.selasa?.shift?.shift_desc,
+          shift: this.emp_attadance.selasa?.shift?._id,
           off_day: this.emp_attadance.selasa.off_day,
         },
         rabu: {
-          shift: this.emp_attadance.rabu?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.rabu?.shift?.shift_desc,
+          shift: this.emp_attadance.rabu?.shift?._id,
           off_day: this.emp_attadance.rabu.off_day,
         },
         kamis: {
-          shift: this.emp_attadance.kamis?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.kamis?.shift?.shift_desc,
+          shift: this.emp_attadance.kamis?.shift?._id,
           off_day: this.emp_attadance.kamis.off_day,
         },
         jumat: {
-          shift: this.emp_attadance.jumat?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.jumat?.shift?.shift_desc,
+          shift: this.emp_attadance.jumat?.shift?._id,
           off_day: this.emp_attadance.jumat.off_day,
         },
         sabtu: {
-          shift: this.emp_attadance.sabtu?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.sabtu?.shift?.shift_desc,
+          shift: this.emp_attadance.sabtu?.shift?._id,
           off_day: this.emp_attadance.sabtu.off_day,
         },
         minggu: {
-          shift: this.emp_attadance.minggu?.shift?.shift_desc,
+          shift_desc: this.emp_attadance.minggu?.shift?.shift_desc,
+          shift: this.emp_attadance.minggu?.shift?._id,
           off_day: this.emp_attadance.minggu.off_day,
         },
       },
