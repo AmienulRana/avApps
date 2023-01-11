@@ -26,3 +26,20 @@ export const GetShiftAPI = async (query) => {
     return error.response;
   }
 };
+
+export const ChangeStatusShiftAPI = async (id) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/shift/status/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
