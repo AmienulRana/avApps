@@ -1,5 +1,8 @@
 <template>
-  <section class="w-full overflow-x-auto custom-scrollbar h-96 bg-white">
+  <section
+    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+    @click="showActions = null"
+  >
     <table class="bg-white min-w-max mt-6 w-full pb-4">
       <thead class="border-b bg-white border-gray-200 text-gray-400">
         <tr>
@@ -38,20 +41,20 @@
           <td class="p-3 text-sm">
             <SwitchButton
               class="w-max"
-              @update:model="(value) => (shift.shift_status = value)"
-              :value="shift.shift_status"
+              @update:model="(value) => updateStatus(value, shift)"
+              :value="shift?.shift_status"
             />
           </td>
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = 0"
+              @click.stop="showActions = i"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === 0"
+              v-if="showActions === i"
             >
               <ul>
                 <li
@@ -71,11 +74,12 @@
 <script>
 import SwitchButton from "./SwitchButton.vue";
 import Button from "./Button.vue";
+import { ChangeStatusShiftAPI } from "@/actions/shift";
 
 export default {
   name: "TableOutsideAssignment",
   components: { SwitchButton, Button },
-  props: { shifts: Array },
+  props: { shifts: Array, showMessageStatus: Function },
   data() {
     return {
       showActions: null,
@@ -93,7 +97,18 @@ export default {
       deep: true,
     },
   },
-  methods: {},
+  methods: {
+    async updateStatus(value, shift) {
+      shift.shift_status = value;
+      const response = await ChangeStatusShiftAPI(shift?._id);
+      this.showMessageStatus(response);
+
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+    },
+  },
 };
 </script>
 
