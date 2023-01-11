@@ -79,7 +79,7 @@ export default {
       this.hours.push(hour);
     }
     // Populate the minutes array
-    for (let i = 1; i <= 59; i++) {
+    for (let i = 0; i <= 59; i++) {
       if (i < 10) {
         this.minutes.push(`0${i}`);
       } else {
