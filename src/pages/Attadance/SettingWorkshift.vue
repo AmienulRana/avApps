@@ -21,7 +21,10 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingWorkshift :shifts="shifts" />
+        <TableSettingWorkshift
+          :shifts="shifts"
+          :showMessageStatus="showMessageStatus"
+        />
       </section>
     </section>
   </LayoutAdmin>
@@ -238,7 +241,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response);
       if (response?.status === 200) {
         this.shifts = response?.data;
       }
