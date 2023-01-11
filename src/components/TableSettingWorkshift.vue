@@ -1,11 +1,5 @@
 <template>
-  <section
-    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
-    @click="
-      showActions = null;
-      showReasonNote = null;
-    "
-  >
+  <section class="w-full overflow-x-auto custom-scrollbar h-96 bg-white">
     <table class="bg-white min-w-max mt-6 w-full pb-4">
       <thead class="border-b bg-white border-gray-200 text-gray-400">
         <tr>
@@ -19,27 +13,33 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b h-max">
+        <tr class="border-b h-max" v-for="(shift, i) in allShifts" :key="i">
           <td class="p-3 text-sm">
-            <p class="text-sm">Armada Vision</p>
+            <p class="text-sm">{{ shift?.company_id?.company_name }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">Shift 1 Mufidah</p>
+            <p class="text-sm">{{ shift?.shift_name }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">08:00 AM</p>
+            <p class="text-sm">{{ shift?.shift_clockin }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">08:00 PM</p>
+            <p class="text-sm">{{ shift?.shift_clockout }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">01:00</p>
+            <p class="text-sm">
+              {{
+                shift?.shift_break_duration < 10
+                  ? `0${shift?.shift_break_duration}:00 Hour`
+                  : `${shift?.shift_break_duration}:00 Hour`
+              }}
+            </p>
           </td>
           <td class="p-3 text-sm">
             <SwitchButton
               class="w-max"
-              @update:model="(value) => (data.status_workshift = value)"
-              :value="data.status_workshift"
+              @update:model="(value) => (shift.shift_status = value)"
+              :value="shift.shift_status"
             />
           </td>
           <td class="p-3 text-right relative">
@@ -70,29 +70,30 @@
 
 <script>
 import SwitchButton from "./SwitchButton.vue";
+import Button from "./Button.vue";
+
 export default {
   name: "TableOutsideAssignment",
-  components: { SwitchButton },
+  components: { SwitchButton, Button },
+  props: { shifts: Array },
   data() {
     return {
       showActions: null,
-      showDropdown: null,
-      showReasonNote: null,
-      showModal: false,
+      allShifts: this.shifts,
       data: {
         status_workshift: false,
       },
     };
   },
-  methods: {
-    changeDropdownActive(id) {
-      if (this.activeDropdown === id) {
-        this.activeDropdown = null;
-      } else {
-        this.activeDropdown = id;
-      }
+  watch: {
+    shifts: {
+      handler: function (newValue) {
+        this.allShifts = newValue;
+      },
+      deep: true,
     },
   },
+  methods: {},
 };
 </script>
 
