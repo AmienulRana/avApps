@@ -21,7 +21,7 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingWorkshift />
+        <TableSettingWorkshift :shifts="shifts" />
       </section>
     </section>
   </LayoutAdmin>
@@ -216,7 +216,7 @@ export default {
         shift_clockout,
         shift_break_duration: Number(this.data.shift_break_duration),
       };
-      const queryAdminSuper = `?company=${this.dataCompany?._id}`;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await AddShiftAPI(queryAdminSuper, payload);
       if (response.status === 401) {
         this.$router.push("/login");
@@ -226,12 +226,13 @@ export default {
       if (response.status === 200) {
         this.modal.showModal = false;
         this.clearInputValue();
+        this.getShift();
       }
       this.showMessageStatus(response);
       this.loading.addShift = false;
     },
     async getShift() {
-      const queryAdminSuper = `?company=${this.dataCompany?._id}`;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await GetShiftAPI(queryAdminSuper);
       if (response?.status === 401) {
         this.$router.push("/login");
@@ -243,7 +244,7 @@ export default {
       }
     },
   },
-  wacth: {
+  watch: {
     dataCompany: {
       handler: function () {
         this.getShift();
@@ -255,8 +256,6 @@ export default {
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
-    this.getShift();
-    // this.handleGetEmployement();
   },
 };
 </script>
