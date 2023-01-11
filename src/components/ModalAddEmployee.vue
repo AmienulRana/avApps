@@ -562,10 +562,9 @@ export default {
         emp_periode: this.basic_salary.periode,
       };
 
-      let newAttendance = {};
       for (const day in this.attadance_day) {
         const value = this.attadance_day[day];
-        newAttendance[day] = {
+        this.attadance_day[day] = {
           shift: value.shift._id,
           off_day: value.off_day,
         };
@@ -577,7 +576,7 @@ export default {
       };
       const formData = new FormData();
       formData.append("profile", this.$store.state.file);
-      formData.append("attadance", JSON.stringify(this.newAttendance));
+      formData.append("attadance", JSON.stringify(this.attadance_day));
       formData.append("basic_salary", JSON.stringify(salary));
       for (const key in data) {
         formData.append(key, data[key]);
