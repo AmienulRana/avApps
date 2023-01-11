@@ -42,6 +42,7 @@
 <script>
 import Sidebar from "../Sidebar/Sidebar.vue";
 import NavbarProfile from "../NavbarProfile.vue";
+import { useToast } from "vue-toastification";
 export default {
   name: "LayoutAdmin",
   components: { Sidebar, NavbarProfile },
@@ -58,6 +59,10 @@ export default {
       localStorage.setItem("modeSidebar", this.modeSidebar);
     },
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   mounted() {
     const modeSidebar = localStorage.getItem("modeSidebar");
     this.modeSidebar = modeSidebar;
@@ -68,7 +73,9 @@ export default {
       // Remove the JWT token from local storage after one hour
       localStorage.removeItem("token");
       localStorage.removeItem("isLoggedIn");
-      window.location.href = "/login";
+      this.$router.push("/login");
+      this.$store.commit("changeIsLoggedIn", false);
+      this.toast.error("Your session has been expired");
     }, 3600 * 1000 - (Date.now() - currentTime));
   },
 };
