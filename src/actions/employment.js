@@ -91,3 +91,20 @@ export const EditWorkShiftAPI = async (id, payload) => {
     return error.response;
   }
 };
+
+export const GetShiftEmpAPI = async (id) => {
+  try {
+    const response = await axios.get(
+      `${URL_API}/employment/workshift/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
