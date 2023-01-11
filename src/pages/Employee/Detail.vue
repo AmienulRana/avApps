@@ -296,10 +296,10 @@ export default {
       employment.company_id = data?.company_id?._id;
     },
     async handleDetailEmployment() {
-      // console.log(this.$route);
       const { id } = this.$route.params;
       const response = await DetailEmployementAPI(id);
       const data = response?.data;
+      console.log(response.data);
       if (response.status === 401) {
         return this.$router.push("/login");
       }
