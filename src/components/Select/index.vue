@@ -19,7 +19,7 @@
         :selected="option === selectedOption"
         :value="option"
       >
-        {{ option }}
+        {{ property ? option[property] : option }}
       </option>
     </select>
   </div>
@@ -36,6 +36,7 @@ export default {
     options: Array,
     disabled: Boolean,
     value: String,
+    property: String,
   },
   data() {
     return {
