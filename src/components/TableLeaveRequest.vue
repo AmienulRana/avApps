@@ -45,22 +45,33 @@
               </p>
             </div>
           </td>
-          <td
-            class="p-3 text-sm"
-            v-if="leave?.empleave_leave_type === 'Multi Day'"
-          >
+          <td class="p-3 text-sm" v-if="leave?.empleave_leave_type === 'Hours'">
             <p class="text-sm">
               <span class="text-gray-400">From :</span>
-              {{ leave?.empleave_start_date }}
+              {{ leave?.empleave_start_hours }}
             </p>
             <p class="text-sm">
               <span class="text-gray-400">To :</span>
-              {{ leave?.empleave_end_date }}
+              {{ leave?.empleave_end_hours }},
+              {{ localDateString(leave?.empleave_start_date) }}
+            </p>
+          </td>
+          <td
+            class="p-3 text-sm"
+            v-else-if="leave?.empleave_leave_type === 'Multi Day'"
+          >
+            <p class="text-sm">
+              <span class="text-gray-400">From :</span>
+              {{ localDateString(leave?.empleave_start_date) }}
+            </p>
+            <p class="text-sm">
+              <span class="text-gray-400">To :</span>
+              {{ localDateString(leave?.empleave_end_date) }}
             </p>
           </td>
           <td class="p-3 text-sm" v-else>
             <p class="text-sm">
-              {{ leave?.empleave_start_date }}
+              {{ localDateString(leave?.empleave_start_date) }}
             </p>
           </td>
           <td class="p-3 text-sm">
@@ -81,7 +92,14 @@
           </td>
           <td class="p-3 text-sm">
             <p
-              class="flex py-1 text-white w-24 items-center justify-center rounded-full bg-coral"
+              class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+              :class="
+                leave?.empleave_status === 'Pending'
+                  ? 'bg-coral'
+                  : leave?.empleave_status === 'Rejected'
+                  ? 'bg-red-500'
+                  : 'bg-green-500'
+              "
             >
               {{ leave?.empleave_status }}
             </p>
@@ -173,11 +191,12 @@
             {{ detailLeave?.empleave_leave_duration }}
           </h2>
           <h2 class="text-sm mt-1">
-            {{ detailLeave?.empleave_start_date }}
+            {{ localDateString(detailLeave?.empleave_start_date) }}
+            {{ detailLeave?.empleave_leave_type === "Multi Day" ? "to" : "" }}
             {{
-              detailLeave?.empleave_leave_duration === "Multi Day" ? "to" : ""
+              detailLeave?.empleave_end_date &&
+              localDateString(detailLeave?.empleave_end_date)
             }}
-            {{ detailLeave?.empleave_end_date }}
           </h2>
           <div class="flex text-xs text-gray-400 mt-2">
             <font-awesome-icon icon="fa-file" />
@@ -195,9 +214,25 @@
       <section class="grid grid-cols-3 items-center mt-4">
         <p class="text-sm">Update status</p>
         <div class="flex">
-          <Radio label="Pending" />
-          <Radio label="Approved" class="mx-8" />
-          <Radio label="Rejected" />
+          <Radio
+            label="Pending"
+            value="Pending"
+            :checked="detailLeave?.empleave_status === 'Pending'"
+            @change="detailLeave.empleave_status = 'Pending'"
+          />
+          <Radio
+            label="Approved"
+            class="mx-8"
+            value="Approved"
+            :checked="detailLeave?.empleave_status === 'Approved'"
+            @change="detailLeave.empleave_status = 'Approved'"
+          />
+          <Radio
+            label="Rejected"
+            value="Rejected"
+            :checked="detailLeave?.empleave_status === 'Rejected'"
+            @change="detailLeave.empleave_status = 'Rejected'"
+          />
         </div>
       </section>
     </section>
@@ -206,7 +241,11 @@
         <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
           Cancel
         </Button>
-        <Button class="bg-green-500 w-24 py-2 text-white rounded-md">
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditStatus"
+          :disabled="loading"
+        >
           Save
         </Button>
       </section>
@@ -217,15 +256,18 @@
 <script>
 import Modal from "./Modal.vue";
 import Radio from "./Radio.vue";
+import { EditStatusLeaveRequestAPI } from "@/actions/leave-request";
+
 export default {
   name: "TableAttadance",
-  props: { leave_request: Array },
+  props: { leave_request: Array, showMessageStatus: Function },
   components: { Modal, Radio },
   data() {
     return {
       showActions: null,
       showDropdown: null,
       showReasonNote: null,
+      loading: false,
       showModal: false,
       detailLeave: {},
     };
@@ -238,6 +280,33 @@ export default {
         this.activeDropdown = id;
       }
     },
+    localDateString(date) {
+      let new_date = new Date(date);
+      return new_date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    },
+    async handleEditStatus() {
+      this.loading = true;
+      const payload = {
+        empleave_status: this.detailLeave?.empleave_status,
+      };
+      const response = await EditStatusLeaveRequestAPI(
+        this.detailLeave?._id,
+        payload
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.showModal = false;
+      }
+      this.showMessageStatus(response);
+      this.loading = false;
+    },
   },
 };
 </script>
@@ -245,6 +314,7 @@ export default {
 <style scoped>
 .custom-scrollbar {
   min-height: 396px !important;
+  max-width: 100%;
 }
 table thead th,
 table tbody tr td {
