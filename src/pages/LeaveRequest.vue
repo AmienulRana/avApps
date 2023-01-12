@@ -57,7 +57,10 @@
         <p class="text-sm text-gray-300 mt-5 mb-3">
           Showing 1 to 10 items of 11
         </p>
-        <TableLeaveRequest :leave_request="leave_request" />
+        <TableLeaveRequest
+          :leave_request="leave_request"
+          :showMessageStatus="showMessageStatus"
+        />
       </section>
     </section>
   </LayoutAdmin>
@@ -74,7 +77,12 @@
         :dataCompany="dataCompany"
       />
     </template>
-    <section @click="modal.showSelect = false">
+    <section
+      @click="
+        modal.showSelect = false;
+        modal.showTime = null;
+      "
+    >
       <SelectSearch
         label="Employee"
         :options="employment"
@@ -242,17 +250,23 @@
           label="Enter Date"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.empleave_start_date = $event"
+          :value="data?.empleave_start_date"
         />
         <section class="flex justify-between">
           <InputTime
             label="Start Time"
             :isOpen="modal.showTime === 'start'"
             @showTime="modal.showTime = 'start'"
+            @selected-hour="modal.start_time.hour = $event"
+            @selected-minute="modal.start_time.minute = $event"
           />
           <InputTime
             label="End Time"
             :isOpen="modal.showTime === 'end'"
             @showTime="modal.showTime = 'end'"
+            @selected-hour="modal.end_time.hour = $event"
+            @selected-minute="modal.end_time.minute = $event"
           />
         </section>
       </section>
@@ -381,6 +395,14 @@ export default {
         showAbility: "hide",
         showTime: "",
         getDurationHalfDay: "",
+        start_time: {
+          hour: "",
+          minute: "00",
+        },
+        end_time: {
+          hour: "",
+          minute: "00",
+        },
       },
       data: {
         empleave_attachement: [],
@@ -443,6 +465,11 @@ export default {
     openFileInput() {
       this.$refs.file.click();
     },
+    formatHours(jam, menit) {
+      return `${jam < 10 ? "0" + jam.toString() : jam.toString()}:${
+        menit < 10 ? "0" + menit.toString() : menit.toString()
+      } Hours`;
+    },
     createLeaveDuration() {
       const typeLeave = this.data.empleave_leave_type;
       if (typeLeave === "Single Day") {
@@ -456,6 +483,20 @@ export default {
         return `${getDuration} Day`;
       } else if (typeLeave === "Half Day") {
         return this.modal.getDurationHalfDay;
+      } else if (typeLeave === "Hours") {
+        let start_time = new Date(
+          `1970-01-01T${this.modal.start_time.hour}:${this.modal.start_time.minute}:00`
+        );
+        let end_time = new Date(
+          `1970-01-01T${this.modal.end_time.hour}:${this.modal.end_time.minute}:00`
+        );
+        console.log(start_time, end_time);
+        let diffrent = end_time - start_time;
+
+        let hour = Math.floor(diffrent / (1000 * 60 * 60));
+        let minute = Math.floor((diffrent % (1000 * 60 * 60)) / (1000 * 60));
+
+        return this.formatHours(hour, minute);
       }
     },
     createApplyDate() {
@@ -475,12 +516,14 @@ export default {
       this.leave_request = response?.data;
     },
     async handleLeaveRequest() {
-      this.addLeaveRequest = true;
+      this.loading.addLeaveRequest = true;
       const payload = {
         ...this.data,
         emp_id: this.data.emp_id._id,
         empleave_leave_duration: this.createLeaveDuration(),
         empleave_apply_date: this.createApplyDate(),
+        empleave_start_hours: `${this.modal.start_time.hour}:${this.modal.start_time.minute}`,
+        empleave_end_hours: `${this.modal.end_time.hour}:${this.modal.end_time.minute}`,
       };
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
 
@@ -495,7 +538,7 @@ export default {
         this.clearInputValue();
       }
       this.showMessageStatus(response);
-      this.addLeaveRequest = false;
+      this.loading.addLeaveRequest = false;
     },
     viewImage(e) {
       const files = e.target.files;
@@ -525,6 +568,7 @@ export default {
         this.superAdmin ? querySuperAdmin : ""
       );
       if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
