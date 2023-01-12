@@ -2,7 +2,15 @@
   <LayoutAdmin @click="activeDropdown = false">
     <section class="px-8 mt-6 w-full overflow-x-hiden">
       <section class="flex justify-between">
-        <h1 class="text-2xl">Leave Request</h1>
+        <section class="flex items-center">
+          <h1 class="text-2xl">Leave Request</h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading?.getCompany"
+            @selected:company="dataCompany = $event"
+            :options="optionsCompany"
+            :dataCompany="dataCompany"
+          />
+        </section>
         <div class="flex">
           <Button class="bg-seagreen rounded text-white px-6 py-2"
             >Settings</Button
@@ -61,6 +69,14 @@
     :showModal="modal.showModal"
     @close="modal.showModal = false"
   >
+    <template #header>
+      <ChoiseCompany
+        v-if="superAdmin && !loading?.getCompany"
+        @selected:company="dataCompany = $event"
+        :options="optionsCompany"
+        :dataCompany="dataCompany"
+      />
+    </template>
     <section @click="modal.showSelect = false">
       <SelectSearch
         label="Employee"
@@ -150,7 +166,12 @@
             @change="data.ageDuration = 'Half Day'"
             :modelValue="data.ageDuration"
           />
-          <Radio label="Hours" class="mx-8" />
+          <Radio
+            label="Hours"
+            class="mx-8"
+            @change="data.ageDuration = 'Hours'"
+            :modelValue="data.ageDuration"
+          />
         </div>
       </section>
       <Input
@@ -189,6 +210,27 @@
             <Radio label="Last half" class="my-0" />
           </div>
         </div>
+      </section>
+      <section class="my-4" v-if="data.ageDuration === 'Hours'">
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="Enter Date"
+          label_class="w-full"
+          input_class="mt-2"
+        />
+        <section class="flex justify-between">
+          <InputTime
+            label="Start Time"
+            :isOpen="modal.showTime === 'start'"
+            @showTime="modal.showTime = 'start'"
+          />
+          <InputTime
+            label="End Time"
+            :isOpen="modal.showTime === 'end'"
+            @showTime="modal.showTime = 'end'"
+          />
+        </section>
       </section>
       <label class="text-sm">Reason Note</label>
       <textarea
@@ -277,6 +319,10 @@ import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
 import employee from "@/employee.json";
+import InputTime from "@/components/InputTime.vue";
+import decryptToken from "@/utils/decryptToken";
+import { GetAllCompanyAPI } from "@/actions/company";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -289,7 +335,9 @@ export default {
     Modal,
     Select,
     Radio,
+    ChoiseCompany,
     Input,
+    InputTime,
   },
   data() {
     return {
@@ -300,6 +348,7 @@ export default {
         showModal: false,
         showSelect: false,
         showAbility: "hide",
+        showTime: "",
       },
       data: {
         employee: "",
@@ -307,6 +356,12 @@ export default {
         attachement: [],
         reasonNote: "",
         leaveType: "",
+      },
+      optionsCompany: [],
+      superAdmin: false,
+      dataCompany: {},
+      loading: {
+        getCompany: true,
       },
     };
   },
@@ -348,11 +403,23 @@ export default {
       );
       this.data.attachement = file;
     },
-  },
-  computed: {
-    getAllEmployee() {
-      return this.employee.map((employe) => employe.name);
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.optionsCompany = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.getCompany = false;
     },
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {},
+      deep: true,
+    },
+  },
+  mounted() {
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
   },
 };
 </script>
