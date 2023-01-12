@@ -1,10 +1,7 @@
 <template>
   <section
     class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
-    @click="
-      showActions = null;
-      showReasonNote = null;
-    "
+    @click="showActions = null"
   >
     <table class="bg-white min-w-max mt-6 w-full pb-4">
       <thead class="border-b bg-white border-gray-200 text-gray-400">
@@ -21,31 +18,45 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b h-max">
+        <tr
+          class="border-b h-max"
+          v-for="(data, i) in leaves_holidays"
+          :key="i"
+        >
           <td class="p-3 text-sm">
             <p class="text-sm">1</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">01/12/2022</p>
+            <p class="text-sm">{{ data?.leavehol_startdate }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">01/12/2022</p>
+            <p class="text-sm">{{ data?.leavehol_enddate }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">Libur 1 January</p>
+            <p class="text-sm">{{ data?.leavehol_desc }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">Cuti Bersama</p>
+            <p class="text-sm">{{ data?.leavehol_type }}</p>
           </td>
           <td class="p-3 text-sm">
             <SwitchButton
               class="w-max"
-              @update:model="(value) => (data.status_workshift = value)"
-              :value="data.status_workshift"
+              @update:model="(value) => (data.leavehol_cutleave = value)"
+              :value="data?.leavehol_cutleave"
             />
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">IT, Administrasi</p>
+            <p
+              class="text-sm"
+              v-if="departement.length === data?.leavehol_depid.length"
+            >
+              Semua
+            </p>
+            <template v-else>
+              <p v-for="(departement, i) in data?.leavehol_depid" :key="i">
+                {{ departement?.dep_name }}
+              </p>
+            </template>
           </td>
           <td class="p-3 text-sm">
             <p class="text-sm text-green-500">Aktif</p>
@@ -53,19 +64,24 @@
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = 0"
+              @click.stop="showActions = i"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === 0"
+              v-if="showActions === i"
             >
               <ul>
                 <li
                   class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
                 >
                   Edit
+                </li>
+                <li
+                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                >
+                  Non-Aktif
                 </li>
               </ul>
             </div>
@@ -81,6 +97,7 @@ import SwitchButton from "./SwitchButton.vue";
 export default {
   name: "TableSettingCuti",
   components: { SwitchButton },
+  props: { leaveHoliday: Array, departement: Array },
   data() {
     return {
       showActions: null,
@@ -90,16 +107,19 @@ export default {
       data: {
         status_workshift: false,
       },
+      leaves_holidays: this.leaveHoliday,
     };
   },
-  methods: {
-    changeDropdownActive(id) {
-      if (this.activeDropdown === id) {
-        this.activeDropdown = null;
-      } else {
-        this.activeDropdown = id;
-      }
-    },
+  methods: {},
+
+  mounted() {
+    this.$watch(
+      "leaveHoliday",
+      (newValue) => {
+        this.leaves_holidays = newValue;
+      },
+      { deep: true }
+    );
   },
 };
 </script>
