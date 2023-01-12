@@ -137,7 +137,7 @@ export default {
         const encryptedToken = this.encrypt(token);
         this.$store.state.isLoggedIn = true;
         this.toast.success(response?.data?.message);
-        this.$store.commit("setToken", token);
+        this.$store.commit("setToken", encryptedToken);
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("token", encryptedToken);
         this.$router.push("/");

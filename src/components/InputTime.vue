@@ -27,7 +27,10 @@
         <button
           v-for="data in hours"
           :key="data"
-          @click.stop="hour = data"
+          @click.stop="
+            hour = data;
+            $emit('selected-hour', data);
+          "
           class="w-full text-left block px-4 py-2 text-sm duration-150 ease-in-out rounded-md hover:bg-gray-50 hover:text-gray-400"
           :class="hour === data ? 'bg-gray-50 text-gray-400' : ''"
           role="menuitem"
@@ -41,7 +44,10 @@
         <button
           v-for="data in minutes"
           :key="data"
-          @click.stop="menit = data"
+          @click.stop="
+            menit = data;
+            $emit('selected-minute', data);
+          "
           class="w-full text-left block px-4 py-2 text-sm duration-150 ease-in-out rounded-md hover:bg-gray-50 hover:text-gray-400"
           :class="menit === data ? 'bg-gray-50 text-gray-400' : ''"
           role="menuitem"
@@ -66,14 +72,14 @@ export default {
       minutes: [],
     };
   },
-  emits: ["showTime"],
+  emits: ["showTime", "selected-hour", "selected-minute"],
   created() {
     for (let h = 0; h <= 23; h++) {
       let hour = h.toString().padStart(2, "0");
       this.hours.push(hour);
     }
     // Populate the minutes array
-    for (let i = 1; i <= 59; i++) {
+    for (let i = 0; i <= 59; i++) {
       if (i < 10) {
         this.minutes.push(`0${i}`);
       } else {

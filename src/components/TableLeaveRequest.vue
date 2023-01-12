@@ -1,6 +1,6 @@
 <template>
   <section
-    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+    class="w-full overflow-x-auto custom-scrollbar bg-white"
     @click="
       showActions = null;
       showReasonNote = null;
@@ -21,62 +21,88 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b h-max">
+        <tr class="border-b" v-for="(leave, i) in leave_request" :key="i">
           <td class="flex items-center p-3 text-sm">
             <div
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              <h2 class="text-md text-white">IA</h2>
+              <h2 class="text-md text-white">
+                {{
+                  leave?.emp_id?.emp_fullname.substr(0, 1) +
+                  leave?.emp_id?.emp_fullname.substr(
+                    leave?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                    1
+                  )
+                }}
+              </h2>
             </div>
             <div class="ml-5">
-              <h1 class="text-blue-400 text-base">Ivan Arafat</h1>
-              <p class="text-sm mb-1 text-gray-400">Admin & Hrm</p>
+              <h1 class="text-blue-400 text-base">
+                {{ leave?.emp_id?.emp_fullname }}
+              </h1>
+              <p class="text-sm mb-1 text-gray-400">
+                {{ leave?.emp_id?.emp_depid?.dep_name }}
+              </p>
             </div>
           </td>
-          <td class="p-3 text-sm">
+          <td
+            class="p-3 text-sm"
+            v-if="leave?.empleave_leave_type === 'Multi Day'"
+          >
             <p class="text-sm">
-              <span class="text-gray-400">From :</span> 01:05 PM
+              <span class="text-gray-400">From :</span>
+              {{ leave?.empleave_start_date }}
             </p>
             <p class="text-sm">
-              <span class="text-gray-400">To :</span> 02:05 PM
+              <span class="text-gray-400">To :</span>
+              {{ leave?.empleave_end_date }}
+            </p>
+          </td>
+          <td class="p-3 text-sm" v-else>
+            <p class="text-sm">
+              {{ leave?.empleave_start_date }}
             </p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">2 Days</p>
+            <p class="text-sm">{{ leave?.empleave_leave_duration }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">Cuti Tahunan(Paid)</p>
+            <p class="text-sm">{{ leave?.empleave_type_id }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">Paid</p>
+            <p class="text-sm">
+              {{ leave?.empleave_type_id.includes("Paid") ? "Paid" : "Unpaid" }}
+            </p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">-</p>
+            <p class="text-sm">
+              {{ leave?.empleave_attachement.length === 0 ? "-" : "A" }}
+            </p>
           </td>
           <td class="p-3 text-sm">
             <p
               class="flex py-1 text-white w-24 items-center justify-center rounded-full bg-coral"
             >
-              Pending
+              {{ leave?.empleave_status }}
             </p>
           </td>
           <td class="p-3 text-sm flex">
             <div class="relative">
               <button
                 class="text-blue-400 text-md"
-                @click.stop="showReasonNote = 0"
+                @click.stop="showReasonNote = i"
               >
                 <font-awesome-icon icon="fa-file" />
               </button>
               <section
-                v-if="showReasonNote === 0"
+                v-if="showReasonNote === i"
                 class="z-10 bg-white absolute rounded-md top-full left-auto right-0 shadow-md w-72 mt-2.5 px-8 py-4"
               >
                 <h1 class="opacity-70">Reason Note</h1>
                 <p
                   class="mt-5 text-sm bg-amber-100 px-6 py-4 mb-10 text-gray-400"
                 >
-                  Catatan leave request
+                  {{ leave?.empleave_reason }}
                 </p>
                 <div class="flex justify-end mb-6">
                   <Button
@@ -88,20 +114,26 @@
                 </div>
               </section>
             </div>
-            <button class="text-xl ml-3" @click="showModal = true">
+            <button
+              class="text-xl ml-3"
+              @click="
+                showModal = true;
+                detailLeave = leave;
+              "
+            >
               <img src="../assets/icons/log.svg" />
             </button>
           </td>
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = 0"
+              @click.stop="showActions = i"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute -top-full right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === 0"
+              v-if="showActions === i"
             >
               <ul>
                 <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
@@ -120,9 +152,12 @@
   <Modal title="Response Log" :showModal="showModal" @close="showModal = false">
     <section class="flex w-full justify-center">
       <div>
-        <h2 class="text-base">At 9:18 AM, Today</h2>
+        <h2 class="text-base">At {{ detailLeave?.empleave_apply_date }}</h2>
         <p class="text-gray-400 text-xs">
-          Applied by <span class="text-blue-400">Dr.Banner</span>
+          Applied by
+          <span class="text-blue-400">{{
+            detailLeave?.emp_id?.emp_fullname
+          }}</span>
         </p>
       </div>
       <section class="relative px-10 border-l-2 h-52 ml-10">
@@ -133,15 +168,21 @@
         </div>
         <div class="bg-gray-100 mt-10 px-4 py-2 rounded">
           <h2 class="text-sm flex items-center">
-            Paid Casual
+            {{ detailLeave?.empleave_type_id }}
             <span class="w-1.5 block h-1.5 rounded-full bg-gray-300 mx-4" />
-            1 Day
+            {{ detailLeave?.empleave_leave_duration }}
           </h2>
-          <h2 class="text-sm mt-1">01 Dec, 22</h2>
+          <h2 class="text-sm mt-1">
+            {{ detailLeave?.empleave_start_date }}
+            {{
+              detailLeave?.empleave_leave_duration === "Multi Day" ? "to" : ""
+            }}
+            {{ detailLeave?.empleave_end_date }}
+          </h2>
           <div class="flex text-xs text-gray-400 mt-2">
             <font-awesome-icon icon="fa-file" />
             <article>
-              <p class="ml-2">Reason Note</p>
+              <p class="ml-2">{{ detailLeave?.empleave_reason }}</p>
             </article>
           </div>
         </div>
@@ -178,6 +219,7 @@ import Modal from "./Modal.vue";
 import Radio from "./Radio.vue";
 export default {
   name: "TableAttadance",
+  props: { leave_request: Array },
   components: { Modal, Radio },
   data() {
     return {
@@ -185,6 +227,7 @@ export default {
       showDropdown: null,
       showReasonNote: null,
       showModal: false,
+      detailLeave: {},
     };
   },
   methods: {
@@ -200,6 +243,9 @@ export default {
 </script>
 
 <style scoped>
+.custom-scrollbar {
+  min-height: 396px !important;
+}
 table thead th,
 table tbody tr td {
   padding: 1rem 2rem;

@@ -16,10 +16,14 @@
         v-for="(option, i) in options"
         :key="i"
         class="px-2 py-1"
-        :selected="option === selectedOption"
-        :value="option"
+        :selected="
+          property
+            ? option[property] === selectedOption
+            : option === selectedOption
+        "
+        :value="property ? option[property] : option"
       >
-        {{ option }}
+        {{ property ? option[property] : option }}
       </option>
     </select>
   </div>
@@ -36,6 +40,7 @@ export default {
     options: Array,
     disabled: Boolean,
     value: String,
+    property: String,
   },
   data() {
     return {

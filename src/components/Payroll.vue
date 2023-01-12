@@ -48,7 +48,6 @@
         class="mb-2.5"
         :value="data?.emp_salary"
         @input="data.emp_salary = $event"
-        placeholder="Tidak ada perkiraan untuk Project Manager "
       />
       <section class="flex justify-between items-center">
         <p class="text-sm text-gray-400 md:w-1/5">Jumlah Hari kerja :</p>
@@ -124,10 +123,11 @@ import Allowance from "./Allowance.vue";
 import Deducation from "./Deducation.vue";
 import { AddSalaryAPI, GetSalaryAPI } from "@/actions/salary";
 import { useToast } from "vue-toastification";
+import Button from "./Button.vue";
 
 export default {
-  name: "PersonalDetail",
-  components: { Input, Select, Deducation, Allowance },
+  name: "PayrolDetail",
+  components: { Input, Select, Deducation, Allowance, Button },
   data() {
     return {
       indicator_position: {
@@ -204,6 +204,13 @@ export default {
       if (response.status === 200) {
         this.data = response?.data;
       }
+    },
+    formatInput(value) {
+      this.data.emp_salary = this.formatRupiah(value);
+    },
+    formatRupiah(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val;
     },
     handleChangeTab(event, tab) {
       const buttonHeight = event.target.offsetHeight;

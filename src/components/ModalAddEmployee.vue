@@ -48,7 +48,7 @@
                 </template>
                 <img
                   :src="previewImage"
-                  class="w-full h-ful rounded-full"
+                  class="w-full h-full rounded-full"
                   alt=""
                   v-else
                 />
@@ -267,6 +267,7 @@
               :label="day.name"
               input_class="md:w-4/6 mt-2 md:mt-0"
               class="w-full mr-6"
+              property="shift_desc"
               :options="shift_data"
               :disabled="attadance_day[day.name.toLowerCase()].off_day"
               :value="attadance_day[day.name.toLowerCase()].shift"
@@ -386,6 +387,7 @@ import SwitchButton from "./SwitchButton.vue";
 import { AddEmploymentAPI } from "@/actions/employment";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetAllCompanyAPI } from "@/actions/company";
+import { GetShiftAPI } from "@/actions/shift";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "./ChoiseCompany.vue";
 import { GetDesignationAPI } from "@/actions/designation";
@@ -432,13 +434,13 @@ export default {
         emp_location: "",
       },
       attadance_day: {
-        senin: { shift: "", off_day: false },
-        selasa: { shift: "", off_day: false },
-        rabu: { shift: "", off_day: false },
-        kamis: { shift: "", off_day: false },
-        jumat: { shift: "", off_day: false },
-        sabtu: { shift: "", off_day: false },
-        minggu: { shift: "", off_day: false },
+        senin: { shift: "", off_day: false, _id: "" },
+        selasa: { shift: "", off_day: false, _id: "" },
+        rabu: { shift: "", off_day: false, _id: "" },
+        kamis: { shift: "", off_day: false, _id: "" },
+        jumat: { shift: "", off_day: false, _id: "" },
+        sabtu: { shift: "", off_day: false, _id: "" },
+        minggu: { shift: "", off_day: false, _id: "" },
       },
       basic_salary: {
         periode: "",
@@ -447,11 +449,7 @@ export default {
         working_hours: null,
       },
       titleTabs: ["Personal", "Employment", "Attadance Day", "Basic Sallary"],
-      shift_data: [
-        "Shift 1 Stationery (08:00 am - 05:00pm)",
-        "Shift 2 Stationery",
-        "Shift 3 Stationery",
-      ],
+      shift_data: [],
       shift_day: [
         { name: "Senin", off_day: false },
         { name: "Selasa", off_day: false },
@@ -549,7 +547,7 @@ export default {
       }
     },
     async handleAddEmployment() {
-      this.loading = true;
+      this.loadingAdd = true;
       const employment = {
         ...this.employment,
         emp_depid: this.employment.emp_depid?._id,
@@ -563,6 +561,14 @@ export default {
         emp_working_hours: Number(this.basic_salary.working_hours),
         emp_periode: this.basic_salary.periode,
       };
+
+      for (const day in this.attadance_day) {
+        const value = this.attadance_day[day];
+        this.attadance_day[day] = {
+          shift: value.shift._id,
+          off_day: value.off_day,
+        };
+      }
 
       const data = {
         ...this.personal,
@@ -588,7 +594,22 @@ export default {
         this.clearInputValue();
       }
       this.showMessageStatus(response);
-      this.loading = true;
+      this.loadingAdd = false;
+    },
+    async getShift() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetShiftAPI(queryAdminSuper);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        const getShiftDesc = response?.data?.map((shift) => ({
+          _id: shift?._id,
+          shift_desc: shift?.shift_desc,
+        }));
+        this.shift_data = getShiftDesc;
+      }
     },
   },
   watch: {
@@ -596,6 +617,7 @@ export default {
       handler: function () {
         this.handleGetDepartement();
         this.handleGetDesignation();
+        this.getShift();
       },
       deep: true,
     },

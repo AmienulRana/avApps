@@ -2,9 +2,17 @@
   <LayoutAdmin @click="activeDropdown = false">
     <section class="px-8 mt-6 w-full overflow-x-hiden">
       <section class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl">
-          Setting Hari Libur Nasional <br />& Cuti Bersama
-        </h1>
+        <section class="flex items-center">
+          <h1 class="text-2xl">
+            Setting Hari Libur Nasional <br />& Cuti Bersama
+          </h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading?.getCompany"
+            @selected:company="dataCompany = $event"
+            :options="optionsCompany"
+            :dataCompany="dataCompany"
+          />
+        </section>
         <div class="flex">
           <Button
             class="bg-primary rounded text-white mx-2 px-6 py-2"
@@ -15,7 +23,11 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingCuti />
+        <TableSettingCuti
+          :leaveHoliday="leaveHoliday"
+          :departement="departement"
+          :loading="loading.getLeaveHol"
+        />
       </section>
     </section>
   </LayoutAdmin>
@@ -24,13 +36,15 @@
     :showModal="modal.showModal"
     @close="modal.showModal = false"
   >
-    <section
-      @click="
-        modal.showSelect = false;
-        modal.showTime = false;
-        modal.activeDropdown = null;
-      "
-    >
+    <template #header>
+      <ChoiseCompany
+        v-if="superAdmin && !loading?.getCompany"
+        @selected:company="dataCompany = $event"
+        :options="optionsCompany"
+        :dataCompany="dataCompany"
+      />
+    </template>
+    <section @click="modal.showDropdown = null">
       <section class="grid grid-cols-2 gap-4">
         <Input
           type="date"
@@ -38,6 +52,8 @@
           label="Tanggal Mulai"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.leavehol_startdate = $event"
+          :value="data?.leavehol_startdate"
         />
         <Input
           type="date"
@@ -45,14 +61,18 @@
           label="Tanggal Selesai"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.leavehol_enddate = $event"
+          :value="data?.leavehol_enddate"
         />
       </section>
       <Input
-        type="number"
+        type="text"
         label="Keterangan Cuti Bersama"
         class="flex-col mt-4"
         label_class="w-full"
         input_class="mt-2"
+        @change="data.leavehol_desc = $event"
+        :value="data?.leavehol_desc"
       />
       <Select
         label="Tipe"
@@ -60,6 +80,8 @@
         input_class="w-full mt-2"
         class="mb-2.5 flex-col"
         :options="['Cuti Bersama', 'Libur Nasional']"
+        @change="data.leavehol_type = $event"
+        :value="data?.leavehol_type"
       />
       <div class="relative flex items-start mt-4">
         <div class="flex items-center h-5">
@@ -69,6 +91,10 @@
             name="comments"
             type="checkbox"
             class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            @change="
+              data.leavehol_cutleave = data.leavehol_cutleave ? false : true
+            "
+            :value="data.leavehol_cutleave"
           />
         </div>
         <div class="ml-3 text-sm">
@@ -80,20 +106,73 @@
       <div class="flex mt-6 items-center">
         <p class="w-1/3 text-sm">Departement</p>
         <section class="w-1/2">
-          <div class="bg-gray-100 px-5 py-2 rounded-md flex items-center">
+          <div
+            class="bg-gray-100 px-5 py-2 rounded-md flex flex-wrap items-center"
+          >
             <p
-              class="text-gray-400 ml-2 bg-white text-sm w-24 px-4 py-1 flex justify-between items-center rounded-full"
+              v-for="(departement, i) in departementSelected"
+              :key="i"
+              class="text-gray-400 ml-2 bg-white my-1.5 text-sm min-w-max px-4 py-1 flex justify-between items-center rounded-full"
             >
-              IT
-              <font-awesome-icon icon="fa-xmark" />
+              {{ departement?.dep_name }}
+              <font-awesome-icon
+                icon="fa-xmark"
+                class="ml-3 cursor-pointer"
+                @click="removeSelectedDepartement(departement)"
+              />
             </p>
-            <Dropdown
-              @update:activeDropdown="modal.activeDropdown = 'bonus'"
-              title="Add"
-              backgroundTitle="bg-transparent"
-              :showDropdown="modal.activeDropdown === 'bonus'"
-            />
+            <div class="relative mx-2">
+              <Button
+                class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm shadow-none"
+                @click.stop="modal.showDropdown = !modal.showDropdown"
+              >
+                Add
+              </Button>
+              <Transition
+                enter-active-class="animated fadeInDown"
+                leave-active-class="animated fadeOutUp"
+              >
+                <section
+                  class="z-10 bg-white absolute bottom-full overflow-y-auto left-0 right-auto shadow-md max-h-80 custom-scrollbar w-72 mt-2.5"
+                  v-if="modal.showDropdown"
+                >
+                  <div
+                    class="bg-white border-b pb-2.5 px-6 py-4 w-full"
+                    @click.stop
+                  >
+                    <div class="relative">
+                      <Input
+                        :icon="true"
+                        input_class="rounded-full"
+                        @input="handleSearchData($event)"
+                        :value="query"
+                      />
+                      <font-awesome-icon
+                        icon="fa-magnifying-glass"
+                        class="absolute top-1/2 -translate-y-1/2 left-3 text-primary"
+                      />
+                    </div>
+                  </div>
+                  <ul>
+                    <li
+                      v-for="(option, index) in searchDepartement"
+                      :key="index"
+                      @click.stop="handleSelectedDepartement(option)"
+                      class="px-4 py-2 text-gray-400 text-sm hover:bg-primary justify-between items-center hover:text-white cursor-pointer flex"
+                    >
+                      {{ option?.dep_name }}
+                    </li>
+                  </ul>
+                </section>
+              </Transition>
+            </div>
           </div>
+          <p
+            class="text-sm cursor-pointer mt-2 text-gray-400 hover:text-primary"
+            @click="selectAllDepartement"
+          >
+            All Departement
+          </p>
         </section>
       </div>
     </section>
@@ -102,7 +181,11 @@
         <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
           Cancel
         </Button>
-        <Button class="bg-green-500 w-24 py-2 text-white rounded-md">
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleAddLeaveHoliday"
+          :disabled="loading.addLeaveHol"
+        >
           Save
         </Button>
       </section>
@@ -116,9 +199,16 @@ import Button from "../../components/Button.vue";
 import TableSettingCuti from "../../components/TableSettingCuti.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "@/components/Input.vue";
-import Dropdown from "@/components/Dropdown.vue";
-import employee from "@/employee.json";
 import Select from "@/components/Select/index.vue";
+import { GetDepartementAPI } from "@/actions/departement";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import decryptToken from "@/utils/decryptToken";
+import { GetAllCompanyAPI } from "@/actions/company";
+import {
+  AddLeaveHolidayAPI,
+  GetLeaveHolidayAPI,
+} from "@/actions/leave-holiday";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "SettingCuti",
@@ -129,47 +219,146 @@ export default {
     Modal,
     Input,
     Select,
-    Dropdown,
+    ChoiseCompany,
   },
   data() {
     return {
-      activeDropdown: "",
-      layoutData: "card",
-      employee: employee,
       modal: {
-        showTime: "",
         showModal: false,
-        activeDropdown: "",
+        showDropdown: false,
       },
+      query: "",
+      departement: [],
+      searchDepartement: [],
+      departementSelected: [],
+      leaveHoliday: [],
       data: {
-        employee: "",
-        ageDuration: "Single Day",
-        reasonNote: "",
-        leaveType: "",
+        leavehol_startdate: "",
+        leavehol_enddate: "",
+        leavehol_desc: "",
+        leavehol_type: "",
+        leavehol_cutleave: false,
+        leavehol_depid: [],
+      },
+      optionsCompany: [],
+      superAdmin: false,
+      dataCompany: {},
+      loading: {
+        getCompany: true,
+        addLeaveHol: false,
+        getLeaveHol: true,
       },
     };
   },
-  methods: {
-    changeDropdownActive(id) {
-      if (this.activeDropdown === id) {
-        this.activeDropdown = false;
-      } else {
-        this.activeDropdown = id;
-      }
-    },
-    showContactEmployee(id) {
-      if (this.contactEmployee === id) {
-        this.contactEmployee = false;
-      } else {
-        this.contactEmployee = id;
-      }
-    },
-    handleLeaveRequest() {},
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
-  computed: {
-    getAllEmployee() {
-      return this.employee.map((employe) => employe.name);
+  methods: {
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
     },
+    async handleAddLeaveHoliday() {
+      this.loading.addLeaveHol = true;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await AddLeaveHolidayAPI(queryAdminSuper, this.data);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.getLeaveHoliday();
+      }
+      this.showMessageStatus(response);
+      this.loading.addLeaveHol = false;
+    },
+    async getLeaveHoliday() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetLeaveHolidayAPI(queryAdminSuper);
+
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.leaveHoliday = response.data;
+      this.loading.getLeaveHol = false;
+      // this.toast.success("tes");
+    },
+    handleSearchData(value) {
+      this.query = value;
+      if (this.query.length >= 1) {
+        const result = this.options.filter((option) =>
+          option[this.property].toLowerCase().includes(this.query.toLowerCase())
+        );
+        this.searchDepartement = result;
+      } else {
+        this.searchDepartement = this.options;
+      }
+    },
+    selectAllDepartement() {
+      this.departementSelected = this.departement;
+      this.data.leavehol_depid = this.departementSelected.map((dep) => dep._id);
+      this.searchDepartement = [];
+      this.departement = [];
+    },
+    removeSelectedDepartement(dep) {
+      this.data.leavehol_depid = this.data.leavehol_depid.filter(
+        (id) => id !== dep._id
+      );
+      this.departementSelected = this.departementSelected.filter(
+        (departement) => departement._id !== dep._id
+      );
+      this.departement.push(dep);
+      this.searchDepartement.push(dep);
+    },
+    handleSelectedDepartement(dep) {
+      this.data.leavehol_depid.push(dep?._id);
+      this.departementSelected.push(dep);
+      this.departement = this.departement.filter(
+        (departement) => departement._id !== dep?._id
+      );
+      this.searchDepartement = this.searchDepartement.filter(
+        (departement) => departement._id !== dep?._id
+      );
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.searchDepartement = response.data;
+      this.departement = response.data;
+    },
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.optionsCompany = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.getCompany = false;
+    },
+  },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetDepartement();
+        this.getLeaveHoliday();
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
+
+    // this.handleGetEmployement();
   },
 };
 </script>

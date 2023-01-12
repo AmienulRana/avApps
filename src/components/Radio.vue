@@ -6,7 +6,7 @@
     <input
       type="radio"
       :value="value"
-      name="status"
+      :name="name"
       class="opacity-0 absolute top-0"
       :id="id"
       @change="$emit('change', value)"
@@ -27,6 +27,7 @@ export default {
     id: String,
     checked: Boolean,
     value: String,
+    name: String,
   },
   emits: ["change"],
 };

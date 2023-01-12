@@ -13,6 +13,7 @@ import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
 import ChangeWorkShift from "../pages/Pengajuan/ChangeWorkShift.vue";
 import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
+import AllowDeduc from "../pages/Setting/AllowDeduc.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
 import Home from "../pages/Home.vue";
 import store from "../store";
@@ -98,6 +99,11 @@ const routes = [
   {
     path: "/organisasi/departemen",
     component: Departement,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/allowance-deduction",
+    component: AllowDeduc,
     beforeEnter: requiredAuth,
   },
   {

@@ -82,7 +82,7 @@ export default {
     input_class: String,
     label_class: String,
     options: Array,
-    selectedOption: String,
+    selectedOption: String || Object,
     placeholder: String,
     property: String,
     position: {

@@ -1,60 +1,58 @@
 <template>
   <section
     class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
-    @click="showActions = null"
+    @click="
+      showActions = null;
+      showReasonNote = null;
+    "
   >
     <table class="bg-white min-w-max mt-6 w-full pb-4">
       <thead class="border-b bg-white border-gray-200 text-gray-400">
         <tr>
-          <th class="text-left text-sm">Company Name</th>
-          <th class="text-left text-sm">Shift Name</th>
-          <th class="text-left text-sm">Start At</th>
-          <th class="text-left text-sm">End At</th>
-          <th class="text-left text-sm">Break Duration</th>
+          <th class="text-left text-sm">Name</th>
+          <th class="text-left text-sm">Description</th>
+          <th class="text-left text-sm">Type</th>
           <th class="text-left text-sm">Status</th>
           <th class="text-left text-sm">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b h-max" v-for="(shift, i) in allShifts" :key="i">
+        <tr class="border-b h-max" v-for="dataAd in data" :key="dataAd._id">
           <td class="p-3 text-sm">
-            <p class="text-sm">{{ shift?.company_id?.company_name }}</p>
+            <p class="text-sm">{{ dataAd?.ad_name }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">{{ shift?.shift_name }}</p>
+            <p class="text-sm">{{ dataAd?.ad_desc ? dataAd?.ad_desc : "-" }}</p>
           </td>
           <td class="p-3 text-sm">
-            <p class="text-sm">{{ shift?.shift_clockin }}</p>
-          </td>
-          <td class="p-3 text-sm">
-            <p class="text-sm">{{ shift?.shift_clockout }}</p>
-          </td>
-          <td class="p-3 text-sm">
-            <p class="text-sm">
-              {{
-                shift?.shift_break_duration < 10
-                  ? `0${shift?.shift_break_duration}:00 Hour`
-                  : `${shift?.shift_break_duration}:00 Hour`
-              }}
+            <p
+              class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+              :class="
+                dataAd?.ad_type === 'Allowance'
+                  ? 'bg-green-500'
+                  : 'bg-orange-500'
+              "
+            >
+              {{ dataAd?.ad_type }}
             </p>
           </td>
           <td class="p-3 text-sm">
             <SwitchButton
               class="w-max"
-              @update:model="(value) => updateStatus(value, shift)"
-              :value="shift?.shift_status"
+              @update:model="(value) => updateStatus(value, dataAd)"
+              :value="dataAd?.ad_status"
             />
           </td>
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = i"
+              @click.stop="showActions = 0"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === i"
+              v-if="showActions === 0"
             >
               <ul>
                 <li
@@ -73,40 +71,31 @@
 
 <script>
 import SwitchButton from "./SwitchButton.vue";
-import Button from "./Button.vue";
-import { ChangeStatusShiftAPI } from "@/actions/shift";
-
+import { ChangeStatusAllowDeductAPI } from "@/actions/allow-deduction";
 export default {
   name: "TableOutsideAssignment",
-  components: { SwitchButton, Button },
-  props: { shifts: Array, showMessageStatus: Function },
+  components: { SwitchButton },
+  props: { ad: Object },
   data() {
     return {
       showActions: null,
-      allShifts: this.shifts,
-      data: {
-        status_workshift: false,
-      },
+      showDropdown: null,
+      showReasonNote: null,
+      showModal: false,
+      data: this.ad,
     };
   },
   watch: {
-    shifts: {
-      handler: function (newValue) {
-        this.allShifts = newValue;
+    ad: {
+      handler(newValue) {
+        this.data = newValue;
       },
-      deep: true,
     },
   },
   methods: {
-    async updateStatus(value, shift) {
-      shift.shift_status = value;
-      const response = await ChangeStatusShiftAPI(shift?._id);
-      this.showMessageStatus(response);
-
-      if (response.status === 401) {
-        this.$router.push("/login");
-        this.$store.commit("changeIsLoggedIn", false);
-      }
+    async updateStatus(value, dataAd) {
+      dataAd.ad_status = value;
+      await ChangeStatusAllowDeductAPI(dataAd?._id);
     },
   },
 };
