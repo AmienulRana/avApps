@@ -30,3 +30,19 @@ export const GetLeaveRequestAPI = async (query) => {
     return error.response;
   }
 };
+export const EditStatusLeaveRequestAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/leave-request/status/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
