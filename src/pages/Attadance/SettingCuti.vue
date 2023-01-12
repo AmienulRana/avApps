@@ -26,6 +26,7 @@
         <TableSettingCuti
           :leaveHoliday="leaveHoliday"
           :departement="departement"
+          :loading="loading.getLeaveHol"
         />
       </section>
     </section>
@@ -245,6 +246,7 @@ export default {
       loading: {
         getCompany: true,
         addLeaveHol: false,
+        getLeaveHol: true,
       },
     };
   },
@@ -286,6 +288,7 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       this.leaveHoliday = response.data;
+      this.loading.getLeaveHol = false;
       // this.toast.success("tes");
     },
     handleSearchData(value) {
@@ -336,7 +339,7 @@ export default {
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
-      this.options = response.data;
+      this.optionsCompany = response.data;
       this.dataCompany = response.data[0];
       this.loading.getCompany = false;
     },
