@@ -17,14 +17,14 @@
           <th class="text-left text-sm">Action</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="!loading">
         <tr
           class="border-b h-max"
           v-for="(data, i) in leaves_holidays"
           :key="i"
         >
           <td class="p-3 text-sm">
-            <p class="text-sm">1</p>
+            <p class="text-sm">{{ i + 1 }}</p>
           </td>
           <td class="p-3 text-sm">
             <p class="text-sm">{{ data?.leavehol_startdate }}</p>
@@ -89,15 +89,19 @@
         </tr>
       </tbody>
     </table>
+    <section class="w-full mt-10" v-if="loading">
+      <Loading />
+    </section>
   </section>
 </template>
 
 <script>
 import SwitchButton from "./SwitchButton.vue";
+import Loading from "./Loading.vue";
 export default {
   name: "TableSettingCuti",
-  components: { SwitchButton },
-  props: { leaveHoliday: Array, departement: Array },
+  components: { SwitchButton, Loading },
+  props: { leaveHoliday: Array, departement: Array, loading: Boolean },
   data() {
     return {
       showActions: null,
