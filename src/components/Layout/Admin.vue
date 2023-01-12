@@ -8,7 +8,7 @@
       @click="showSidebar = false"
     >
       <section
-        class="bg-white w-full px-8 py-6 shadow-md flex justify-between items-center z-20 fixed lg:static"
+        class="bg-white w-full px-8 py-4 shadow-md flex justify-between items-center z-20 fixed lg:static"
       >
         <font-awesome-icon
           icon="fa-bars"
@@ -69,7 +69,7 @@ export default {
     let currentTime = Date.now();
 
     // Set a timer for one hour
-    setTimeout(function () {
+    setTimeout(() => {
       // Remove the JWT token from local storage after one hour
       localStorage.removeItem("token");
       localStorage.removeItem("isLoggedIn");
