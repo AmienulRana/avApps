@@ -327,6 +327,7 @@
         <Button
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleLeaveRequest"
+          :disabled="loading.addLeaveRequest"
         >
           Save
         </Button>
@@ -402,6 +403,7 @@ export default {
       loading: {
         getCompany: true,
         getLeaveRequest: true,
+        addLeaveRequest: false,
       },
     };
   },
@@ -473,6 +475,7 @@ export default {
       this.leave_request = response?.data;
     },
     async handleLeaveRequest() {
+      this.addLeaveRequest = true;
       const payload = {
         ...this.data,
         emp_id: this.data.emp_id._id,
@@ -492,6 +495,7 @@ export default {
         this.clearInputValue();
       }
       this.showMessageStatus(response);
+      this.addLeaveRequest = false;
     },
     viewImage(e) {
       const files = e.target.files;
