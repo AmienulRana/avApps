@@ -7,7 +7,7 @@
       {{ dataCompany?.company_name ? dataCompany?.company_name : "Company" }}
       <font-awesome-icon
         icon="fa-chevron-up"
-        class="duration-500 w-3 h-3 ease-in-out"
+        class="duration-500 w-3 h-3 ease-in-out ml-2"
         :class="showSelectCompany ? '' : 'rotate-180'"
       />
     </Button>
@@ -53,10 +53,11 @@
 </template>
 <script>
 import Input from "./Input.vue";
+import Button from "./Button.vue";
 export default {
   name: "ChoiseCompany",
   props: { dataCompany: Object, options: Array },
-  components: { Input },
+  components: { Input, Button },
   emits: ["selected"],
   data() {
     return {
@@ -87,10 +88,10 @@ export default {
   min-width: 250px;
 }
 .fadeInDown {
-  animation: fadeInDown 0.3s;
+  animation: fadeInDown 0.2s;
 }
 .fadeOutUp {
-  animation: fadeOutUp 0.3s;
+  animation: fadeOutUp 0.2s;
 }
 @keyframes fadeInDown {
   0% {
