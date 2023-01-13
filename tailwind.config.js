@@ -11,6 +11,7 @@ module.exports = {
         dodgerblue: "#009df9",
         coral: "#f79646",
         seagreen: "#46c35f",
+        white: "#fbfbfb",
       },
     },
   },
