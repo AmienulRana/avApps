@@ -23,7 +23,8 @@
           <table class="table-auto bg-white w-full mt-6 min-w-max">
             <thead class="border-b bg-white border-gray-200 text-gray-400">
               <tr>
-                <th class="text-left text-sm p-3">Name</th>
+                <th class="text-left text-sm p-3">Name Employement</th>
+                <th class="text-left text-sm p-3">Designation</th>
                 <th class="text-left text-sm p-3">Description</th>
                 <th class="text-left text-sm p-3">No. Of Employees</th>
                 <th class="text-left text-sm p-3">Actions</th>
@@ -31,6 +32,11 @@
             </thead>
             <tbody v-if="!loading.designation">
               <tr v-for="(des, index) in designations" :key="index">
+                <td class="p-3 text-sm">
+                  <p class="text-sm text-gray-400">
+                    {{ des?.emp_id?.emp_fullname }}
+                  </p>
+                </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">{{ des?.des_name }}</p>
                 </td>
@@ -51,7 +57,7 @@
                       class="text-red-500"
                     />
                   </button>
-                  <button @click="handleDetailDesignation(des?._id)">
+                  <button @click="handleDetailDesignation(des)">
                     <font-awesome-icon
                       icon="fa-pen-to-square"
                       class="text-primary"
@@ -71,7 +77,7 @@
       </section>
     </section>
     <Modal
-      title="Add Designation"
+      :title="`${modalEdit ? 'Edit' : 'Add'} Designation`"
       class="md:w-9/12 w-full mx-auto h-max"
       :showModal="showModal"
       @close="showModal = false"
@@ -84,7 +90,20 @@
           :dataCompany="dataCompany"
         />
       </template>
+
       <section class="mb-10">
+        <SelectSearch
+          label="Employee"
+          :options="employment"
+          :isOpen="modal.showSelect"
+          @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
+          class="flex-col"
+          property="emp_name"
+          input_class="w-full mt-2"
+          label_class="w-full text-black"
+          @selected="emp_id = $event"
+          :selectedOption="emp_id"
+        />
         <Input
           label="Name"
           label_class="w-full"
@@ -139,11 +158,17 @@ import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "../../components/Input.vue";
-import { GetDesignationAPI, AddDesignationAPI } from "@/actions/designation";
+import {
+  GetDesignationAPI,
+  AddDesignationAPI,
+  EditDesignationAPI,
+} from "@/actions/designation";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
+import { GetAllEmployementAPI } from "@/actions/employment";
+import SelectSearch from "@/components/Select/SelectSearch.vue";
 
 export default {
   name: "EmployeeIndex",
@@ -154,13 +179,20 @@ export default {
     Loading,
     ChoiseCompany,
     Input,
+    SelectSearch,
   },
   data() {
     return {
       showModal: false,
       modalEdit: false,
+      modal: {
+        showSelect: false,
+      },
       name: "",
       description: "",
+      id_des: "",
+      emp_id: "",
+      employment: [],
       designations: [],
       superAdmin: false,
       showSelectCompany: false,
@@ -183,6 +215,7 @@ export default {
       const response = await GetDesignationAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
+      console.log(response);
       if (response.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
@@ -193,27 +226,62 @@ export default {
     async handleAddDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const data = {
-        dep_name: this.name,
-        dep_desc: this.description,
+        des_name: this.name,
+        des_desc: this.description,
+        emp_id: this.emp_id?._id,
       };
+      console.log(data);
       const response = await AddDesignationAPI(data, querySuperAdmin);
-      if (response.status === 200) {
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
         this.handleGetDesignation();
         this.showModal = false;
       }
     },
-    handleDetailDesignation() {
-      // this.showModal = true;
-      // this.id = id;
-      // this.modalEdit = true;
-      // const findDesignation = this.designations.filter(
-      //   (des) => des.id === id
-      // )[0];
-      // this.name = findDesignation.name;
-      // this.description = findDesignation.description;
+    handleDetailDesignation(designation) {
+      this.showModal = true;
+      this.modalEdit = true;
+      this.id_des = designation?._id;
+      this.emp_id = designation?.emp_id;
+      this.name = designation?.des_name;
+      this.description = designation?.des_desc;
     },
-    handleEditDesignation() {},
+    async handleEditDesignation() {
+      const payload = {
+        emp_id: this.emp_id?._id,
+        des_name: this.name,
+        des_desc: this.description,
+      };
+      const response = await EditDesignationAPI(payload, this.id_des);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.handleGetDesignation();
+        this.showModal = false;
+        this.modalEdit = false;
+      }
+    },
     handleDeleteDesignation() {},
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_name: employment?.emp_fullname,
+      }));
+      this.employment = getIdNameEmp;
+    },
   },
   mounted() {
     // const departement
@@ -226,6 +294,7 @@ export default {
     dataCompany: {
       handler: function () {
         this.handleGetDesignation();
+        this.handleGetEmployement();
       },
       deep: true,
     },
