@@ -18,6 +18,18 @@ export const AddDesignationAPI = async (payload, query) => {
     return error.response;
   }
 };
+export const EditDesignationAPI = async (payload, id) => {
+  try {
+    const response = await axios.put(`${URL_API}/designation/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetDesignationAPI = async (query) => {
   try {
     const response = await axios.get(`${URL_API}/designation${query}`, {
