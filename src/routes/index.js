@@ -1,6 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Employee from "../pages/Employee/index.vue";
 import EmployeeDetail from "../pages/Employee/Detail.vue";
+import EmployeeStatus from "../pages/Employee/Status.vue";
 import Login from "../pages/Login.vue";
 import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
@@ -40,6 +41,11 @@ function notRequiredAuth(to, from, next) {
 const routes = [
   { path: "/", component: Home, beforeEnter: requiredAuth },
   { path: "/employee", component: Employee, beforeEnter: requiredAuth },
+  {
+    path: "/employee-status",
+    component: EmployeeStatus,
+    beforeEnter: requiredAuth,
+  },
   { path: "/login", component: Login, beforeEnter: notRequiredAuth },
   {
     path: "/employee/:id",
