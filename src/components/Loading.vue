@@ -33,7 +33,7 @@ export default {
   width: 10px;
   height: 10px;
   margin: 0 5px;
-  animation: dot-blink 1s ease-in-out infinite;
+  animation: dot-blink 1.4s ease-in-out infinite;
 }
 
 .dot:nth-child(2) {
