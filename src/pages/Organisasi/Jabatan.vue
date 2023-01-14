@@ -18,7 +18,7 @@
         >
       </section>
       <section class="flex mt-6 flex-wrap w-10/12"></section>
-      <section class="">
+      <section class="relative">
         <section class="overflow-x-auto custom-scrollbar w-full">
           <table class="table-auto bg-white w-full mt-6 min-w-max">
             <thead class="border-b bg-white border-gray-200 text-gray-400">
@@ -67,12 +67,7 @@
               </tr>
             </tbody>
           </table>
-          <div
-            class="flex justify-center mt-14 w-full"
-            v-if="loading.designation"
-          >
-            <Loading />
-          </div>
+          <Loading v-if="loading.designation" />
         </section>
       </section>
     </section>

@@ -21,7 +21,9 @@
         </div>
       </section>
       <section class="w-full">
-        <section class="w-full overflow-x-auto custom-scrollbar h-96 bg-white">
+        <section
+          class="w-full overflow-x-auto relative custom-scrollbar h-96 bg-white"
+        >
           <table class="bg-white min-w-max mt-6 w-full pb-4">
             <thead class="border-b bg-white border-gray-200 text-gray-400">
               <tr>
@@ -62,9 +64,7 @@
               </tr>
             </tbody>
           </table>
-          <section class="w-full mt-10" v-if="loading.getStatus">
-            <Loading />
-          </section>
+          <Loading v-if="loading.getStatus" class="mt-10" />
         </section>
       </section>
     </section>

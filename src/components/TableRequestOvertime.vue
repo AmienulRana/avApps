@@ -1,6 +1,6 @@
 <template>
   <section
-    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white relative"
     @click="
       showActions = null;
       showReasonNote = null;
@@ -192,7 +192,8 @@
         </tr>
       </tbody>
     </table>
-    <Loading v-if="loading" />
+
+    <Loading class="mt-10" v-if="loading" />
   </section>
   <Modal title="Response Log" :showModal="showModal" @close="showModal = false">
     <section

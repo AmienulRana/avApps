@@ -1,6 +1,6 @@
 <template>
   <section
-    class="w-full overflow-x-auto custom-scrollbar bg-white"
+    class="w-full overflow-x-auto custom-scrollbar bg-white relative"
     @click="
       showActions = null;
       showReasonNote = null;

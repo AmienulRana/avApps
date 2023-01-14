@@ -116,6 +116,7 @@ import Modal from "../../components/Modal.vue";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Input from "@/components/Input.vue";
 import employee from "@/employee.json";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "OutsideAssignment",
@@ -127,6 +128,7 @@ export default {
     SelectSearch,
     Modal,
     Input,
+    Loading,
   },
   data() {
     return {
