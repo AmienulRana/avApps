@@ -1,198 +1,201 @@
 <template>
-  <section
-    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white relative"
-    @click="
-      showActions = null;
-      showReasonNote = null;
-    "
-  >
-    <table class="bg-white min-w-max mt-6 w-full pb-4">
-      <thead class="border-b bg-white border-gray-200 text-gray-400">
-        <tr>
-          <th class="text-left text-sm">Profile</th>
-          <th class="text-left text-sm">Date & time</th>
-          <th class="text-left text-sm">Overtime duration</th>
-          <th class="text-left text-sm">Reason</th>
-          <th class="text-left text-sm">Approved 1</th>
-          <th class="text-left text-sm">Approved 2</th>
-          <th class="text-left text-sm">HR Approved</th>
-          <th class="text-left text-sm">Activity</th>
-          <th class="text-left text-sm">Actions</th>
-        </tr>
-      </thead>
-      <tbody v-if="!loading">
-        <tr
-          class="border-b h-max"
-          v-for="(overtime, i) in overtime_request"
-          :key="i"
-        >
-          <td class="flex items-center p-3 text-sm">
-            <div
-              class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
-            >
-              <h2 class="text-md text-white">
+  <section class="relative bg-white">
+    <section
+      class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+      @click="
+        showActions = null;
+        showReasonNote = null;
+      "
+    >
+      <table class="bg-white min-w-max mt-6 w-full pb-4">
+        <thead class="border-b bg-white border-gray-200 text-gray-400">
+          <tr>
+            <th class="text-left text-sm">Profile</th>
+            <th class="text-left text-sm">Date & time</th>
+            <th class="text-left text-sm">Overtime duration</th>
+            <th class="text-left text-sm">Reason</th>
+            <th class="text-left text-sm">Approved 1</th>
+            <th class="text-left text-sm">Approved 2</th>
+            <th class="text-left text-sm">HR Approved</th>
+            <th class="text-left text-sm">Activity</th>
+            <th class="text-left text-sm">Actions</th>
+          </tr>
+        </thead>
+        <tbody v-if="!loading">
+          <tr
+            class="border-b h-max"
+            v-for="(overtime, i) in overtime_request"
+            :key="i"
+          >
+            <td class="flex items-center p-3 text-sm">
+              <div
+                class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
+              >
+                <h2 class="text-md text-white">
+                  {{
+                    overtime?.emp_id?.emp_fullname.substr(0, 1) +
+                    overtime?.emp_id?.emp_fullname.substr(
+                      overtime?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                      1
+                    )
+                  }}
+                </h2>
+              </div>
+              <div class="ml-5">
+                <h1 class="text-blue-400 text-base">
+                  {{ overtime?.emp_id?.emp_fullname }}
+                </h1>
+                <p class="text-sm mb-1 text-gray-400">
+                  {{ overtime?.emp_id?.emp_depid?.dep_name }}
+                </p>
+                <p class="text-xs mb-1 text-gray-400">
+                  {{ overtime?.company_id?.company_name }}
+                </p>
+              </div>
+            </td>
+            <td class="p-3 text-sm">
+              <p class="text-sm">
+                <span class="text-gray-400">From :</span>
+                {{ formatAMPM(overtime?.overtime_start_hours) }}
+              </p>
+              <p class="text-sm">
+                <span class="text-gray-400">To :</span>
+                {{ formatAMPM(overtime?.overtime_end_hours) }}
+              </p>
+            </td>
+            <td class="p-3 text-sm">
+              <p class="text-sm">{{ overtime?.overtime_duration }}</p>
+            </td>
+            <td class="p-3 text-sm">
+              <p class="text-sm">{{ overtime?.overtime_reason }}</p>
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+                :class="
+                  overtime?.overtime_fsuperior?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : overtime?.overtime_fsuperior?.status === 'Approved'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                "
+              >
+                {{ overtime?.overtime_fsuperior?.status }}
+              </p>
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="overtime?.overtime_fsuperior?.status !== 'Pending'"
+              >
                 {{
-                  overtime?.emp_id?.emp_fullname.substr(0, 1) +
-                  overtime?.emp_id?.emp_fullname.substr(
-                    overtime?.emp_id?.emp_fullname.indexOf(" ") + 1,
-                    1
-                  )
+                  overtime?.overtime_fsuperior?.fsuperior_id?.emp_id
+                    ?.emp_fullname
                 }}
-              </h2>
-            </div>
-            <div class="ml-5">
-              <h1 class="text-blue-400 text-base">
-                {{ overtime?.emp_id?.emp_fullname }}
-              </h1>
-              <p class="text-sm mb-1 text-gray-400">
-                {{ overtime?.emp_id?.emp_depid?.dep_name }}
+                <br />
+                {{ overtime?.overtime_fsuperior?.approved_hours }},
+                {{ overtime?.overtime_fsuperior?.approved_date }}
               </p>
-              <p class="text-xs mb-1 text-gray-400">
-                {{ overtime?.company_id?.company_name }}
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                class="flex py-1 text-white w-24 px-2 items-center justify-center rounded-full"
+                :class="
+                  overtime?.overtime_ssuperior?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : overtime?.overtime_ssuperior?.status === 'Approved'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                "
+              >
+                {{ overtime?.overtime_ssuperior?.status }}
               </p>
-            </div>
-          </td>
-          <td class="p-3 text-sm">
-            <p class="text-sm">
-              <span class="text-gray-400">From :</span>
-              {{ formatAMPM(overtime?.overtime_start_hours) }}
-            </p>
-            <p class="text-sm">
-              <span class="text-gray-400">To :</span>
-              {{ formatAMPM(overtime?.overtime_end_hours) }}
-            </p>
-          </td>
-          <td class="p-3 text-sm">
-            <p class="text-sm">{{ overtime?.overtime_duration }}</p>
-          </td>
-          <td class="p-3 text-sm">
-            <p class="text-sm">{{ overtime?.overtime_reason }}</p>
-          </td>
-          <td class="p-3 text-sm">
-            <p
-              class="flex py-1 text-white w-24 items-center justify-center rounded-full"
-              :class="
-                overtime?.overtime_fsuperior?.status === 'Pending'
-                  ? 'bg-gray-300'
-                  : overtime?.overtime_fsuperior?.status === 'Approved'
-                  ? 'bg-green-500'
-                  : 'bg-red-500'
-              "
-            >
-              {{ overtime?.overtime_fsuperior?.status }}
-            </p>
-            <p
-              class="text-sm mt-2 text-gray-400"
-              v-if="overtime?.overtime_fsuperior?.status !== 'Pending'"
-            >
-              {{
-                overtime?.overtime_fsuperior?.fsuperior_id?.emp_id?.emp_fullname
-              }}
-              <br />
-              {{ overtime?.overtime_fsuperior?.approved_hours }},
-              {{ overtime?.overtime_fsuperior?.approved_date }}
-            </p>
-          </td>
-          <td class="p-3 text-sm">
-            <p
-              class="flex py-1 text-white w-24 px-2 items-center justify-center rounded-full"
-              :class="
-                overtime?.overtime_ssuperior?.status === 'Pending'
-                  ? 'bg-gray-300'
-                  : overtime?.overtime_ssuperior?.status === 'Approved'
-                  ? 'bg-green-500'
-                  : 'bg-red-500'
-              "
-            >
-              {{ overtime?.overtime_ssuperior?.status }}
-            </p>
-            <p
-              class="text-sm mt-2 text-gray-400"
-              v-if="overtime?.overtime_ssuperior?.status !== 'Pending'"
-            >
-              {{
-                overtime?.overtime_ssuperior?.ssuperior_id?.emp_id?.emp_fullname
-              }}
-              <br />
-              {{ overtime?.overtime_ssuperior?.approved_hours }},
-              {{ overtime?.overtime_ssuperior?.approved_date }}
-            </p>
-          </td>
-          <td class="p-3 text-sm">
-            <p
-              class="flex py-1 text-white w-24 items-center justify-center rounded-full"
-              :class="
-                overtime?.overtime_hr?.status === 'Pending'
-                  ? 'bg-gray-300'
-                  : overtime?.overtime_hr?.status === 'Approved'
-                  ? 'bg-green-500'
-                  : 'bg-red-500'
-              "
-            >
-              {{ overtime?.overtime_hr?.status }}
-            </p>
-            <p
-              class="text-sm mt-2 text-gray-400"
-              v-if="overtime?.overtime_hr?.status !== 'Pending'"
-            >
-              Admin / HR
-              <br />
-              {{ overtime?.overtime_hr?.approved_hours }},
-              {{ overtime?.overtime_hr?.approved_date }}
-            </p>
-          </td>
-          <td class="p-3 text-sm flex">
-            <button
-              class="text-xl ml-3"
-              @click="assignDetailStatusOvertime(overtime)"
-            >
-              <img src="../assets/icons/log.svg" />
-            </button>
-          </td>
-          <td class="p-3 text-right relative">
-            <Button
-              class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = 0"
-            >
-              <font-awesome-icon icon="fa-ellipsis" />
-            </Button>
-            <div
-              class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === 0"
-            >
-              <ul>
-                <li
-                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                >
-                  Calculate/Recalculate
-                </li>
-                <li
-                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                >
-                  Approved 1
-                </li>
-                <li
-                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                >
-                  Approved 2
-                </li>
-                <li
-                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                >
-                  HR Aproved
-                </li>
-                <li
-                  class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                >
-                  Edit
-                </li>
-              </ul>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="overtime?.overtime_ssuperior?.status !== 'Pending'"
+              >
+                {{
+                  overtime?.overtime_ssuperior?.ssuperior_id?.emp_id
+                    ?.emp_fullname
+                }}
+                <br />
+                {{ overtime?.overtime_ssuperior?.approved_hours }},
+                {{ overtime?.overtime_ssuperior?.approved_date }}
+              </p>
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+                :class="
+                  overtime?.overtime_hr?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : overtime?.overtime_hr?.status === 'Approved'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                "
+              >
+                {{ overtime?.overtime_hr?.status }}
+              </p>
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="overtime?.overtime_hr?.status !== 'Pending'"
+              >
+                Admin / HR
+                <br />
+                {{ overtime?.overtime_hr?.approved_hours }},
+                {{ overtime?.overtime_hr?.approved_date }}
+              </p>
+            </td>
+            <td class="p-3 text-sm flex">
+              <button
+                class="text-xl ml-3"
+                @click="assignDetailStatusOvertime(overtime)"
+              >
+                <img src="../assets/icons/log.svg" />
+              </button>
+            </td>
+            <td class="p-3 text-right relative">
+              <Button
+                class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
+                @click.stop="showActions = 0"
+              >
+                <font-awesome-icon icon="fa-ellipsis" />
+              </Button>
+              <div
+                class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
+                v-if="showActions === 0"
+              >
+                <ul>
+                  <li
+                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                  >
+                    Calculate/Recalculate
+                  </li>
+                  <li
+                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                  >
+                    Approved 1
+                  </li>
+                  <li
+                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                  >
+                    Approved 2
+                  </li>
+                  <li
+                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                  >
+                    HR Aproved
+                  </li>
+                  <li
+                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                  >
+                    Edit
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
     <Loading class="mt-10" v-if="loading" />
   </section>
   <Modal title="Response Log" :showModal="showModal" @close="showModal = false">
