@@ -14,6 +14,6 @@ export function getDate() {
     "Nov",
     "Dec",
   ];
-  let date = d.getDate() + ", " + months[d.getMonth()] + " " + d.getFullYear();
+  let date = d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
   return date;
 }
