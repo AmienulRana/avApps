@@ -61,7 +61,7 @@
           :overtime_request="overtime_requests"
           :showMessageStatus="showMessageStatus"
           :loading="loading.getOvertimeRequest"
-          :getOvertimeRequest="getOvertimeRequest"
+          :getOvertime="getOvertimeRequest"
         />
       </section>
     </section>
@@ -281,6 +281,7 @@ export default {
       if (response.status === 200) {
         this.modal.showModal = false;
         this.clearInputValue();
+        this.getOvertimeRequest();
       }
       this.showMessageStatus(response);
       this.loading.addOvertimeRequest = false;
