@@ -493,6 +493,7 @@ export default {
       if (response.status === 200) {
         this.showModal = false;
         this.clearInputValue();
+        this.getOvertimeRequest();
       }
       this.showMessageStatus(response);
       this.loading_overtime.edit = false;
