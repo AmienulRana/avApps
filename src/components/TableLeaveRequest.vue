@@ -20,7 +20,7 @@
           <th class="text-left text-sm">Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="!loadingGet">
         <tr class="border-b" v-for="(leave, i) in leave_request" :key="i">
           <td class="flex items-center p-3 text-sm">
             <div
@@ -166,6 +166,7 @@
         </tr>
       </tbody>
     </table>
+    <Loading class="mt-10" v-if="loadingGet" />
   </section>
   <Modal title="Response Log" :showModal="showModal" @close="showModal = false">
     <section class="flex w-full justify-center">
@@ -257,11 +258,16 @@
 import Modal from "./Modal.vue";
 import Radio from "./Radio.vue";
 import { EditStatusLeaveRequestAPI } from "@/actions/leave-request";
+import Loading from "./Loading.vue";
 
 export default {
   name: "TableAttadance",
-  props: { leave_request: Array, showMessageStatus: Function },
-  components: { Modal, Radio },
+  props: {
+    leave_request: Array,
+    showMessageStatus: Function,
+    loadingGet: Boolean,
+  },
+  components: { Modal, Radio, Loading },
   data() {
     return {
       showActions: null,
