@@ -36,7 +36,7 @@
                 <th class="text-left text-sm">Action</th>
               </tr>
             </thead>
-            <tbody v-if="!loading.getStatus">
+            <tbody v-if="!loading.getStatus && empWarning.length !== 0">
               <tr
                 class="border-b h-max"
                 v-for="(warning, i) in empWarning"
@@ -84,6 +84,8 @@
               </tr>
             </tbody>
           </table>
+          <NoDataShowing v-if="!loading.getStatus && empWarning.length === 0" />
+
           <Loading v-if="loading.getStatus" />
         </section>
       </section>
@@ -201,6 +203,7 @@ import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
+import NoDataShowing from "@/components/NoDataShowing.vue";
 import {
   AddEmpWarningAPI,
   GetEmpWarningAPI,
@@ -221,6 +224,7 @@ export default {
     Select,
     ChoiseCompany,
     SelectSearch,
+    NoDataShowing,
   },
   data() {
     return {
