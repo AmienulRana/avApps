@@ -89,7 +89,7 @@
         </tr>
       </tbody>
     </table>
-    <NoDataShowing v-if="!loading.getStatus && leaves_holidays.length === 0" />
+    <NoDataShowing v-if="!loading && leaves_holidays.length === 0" />
     <Loading v-if="loading" />
   </section>
 </template>
