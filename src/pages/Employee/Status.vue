@@ -22,7 +22,8 @@
       </section>
       <section class="w-full">
         <section
-          class="w-full overflow-x-auto relative custom-scrollbar h-96 bg-white"
+          class="w-full overflow-x-auto relative custom-scrollbar bg-white"
+          :class="loading.getStatus ? 'h-96' : ''"
         >
           <table class="bg-white min-w-max mt-6 w-full pb-4">
             <thead class="border-b bg-white border-gray-200 text-gray-400">
@@ -42,9 +43,9 @@
                 <td class="p-3 text-sm">
                   <p class="text-sm">{{ data?.empstatus_name }}</p>
                 </td>
-                <td class="p-3 text-sm font-semibold">
+                <td class="p-3 text-sm font-bold">
                   <p
-                    class="preview-badge rounded-full text-sm"
+                    class="preview-badge rounded-full text-xs"
                     :style="`background:${data?.empstatus_color}`"
                   >
                     {{ data.empstatus_name }}
@@ -64,7 +65,7 @@
               </tr>
             </tbody>
           </table>
-          <Loading v-if="loading.getStatus" class="mt-10" />
+          <Loading v-if="loading.getStatus" />
         </section>
       </section>
     </section>
@@ -251,7 +252,6 @@ export default {
       }
       this.empStatus = response.data;
       this.loading.getStatus = false;
-      // this.toast.success("tes");
     },
     detailEmpStatus(status) {
       this.modeEdit = true;
@@ -301,8 +301,6 @@ export default {
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
-
-    // this.handleGetEmployement();
   },
   computed: {
     changeBackgroundStatus() {
@@ -330,7 +328,7 @@ export default {
   min-width: 35px;
   min-height: 25px;
   width: max-content;
-  padding: 5px 10px;
+  padding: 5px 20px;
   color: white;
 }
 </style>
