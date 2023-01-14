@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import Employee from "../pages/Employee/index.vue";
 import EmployeeDetail from "../pages/Employee/Detail.vue";
 import EmployeeStatus from "../pages/Employee/Status.vue";
+import EmployeeWarning from "../pages/Employee/Warning.vue";
 import Login from "../pages/Login.vue";
 import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
@@ -44,6 +45,11 @@ const routes = [
   {
     path: "/employee-status",
     component: EmployeeStatus,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/employee-warning",
+    component: EmployeeWarning,
     beforeEnter: requiredAuth,
   },
   { path: "/login", component: Login, beforeEnter: notRequiredAuth },
