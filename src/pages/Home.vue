@@ -11,10 +11,10 @@
         />
       </div>
       <section
-        class="grid flex-wrap lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 lg:gap-8 md:gap-4 my-8"
+        class="grid flex-wrap relative lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 lg:gap-8 md:gap-4 my-8"
       >
         <section
-          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
+          class="card-detail-company mb-3 md:mb-0 rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -27,7 +27,7 @@
           </div>
         </section>
         <section
-          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
+          class="card-detail-company mb-3 md:mb-0 rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -40,7 +40,7 @@
           </div>
         </section>
         <section
-          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
+          class="card-detail-company mb-3 md:mb-0 rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -53,7 +53,7 @@
           </div>
         </section>
         <section
-          class="card-detail-company rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
+          class="card-detail-company mb-3 md:mb-0 rounded-md shadow-md w-full md:p-8 p-4 flex items-center"
         >
           <div
             class="bg-icon flex items-center justify-center bg-blue-500 w-12 h-12 rounded-md text-white"
@@ -65,15 +65,19 @@
             <p class="text-xs text-gray-400">On leave today</p>
           </div>
         </section>
+        <Loading v-if="loading.getData" />
       </section>
 
       <section class="md:grid gap-6 grid-cols-4 mb-6">
-        <EmployementStatistic
-          class="col-span-3 mb-10"
-          :total_employment_status="data.total_employment_status"
-        />
-        <section class="col-span-1">
+        <section class="col-span-3 mb-10 relative">
+          <EmployementStatistic
+            :total_employment_status="data.total_employment_status"
+          />
+          <Loading v-if="loading.getData" />
+        </section>
+        <section class="col-span-1 relative">
           <AttedanceStatistic />
+          <Loading v-if="loading.getData" />
         </section>
       </section>
     </section>
@@ -87,6 +91,8 @@ import LayoutAdmin from "../components/Layout/Admin.vue";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI, GetDahsboardAPI } from "@/actions/company";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import Loading from "@/components/Loading.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "DashboardPage",
@@ -99,6 +105,7 @@ export default {
       loadingData: true,
       loading: {
         company: true,
+        getData: true,
       },
       data: {
         total_employment: 0,
@@ -109,9 +116,14 @@ export default {
   },
   components: {
     LayoutAdmin,
+    Loading,
     EmployementStatistic,
     AttedanceStatistic,
     ChoiseCompany,
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     async getAllCompany() {
@@ -126,13 +138,16 @@ export default {
       const { data } = response;
       if (response.status === 401) {
         this.$router.push("/login");
+        this.toast.error(response?.data?.message);
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.data.total_departement = data.total_departement;
         this.data.total_employment = data.total_employment;
         this.data.total_employment_status = data.employment_status;
+        console.log(response);
       }
+      this.loading.getData = false;
     },
   },
   watch: {
@@ -144,18 +159,15 @@ export default {
     },
   },
   mounted() {
-    // const payload = decrypt
     const payload = decryptToken();
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
-    // this.handleGetDashboard();
   },
 };
 </script>
 
 <style scoped>
 .card-detail-company {
-  margin-bottom: 10px;
   background: white;
 }
 </style>
