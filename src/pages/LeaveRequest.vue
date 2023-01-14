@@ -60,6 +60,7 @@
         <TableLeaveRequest
           :leave_request="leave_request"
           :showMessageStatus="showMessageStatus"
+          :loadingGet="loading.getLeaveRequest"
         />
       </section>
     </section>
@@ -490,7 +491,6 @@ export default {
         let end_time = new Date(
           `1970-01-01T${this.modal.end_time.hour}:${this.modal.end_time.minute}:00`
         );
-        console.log(start_time, end_time);
         let diffrent = end_time - start_time;
 
         let hour = Math.floor(diffrent / (1000 * 60 * 60));
@@ -512,6 +512,9 @@ export default {
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.loading.getLeaveRequest = false;
       }
       this.leave_request = response?.data;
     },
