@@ -157,7 +157,7 @@ export default {
           contents: [
             { text: "Data karyawan", to: "/employee" },
             { text: "Status Karyawan", to: "/employee-status" },
-            { text: "Peringatan", to: "/designation" },
+            { text: "Peringatan", to: "/employee-warning" },
             { text: "Mutasi / Resign", to: "/designation" },
           ],
         },
