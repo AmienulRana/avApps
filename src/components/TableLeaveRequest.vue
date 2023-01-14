@@ -21,7 +21,7 @@
             <th class="text-left text-sm">Actions</th>
           </tr>
         </thead>
-        <tbody v-if="!loadingGet">
+        <tbody v-if="!loadingGet && leave_request.length !== 0">
           <tr class="border-b" v-for="(leave, i) in leave_request" :key="i">
             <td class="flex items-center p-3 text-sm">
               <div
@@ -172,6 +172,7 @@
           </tr>
         </tbody>
       </table>
+      <NoDataShowing v-if="!loadingGet && leave_request.length === 0" />
     </section>
     <Loading class="mt-10" v-if="loadingGet" />
   </section>
@@ -266,6 +267,7 @@ import Modal from "./Modal.vue";
 import Radio from "./Radio.vue";
 import { EditStatusLeaveRequestAPI } from "@/actions/leave-request";
 import Loading from "./Loading.vue";
+import NoDataShowing from "./NoDataShowing.vue";
 
 export default {
   name: "TableAttadance",
@@ -274,7 +276,7 @@ export default {
     showMessageStatus: Function,
     loadingGet: Boolean,
   },
-  components: { Modal, Radio, Loading },
+  components: { Modal, Radio, Loading, NoDataShowing },
   data() {
     return {
       showActions: null,

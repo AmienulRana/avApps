@@ -1,7 +1,7 @@
 <template>
   <section class="relative bg-white">
     <section
-      class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+      class="w-full overflow-x-auto custom-scrollbar bg-white"
       @click="
         showActions = null;
         showReasonNote = null;
@@ -21,7 +21,7 @@
             <th class="text-left text-sm">Actions</th>
           </tr>
         </thead>
-        <tbody v-if="!loading">
+        <tbody v-if="!loading && overtime_request.length !== 0">
           <tr
             class="border-b h-max"
             v-for="(overtime, i) in overtime_request"
@@ -195,6 +195,7 @@
           </tr>
         </tbody>
       </table>
+      <NoDataShowing v-if="!loadingGet && overtime_request.length === 0" />
     </section>
     <Loading class="mt-10" v-if="loading" />
   </section>
@@ -415,10 +416,11 @@ import { getDate } from "@/utils/getDate";
 import { getCurrentTime } from "@/utils/getHours";
 import { EditOvertimeRequestAPI } from "@/actions/overtime-request";
 import Loading from "./Loading.vue";
+import NoDataShowing from "./NoDataShowing.vue";
 
 export default {
   name: "TableAttadance",
-  components: { Modal, Radio, Button, Loading },
+  components: { Modal, Radio, Button, Loading, NoDataShowing },
   props: {
     loading: Boolean,
     showMessageStatus: Function,
