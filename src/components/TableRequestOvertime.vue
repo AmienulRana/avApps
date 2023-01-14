@@ -81,10 +81,17 @@
             >
               {{ overtime?.overtime_fsuperior?.status }}
             </p>
-            <!-- <p class="text-sm mt-2 text-gray-400">
-              Joko Legowo <br />
-              10:00 AM, 24 Dec 2022
-            </p> -->
+            <p
+              class="text-sm mt-2 text-gray-400"
+              v-if="overtime?.overtime_fsuperior?.status !== 'Pending'"
+            >
+              {{
+                overtime?.overtime_fsuperior?.fsuperior_id?.emp_id?.emp_fullname
+              }}
+              <br />
+              {{ overtime?.overtime_fsuperior?.approved_hours }},
+              {{ overtime?.overtime_fsuperior?.approved_date }}
+            </p>
           </td>
           <td class="p-3 text-sm">
             <p
@@ -99,14 +106,21 @@
             >
               {{ overtime?.overtime_ssuperior?.status }}
             </p>
-            <!-- <p class="text-sm mt-2 text-gray-400">
-              Legowo Joko <br />
-              9:42 AM, 23 Dec 2022
-            </p> -->
+            <p
+              class="text-sm mt-2 text-gray-400"
+              v-if="overtime?.overtime_ssuperior?.status !== 'Pending'"
+            >
+              {{
+                overtime?.overtime_ssuperior?.ssuperior_id?.emp_id?.emp_fullname
+              }}
+              <br />
+              {{ overtime?.overtime_ssuperior?.approved_hours }},
+              {{ overtime?.overtime_ssuperior?.approved_date }}
+            </p>
           </td>
           <td class="p-3 text-sm">
             <p
-              class="flex py-1 text-white min-w-max items-center justify-center rounded-full"
+              class="flex py-1 text-white w-24 items-center justify-center rounded-full"
               :class="
                 overtime?.overtime_hr?.status === 'Pending'
                   ? 'bg-gray-300'
@@ -117,10 +131,15 @@
             >
               {{ overtime?.overtime_hr?.status }}
             </p>
-            <!-- <p class="text-sm mt-2 text-gray-400">
-              Leo Joko <br />
-              8:21 AM, 23 Dec 2022
-            </p> -->
+            <p
+              class="text-sm mt-2 text-gray-400"
+              v-if="overtime?.overtime_hr?.status !== 'Pending'"
+            >
+              Admin / HR
+              <br />
+              {{ overtime?.overtime_hr?.approved_hours }},
+              {{ overtime?.overtime_hr?.approved_date }}
+            </p>
           </td>
           <td class="p-3 text-sm flex">
             <button
@@ -400,7 +419,7 @@ export default {
     loading: Boolean,
     showMessageStatus: Function,
     overtime_request: Array,
-    getOvertimeRequest: Function,
+    getOvertime: Function,
   },
   data() {
     return {
@@ -456,28 +475,28 @@ export default {
     assignDetailStatusOvertime(overtime) {
       this.showModal = true;
       this.data.overtime_request_id = overtime?._id;
-      this.data.overtime_fsuperior = overtime?.overtime_fsuperior;
-      this.data.overtime_ssuperior = overtime?.overtime_ssuperior;
-      this.data.overtime_hr = overtime?.overtime_hr;
+      this.data.overtime_fsuperior = { ...overtime?.overtime_fsuperior };
+      this.data.overtime_ssuperior = { ...overtime?.overtime_ssuperior };
+      this.data.overtime_hr = { ...overtime?.overtime_hr };
     },
     async handleEditOvertimeRequest() {
       this.loading_overtime.edit = true;
       const payload = {
         overtime_hr: {
           approved_by: "HR / Admin App",
-          approved_data: getDate(),
+          approved_date: getDate(),
           approved_hours: getCurrentTime(),
           status: this.data.overtime_hr.status,
         },
         overtime_fsuperior: {
           approved_by: "HR / Admin App",
-          approved_data: getDate(),
+          approved_date: getDate(),
           approved_hours: getCurrentTime(),
           status: this.data.overtime_fsuperior.status,
         },
         overtime_ssuperior: {
           approved_by: "HR / Admin App",
-          approved_data: getDate(),
+          approved_date: getDate(),
           approved_hours: getCurrentTime(),
           status: this.data.overtime_ssuperior.status,
         },
@@ -493,7 +512,7 @@ export default {
       if (response.status === 200) {
         this.showModal = false;
         this.clearInputValue();
-        this.getOvertimeRequest();
+        this.getOvertime();
       }
       this.showMessageStatus(response);
       this.loading_overtime.edit = false;
