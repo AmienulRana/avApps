@@ -66,17 +66,17 @@ export default {
   mounted() {
     const modeSidebar = localStorage.getItem("modeSidebar");
     this.modeSidebar = modeSidebar;
-    let currentTime = Date.now();
+    // let currentTime = Date.now();
 
     // Set a timer for one hour
-    setTimeout(() => {
-      // Remove the JWT token from local storage after one hour
-      localStorage.removeItem("token");
-      localStorage.removeItem("isLoggedIn");
-      this.$router.push("/login");
-      this.$store.commit("changeIsLoggedIn", false);
-      this.toast.error("Your session has been expired");
-    }, 3600 * 1000 - (Date.now() - currentTime));
+    // setTimeout(() => {
+    //   // Remove the JWT token from local storage after one hour
+    //   localStorage.removeItem("token");
+    //   localStorage.removeItem("isLoggedIn");
+    //   this.$router.push("/login");
+    //   this.$store.commit("changeIsLoggedIn", false);
+    //   this.toast.error("Your session has been expired");
+    // }, 3600 * 1000 - (Date.now() - currentTime));
   },
 };
 </script>
