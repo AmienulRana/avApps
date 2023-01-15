@@ -127,7 +127,7 @@ export default {
   },
   mounted() {
     this.getShift();
-    console.log(this.emp_attadance);
+    // console.log(this.emp_attadance);
   },
 };
 </script>
