@@ -17,6 +17,7 @@ import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
 import AllowDeduc from "../pages/Setting/AllowDeduc.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
+import Holiday from "../pages/Administration/Holiday.vue";
 import Home from "../pages/Home.vue";
 import store from "../store";
 
@@ -116,6 +117,11 @@ const routes = [
   {
     path: "/setting/allowance-deduction",
     component: AllowDeduc,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/administration/holiday",
+    component: Holiday,
     beforeEnter: requiredAuth,
   },
   {
