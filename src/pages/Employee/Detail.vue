@@ -9,92 +9,114 @@
           >
         </h1>
       </section>
-      <section
-        class="bg-white w-full shadow-md md:h-64 py-3 my-6"
-        v-if="loading"
-      >
-        <Loading />
-      </section>
-      <section
-        v-else
-        class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
-      >
+      <section class="bg-white w-full relative">
+        <Loading v-if="loading" />
         <section
-          class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
+          v-else
+          class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
         >
-          <img
-            :src="`${urlImageServer}/${personal_detail.emp_profile}`"
-            alt="profile image"
-            class="profile w-32 h-32 rounded-full"
-            v-if="personal_detail?.emp_profile"
-          />
-          <div
-            v-else
-            class="profile w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
+          <section
+            class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
           >
-            <h2 class="text-3xl text-white">
-              {{
-                personal_detail?.emp_fullname.substr(0, 1) +
-                personal_detail?.emp_fullname.substr(
-                  personal_detail?.emp_fullname.indexOf(" ") + 1,
-                  1
-                )
-              }}
-            </h2>
-          </div>
-          <div class="md:ml-9 ml-0 text-center md:text-start">
-            <h1 class="md:text-xl mt-2 text-base">
-              {{ personal_detail?.emp_fullname }}
-            </h1>
-            <Button
-              class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
-              :class="
-                employment?.emp_status === 'Permanent'
-                  ? 'bg-blue-500'
-                  : employment?.emp_status === 'Probation'
-                  ? 'bg-orange-500'
-                  : 'bg-red-600'
-              "
+            <img
+              :src="`${urlImageServer}/${personal_detail.emp_profile}`"
+              alt="profile image"
+              class="profile w-32 h-32 rounded-full"
+              v-if="personal_detail?.emp_profile"
+            />
+            <div
+              v-else
+              class="profile w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              {{ employment?.emp_status }}</Button
-            >
-            <p class="text-sm text-gray-400">
-              {{ employment.emp_desid?.des_name }}
-            </p>
-            <p class="text-sm text-gray-400"></p>
-            <p class="text-sm text-gray-400">
-              {{ employment.emp_depid?.dep_name }}
-            </p>
-          </div>
-        </section>
-        <section class="md:border-x h-max mb-6">
-          <section class="px-6 py-4">
-            <div class="flex items-center mb-5">
-              <font-awesome-icon
-                icon="fa-briefcase"
-                class="text-2xl w-10 text-primary"
-              />
-              <div class="ml-3">
-                <p class="text-sm text-gray-400">Departemen</p>
-                <p class="text-sm opacity-80">
-                  {{ employment.emp_depid?.dep_name }}
-                </p>
-              </div>
+              <h2 class="text-3xl text-white">
+                {{
+                  personal_detail?.emp_fullname.substr(0, 1) +
+                  personal_detail?.emp_fullname.substr(
+                    personal_detail?.emp_fullname.indexOf(" ") + 1,
+                    1
+                  )
+                }}
+              </h2>
             </div>
-            <div class="flex items-center">
-              <font-awesome-icon
-                icon="fa-clock"
-                class="text-2xl w-10 text-primary"
-              />
-              <div class="ml-3">
-                <p class="text-sm text-gray-400">Work Shifts</p>
-                <p class="text-sm opacity-80">
-                  {{ employment.emp_depid?.dep_workshift }}
-                </p>
-              </div>
+            <div class="md:ml-9 ml-0 text-center md:text-start">
+              <h1 class="md:text-xl mt-2 text-base">
+                {{ personal_detail?.emp_fullname }}
+              </h1>
+              <Button
+                class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
+                :class="
+                  employment?.emp_status === 'Permanent'
+                    ? 'bg-blue-500'
+                    : employment?.emp_status === 'Probation'
+                    ? 'bg-orange-500'
+                    : 'bg-red-600'
+                "
+              >
+                {{ employment?.emp_status }}</Button
+              >
+              <p class="text-sm text-gray-400">
+                {{ employment.emp_desid?.des_name }}
+              </p>
+              <p class="text-sm text-gray-400"></p>
+              <p class="text-sm text-gray-400">
+                {{ employment.emp_depid?.dep_name }}
+              </p>
             </div>
           </section>
-          <section class="px-6 md:py-4 md:hidden">
+          <section class="md:border-x h-max mb-6">
+            <section class="px-6 py-4">
+              <div class="flex items-center mb-5">
+                <font-awesome-icon
+                  icon="fa-briefcase"
+                  class="text-2xl w-10 text-primary"
+                />
+                <div class="ml-3">
+                  <p class="text-sm text-gray-400">Departemen</p>
+                  <p class="text-sm opacity-80">
+                    {{ employment.emp_depid?.dep_name }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <font-awesome-icon
+                  icon="fa-clock"
+                  class="text-2xl w-10 text-primary"
+                />
+                <div class="ml-3">
+                  <p class="text-sm text-gray-400">Work Shifts</p>
+                  <p class="text-sm opacity-80">
+                    {{ employment.emp_depid?.dep_workshift }}
+                  </p>
+                </div>
+              </div>
+            </section>
+            <section class="px-6 md:py-4 md:hidden">
+              <div class="flex items-center mb-5">
+                <font-awesome-icon
+                  icon="fa-dollar"
+                  class="text-2xl w-10 text-primary"
+                />
+                <div class="ml-3">
+                  <p class="text-sm text-gray-400">Salary</p>
+                  <p class="text-sm opacity-80">
+                    $ 10,000
+                    <span class="text-primary text-xs">(current)</span>
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <font-awesome-icon
+                  icon="fa-calendar"
+                  class="text-2xl w-10 text-primary"
+                />
+                <div class="ml-3">
+                  <p class="text-sm text-gray-400">Joining date</p>
+                  <p class="text-sm opacity-80">Not added yet</p>
+                </div>
+              </div>
+            </section>
+          </section>
+          <section class="px-6 md:py-4 hidden md:block">
             <div class="flex items-center mb-5">
               <font-awesome-icon
                 icon="fa-dollar"
@@ -120,32 +142,8 @@
             </div>
           </section>
         </section>
-        <section class="px-6 md:py-4 hidden md:block">
-          <div class="flex items-center mb-5">
-            <font-awesome-icon
-              icon="fa-dollar"
-              class="text-2xl w-10 text-primary"
-            />
-            <div class="ml-3">
-              <p class="text-sm text-gray-400">Salary</p>
-              <p class="text-sm opacity-80">
-                $ 10,000
-                <span class="text-primary text-xs">(current)</span>
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <font-awesome-icon
-              icon="fa-calendar"
-              class="text-2xl w-10 text-primary"
-            />
-            <div class="ml-3">
-              <p class="text-sm text-gray-400">Joining date</p>
-              <p class="text-sm opacity-80">Not added yet</p>
-            </div>
-          </div>
-        </section>
       </section>
+
       <section
         class="flex justify-between flex-col md:flex-row w-full h-auto mb-6"
       >
