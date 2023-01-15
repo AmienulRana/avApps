@@ -2,7 +2,15 @@
   <LayoutAdmin @click="activeDropdown = false">
     <section class="px-8 mt-6 w-full overflow-x-hiden">
       <section class="flex justify-between">
-        <h1 class="text-2xl">Outsite Assignment</h1>
+        <section class="flex items-center">
+          <h1 class="text-2xl">Outsite Assignment</h1>
+          <ChoiseCompany
+            v-if="superAdmin && !loading?.getCompany"
+            @selected:company="dataCompany = $event"
+            :options="optionsCompany"
+            :dataCompany="dataCompany"
+          />
+        </section>
         <div class="flex">
           <Button
             class="bg-primary rounded text-white mx-2 px-6 py-2"
@@ -49,26 +57,40 @@
         <p class="text-sm text-gray-300 mt-5 mb-3">
           Showing 1 to 10 items of 11
         </p>
-        <TableOutsideAssignment />
+        <TableOutsideAssignment
+          :outside_request="outside_request"
+          :loading="loading.getOvertimeRequest"
+          :showMessageStatus="showMessageStatus"
+          :getOvertime="getOvertimeRequest"
+        />
       </section>
     </section>
   </LayoutAdmin>
   <Modal
-    title="Assign Leave"
+    title="Add Outside Assignment"
     :showModal="modal.showModal"
     @close="modal.showModal = false"
   >
+    <template #header>
+      <ChoiseCompany
+        v-if="superAdmin && !loading?.getCompany"
+        @selected:company="dataCompany = $event"
+        :options="optionsCompany"
+        :dataCompany="dataCompany"
+      />
+    </template>
     <section @click="modal.showSelect = false">
       <SelectSearch
         label="Employee"
-        :options="getAllEmployee"
+        :options="employment"
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
+        property="emp_name"
         input_class="w-full mt-2"
         label_class="w-full text-black"
-        :selectedOption="data.employee"
-        @selected="data.employee = $event"
+        @selected="data.emp_id = $event"
+        :selectedOption="data.emp_id"
       />
       <section class="grid grid-cols-2 gap-4">
         <Input
@@ -77,6 +99,8 @@
           label="Start date"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.outside_start_date = $event"
+          :value="data?.outside_start_date"
         />
         <Input
           type="date"
@@ -84,13 +108,15 @@
           label="End Date"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.outside_end_date = $event"
+          :value="data?.outside_end_date"
         />
       </section>
       <label class="text-sm">Reason Note</label>
       <textarea
         rows="4"
         class="w-full mt-2 border outline-primary py-4"
-        v-model="data.reasonNote"
+        v-model="data.outside_reason"
       >
       </textarea>
     </section>
@@ -99,7 +125,11 @@
         <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
           Cancel
         </Button>
-        <Button class="bg-green-500 w-24 py-2 text-white rounded-md">
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleAddOvertimeRequest"
+          :disabled="loading?.addOvertimeRequest"
+        >
           Save
         </Button>
       </section>
@@ -116,7 +146,16 @@ import Modal from "../../components/Modal.vue";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Input from "@/components/Input.vue";
 import employee from "@/employee.json";
-import Loading from "@/components/Loading.vue";
+// import Loading from "@/components/Loading.vue";
+import { GetAllEmployementAPI } from "@/actions/employment";
+import { GetAllCompanyAPI } from "@/actions/company";
+import {
+  AddOvertimeRequestAPI,
+  GetOvertimeRequestAPI,
+} from "@/actions/outside-request";
+import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import decryptToken from "@/utils/decryptToken";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "OutsideAssignment",
@@ -128,7 +167,8 @@ export default {
     SelectSearch,
     Modal,
     Input,
-    Loading,
+    ChoiseCompany,
+    // Loading,
   },
   data() {
     return {
@@ -141,12 +181,27 @@ export default {
         showAbility: "hide",
       },
       data: {
-        employee: "",
-        ageDuration: "Single Day",
-        reasonNote: "",
-        leaveType: "",
+        emp_id: "",
+        outside_reason: "",
+        outside_date: "",
+        outside_start_date: "",
+        outside_end_date: "",
+      },
+      employment: [],
+      optionsCompany: [],
+      superAdmin: false,
+      outside_request: [],
+      dataCompany: {},
+      loading: {
+        getCompany: true,
+        getOvertimeRequest: true,
+        addOvertimeRequest: false,
       },
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     handleShowLayoutData() {
@@ -159,38 +214,88 @@ export default {
         this.activeDropdown = id;
       }
     },
-    showContactEmployee(id) {
-      if (this.contactEmployee === id) {
-        this.contactEmployee = false;
+    clearInputValue() {
+      for (const key in this.data) {
+        this.data[key] = "";
+      }
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
       } else {
-        this.contactEmployee = id;
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
       }
     },
-    openFileInput() {
-      this.$refs.file.click();
-    },
-    handleLeaveRequest() {},
-    viewImage(e) {
-      const files = e.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = URL.createObjectURL(files[i]);
-        this.data.attachement.push({
-          blobImgUrl: file,
-          originalFile: files[i],
-        });
-      }
-    },
-    removeImageFromPreview(image) {
-      const file = this.data.attachement.filter(
-        (img) => image.blobImgUrl !== img.blobImgUrl
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
       );
-      this.data.attachement = file;
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_name: employment?.emp_fullname,
+      }));
+      this.employment = getIdNameEmp;
+    },
+    async handleAddOvertimeRequest() {
+      this.loading.addOvertimeRequest = true;
+      const payload = {
+        ...this.data,
+        emp_id: this.data?.emp_id?._id,
+      };
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await AddOvertimeRequestAPI(queryAdminSuper, payload);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.clearInputValue();
+        this.getOvertimeRequest();
+      }
+      this.showMessageStatus(response);
+      this.loading.addOvertimeRequest = false;
+    },
+    async getOvertimeRequest() {
+      this.loading.getOvertimeRequest = true;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetOvertimeRequestAPI(queryAdminSuper);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.outside_request = response.data;
+      }
+      this.loading.getOvertimeRequest = false;
+    },
+    async getAllCompany() {
+      const response = await GetAllCompanyAPI();
+      this.optionsCompany = response.data;
+      this.dataCompany = response.data[0];
+      this.loading.getCompany = false;
     },
   },
-  computed: {
-    getAllEmployee() {
-      return this.employee.map((employe) => employe.name);
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.handleGetEmployement();
+        this.getOvertimeRequest();
+      },
+      deep: true,
     },
+  },
+  mounted() {
+    const payload = decryptToken();
+    this.superAdmin = payload?.role === "Super Admin";
+    this.getAllCompany();
   },
 };
 </script>
