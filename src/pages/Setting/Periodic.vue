@@ -21,7 +21,11 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingPeriodic :periodics="periodics" :loading="loading.get" />
+        <TableSettingPeriodic
+          :periodics="periodics"
+          :loading="loading.get"
+          :handleGetPeriodic="handleGetPeriodic"
+        />
       </section>
     </section>
   </LayoutAdmin>
