@@ -39,6 +39,7 @@
                 :class="[
                   'h-28 w-full td text-right text-sm',
                   isToday(day) ? 'bg-blue-500 text-white' : 'text-gray-400',
+                  isSunday(day) ? 'text-red-500' : '',
                 ]"
               >
                 {{ day.date }}
@@ -105,6 +106,10 @@ export default {
     isToday(day) {
       let date = moment(day.date, "DD");
       return moment().isSame(date, "day");
+    },
+    isSunday(day) {
+      // let date = new Date(day.year, day.month, day.date);
+      return day.day === "Sunday";
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
