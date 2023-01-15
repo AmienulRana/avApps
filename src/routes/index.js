@@ -19,6 +19,7 @@ import AllowDeduc from "../pages/Setting/AllowDeduc.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
 import Holiday from "../pages/Administration/Holiday.vue";
 import Home from "../pages/Home.vue";
+import Periodic from "../pages/Setting/Periodic.vue";
 import store from "../store";
 
 function requiredAuth(to, from, next) {
@@ -117,6 +118,11 @@ const routes = [
   {
     path: "/setting/allowance-deduction",
     component: AllowDeduc,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/periodic",
+    component: Periodic,
     beforeEnter: requiredAuth,
   },
   {
