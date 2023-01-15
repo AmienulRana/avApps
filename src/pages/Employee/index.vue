@@ -167,7 +167,7 @@
           @update:activeDropdown="changeDropdownActive('Role')"
         />
       </section>
-      <section class="">
+      <section class="relative">
         <p class="text-sm text-gray-300 mt-5 mb-3">
           <!-- Showing
           {{ employeeFilter?.length === 0 ? 0 : 1 }}
@@ -181,9 +181,7 @@
           }}
           items of {{ employee?.length }} -->
         </p>
-        <div class="flex justify-center mt-24" v-if="loading.employement">
-          <Loading />
-        </div>
+        <Loading v-if="loading.employement" class="mt-24" />
         <template v-else>
           <div
             class="lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid md:gap-4 gap-2"

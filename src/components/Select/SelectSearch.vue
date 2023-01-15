@@ -8,7 +8,7 @@
     <div class="relative" :class="input_class ? input_class : 'w-4/6'">
       <section
         @click.stop="$emit('handleShowSelect')"
-        class="flex text-sm justify-between items-center cursor-pointer px-4 py-1.5 border rounded-md"
+        class="flex text-sm justify-between items-center cursor-pointer px-4 py-1.5 border rounded-md h-9"
         :class="{ 'border-primary': isOpen }"
       >
         <p>

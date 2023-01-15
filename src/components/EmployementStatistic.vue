@@ -55,8 +55,10 @@ ChartJS.register(
 
 export default {
   name: "DepartementPage",
+  props: { total_employment_status: Object },
   data() {
     return {
+      employment_status: this.total_employment_status,
       statistic_by: "status",
       data: {
         labels: ["Probation", "Permanent", "Terminated"],
@@ -101,15 +103,24 @@ export default {
   },
   components: { Bar },
   methods: {
+    getValueWithoutProperty(data, property) {
+      return data.map((d) => d[property]);
+    },
     changeDataStatistik(value) {
       this.statistic_by = value;
       switch (this.statistic_by) {
         case "status":
           this.data = {
-            labels: ["Probation", "Permanent", "Terminated"],
+            labels: this.getValueWithoutProperty(
+              this.total_employment_status,
+              "status"
+            ),
             datasets: [
               {
-                data: [9, 20, 5],
+                data: this.getValueWithoutProperty(
+                  this.total_employment_status,
+                  "total_employment"
+                ),
                 ...this.data.datasets,
               },
             ],
@@ -153,6 +164,46 @@ export default {
           break;
       }
     },
+  },
+  watch: {
+    total_employment_status: {
+      handler: function (newValue) {
+        this.employment_status = newValue;
+        this.data = {
+          labels: this.getValueWithoutProperty(
+            this.total_employment_status,
+            "status"
+          ),
+          datasets: [
+            {
+              data: this.getValueWithoutProperty(
+                this.total_employment_status,
+                "total_employment"
+              ),
+              ...this.data.datasets,
+            },
+          ],
+        };
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    // this.data = {
+    //   labels: this.getValueWithoutProperty(
+    //     this.total_employment_status,
+    //     "status"
+    //   ),
+    //   datasets: [
+    //     {
+    //       data: this.getValueWithoutProperty(
+    //         this.total_employment_status,
+    //         "total_employment"
+    //       ),
+    //       ...this.data.datasets,
+    //     },
+    //   ],
+    // };
   },
 };
 </script>

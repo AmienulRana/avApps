@@ -1,6 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router";
 import Employee from "../pages/Employee/index.vue";
 import EmployeeDetail from "../pages/Employee/Detail.vue";
+import EmployeeStatus from "../pages/Employee/Status.vue";
+import EmployeeWarning from "../pages/Employee/Warning.vue";
 import Login from "../pages/Login.vue";
 import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
@@ -15,7 +17,9 @@ import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
 import AllowDeduc from "../pages/Setting/AllowDeduc.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
+import Holiday from "../pages/Administration/Holiday.vue";
 import Home from "../pages/Home.vue";
+import Periodic from "../pages/Setting/Periodic.vue";
 import store from "../store";
 
 function requiredAuth(to, from, next) {
@@ -40,6 +44,16 @@ function notRequiredAuth(to, from, next) {
 const routes = [
   { path: "/", component: Home, beforeEnter: requiredAuth },
   { path: "/employee", component: Employee, beforeEnter: requiredAuth },
+  {
+    path: "/employee-status",
+    component: EmployeeStatus,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/employee-warning",
+    component: EmployeeWarning,
+    beforeEnter: requiredAuth,
+  },
   { path: "/login", component: Login, beforeEnter: notRequiredAuth },
   {
     path: "/employee/:id",
@@ -104,6 +118,16 @@ const routes = [
   {
     path: "/setting/allowance-deduction",
     component: AllowDeduc,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/periodic",
+    component: Periodic,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/administration/holiday",
+    component: Holiday,
     beforeEnter: requiredAuth,
   },
   {

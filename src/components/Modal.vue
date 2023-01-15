@@ -14,7 +14,8 @@
       leave-active-class="animated fadeOutUp"
     >
       <div
-        class="bg-white rounded-lg relative shadow-xl transform transition-all h-full md:w-8/12 sm:w-full"
+        class="bg-white rounded-lg relative shadow-xl transform transition-all h-full sm:w-full"
+        :class="modalClass ? modalClass : 'md:w-8/12'"
         v-if="showModal"
         @click.stop
       >
@@ -64,6 +65,9 @@ export default {
     showModal: {
       type: Boolean,
       required: true,
+    },
+    modalClass: {
+      type: String,
     },
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <section
-    class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+    class="w-full overflow-x-auto custom-scrollbar bg-white relative"
     @click="showActions = null"
   >
     <table class="bg-white min-w-max mt-6 w-full pb-4">
@@ -89,18 +89,19 @@
         </tr>
       </tbody>
     </table>
-    <section class="w-full mt-10" v-if="loading">
-      <Loading />
-    </section>
+    <NoDataShowing v-if="!loading && leaves_holidays.length === 0" />
+    <Loading v-if="loading" />
   </section>
 </template>
 
 <script>
 import SwitchButton from "./SwitchButton.vue";
 import Loading from "./Loading.vue";
+import NoDataShowing from "./NoDataShowing.vue";
+
 export default {
   name: "TableSettingCuti",
-  components: { SwitchButton, Loading },
+  components: { SwitchButton, Loading, NoDataShowing },
   props: { leaveHoliday: Array, departement: Array, loading: Boolean },
   data() {
     return {

@@ -2,10 +2,10 @@ import { URL_API } from "@/config";
 import { tokenDecrypted } from "@/utils/decryptToken";
 import axios from "axios";
 
-export const AddLeaveRequestAPI = async (query, payload) => {
+export const AddOvertimeRequestAPI = async (query, payload) => {
   try {
     const response = await axios.post(
-      `${URL_API}/leave-request${query}`,
+      `${URL_API}/outside-request${query}`,
       payload,
       {
         headers: {
@@ -18,9 +18,9 @@ export const AddLeaveRequestAPI = async (query, payload) => {
     return error.response;
   }
 };
-export const GetLeaveRequestAPI = async (query) => {
+export const GetOvertimeRequestAPI = async (query) => {
   try {
-    const response = await axios.get(`${URL_API}/leave-request${query}`, {
+    const response = await axios.get(`${URL_API}/outside-request${query}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -30,10 +30,10 @@ export const GetLeaveRequestAPI = async (query) => {
     return error.response;
   }
 };
-export const EditStatusLeaveRequestAPI = async (id, payload) => {
+export const EditOvertimeRequestAPI = async (id, payload) => {
   try {
     const response = await axios.put(
-      `${URL_API}/leave-request/status/${id}`,
+      `${URL_API}/outside-request/${id}`,
       payload,
       {
         headers: {

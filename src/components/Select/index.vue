@@ -5,27 +5,29 @@
       class="text-sm"
       >{{ label }}</label
     >
-    <select
-      class="w-full border focus:outline focus:outline-primary px-3 py-1.5 bg-white rounded-md text-sm"
-      :class="input_class ? input_class : ''"
-      :disabled="disabled"
-      v-model="selectedOption"
-      @change="updateModel"
-    >
-      <option
-        v-for="(option, i) in options"
-        :key="i"
-        class="px-2 py-1"
-        :selected="
-          property
-            ? option[property] === selectedOption
-            : option === selectedOption
-        "
-        :value="property ? option[property] : option"
+    <KeepAlive>
+      <select
+        class="w-full border focus:outline focus:outline-primary px-3 py-1.5 bg-white rounded-md text-sm"
+        :class="input_class ? input_class : ''"
+        :disabled="disabled"
+        v-model="selectedOption"
+        @change="updateModel"
       >
-        {{ property ? option[property] : option }}
-      </option>
-    </select>
+        <option
+          v-for="(option, i) in options"
+          :key="i"
+          class="px-2 py-1"
+          :selected="
+            property
+              ? option[property] === selectedOption
+              : option === selectedOption
+          "
+          :value="option"
+        >
+          {{ property ? option[property] : option }}
+        </option>
+      </select>
+    </KeepAlive>
   </div>
 </template>
 

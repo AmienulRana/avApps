@@ -60,7 +60,7 @@
         />
       </div>
       <Button
-        class="bg-dodgerblue mb-2.5 text-white py-2 text-sm rounded-sm"
+        class="bg-dodgerblue mb-2.5 text-white py-2 h-9 text-sm rounded-sm relative"
         @click="handleLoginCompany"
         :disabled="loading"
       >
