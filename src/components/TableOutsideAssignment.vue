@@ -1,7 +1,7 @@
 <template>
   <section class="relative">
     <section
-      class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+      class="w-full overflow-x-auto custom-scrollbar pb-10 bg-white"
       @click="
         showActions = null;
         showReasonNote = null;
