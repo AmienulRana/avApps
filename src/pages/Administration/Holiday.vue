@@ -89,7 +89,11 @@ export default {
     let day = startDate.day();
     for (let m = moment(startDate); m.isBefore(endDate); m.add(1, "days")) {
       currentWeek[day] = { date: m.format("DD"), day: m.format("dddd") };
-      if (day === 6 || m.isSame(endDate, "day")) {
+      if (
+        day === 6 ||
+        m.isSame(endDate, "day") ||
+        m.date() === moment(m).endOf("month").date()
+      ) {
         this.weeksInPeriod.push(currentWeek);
         currentWeek = [];
         day = 0;
