@@ -195,7 +195,7 @@
           </tr>
         </tbody>
       </table>
-      <NoDataShowing v-if="!loadingGet && overtime_request.length === 0" />
+      <NoDataShowing v-if="!loading && overtime_request.length === 0" />
     </section>
     <Loading class="mt-10" v-if="loading" />
   </section>
