@@ -215,7 +215,8 @@ export default {
       };
       const response = await EditAllowDeductAPI(id, data);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetAllowDeduct();
@@ -228,7 +229,8 @@ export default {
     async handleDeleteAllowDeduct(id) {
       const response = await DeleteAllowDeductAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetAllowDeduct();
