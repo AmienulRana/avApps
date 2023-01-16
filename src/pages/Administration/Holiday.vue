@@ -19,9 +19,15 @@
       </section>
       <section class="bg-white mt-10 py-5 px-10 mb-10">
         <section class="mb-2">
-          <h1 class="text-xl text-gray-400 ml-5">January 2023</h1>
+          <h1 class="text-xl ml-5">
+            {{ periodic?.periodic_month }} {{ periodic?.periodic_years }}
+          </h1>
+          <p class="ml-5 text-sm text-gray-400">
+            {{ periodic?.periodic_start_date }} -
+            {{ periodic?.periodic_end_date }}
+          </p>
         </section>
-        <section class="w-full mt-10 border">
+        <section class="w-full mt-10">
           <div class="grid grid-cols-7 thead">
             <p
               v-for="day in days"
@@ -58,6 +64,7 @@ import Layout from "@/components/Layout/Admin.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import { GetPeriodicActiveAPI } from "@/actions/periodic";
 
 export default {
   name: "HolidayPage",
@@ -77,17 +84,22 @@ export default {
       options: [],
       superAdmin: false,
       dataCompany: {},
+      periodic: {},
       loading: {
         employement: true,
       },
     };
   },
   mounted() {
-    let startDate = moment("2022-12-25");
-    let endDate = moment("2023-01-25");
+    let startDate = moment(this.periodic?.periodic_start_date || "2022-12-25");
+    let endDate = moment(this.periodic?.periodic_end_date || "2023-01-25");
     let currentWeek = [];
     let day = startDate.day();
-    for (let m = moment(startDate); m.isBefore(endDate); m.add(1, "days")) {
+    for (
+      let m = moment(startDate);
+      m.isSameOrBefore(endDate);
+      m.add(1, "days")
+    ) {
       currentWeek[day] = { date: m.format("DD"), day: m.format("dddd") };
       if (
         day === 6 ||
@@ -106,6 +118,14 @@ export default {
     this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
   },
+  watch: {
+    dataCompany: {
+      handler: function () {
+        this.getPeriodic();
+      },
+      deep: true,
+    },
+  },
   methods: {
     isToday(day) {
       let date = moment(day.date, "DD");
@@ -120,6 +140,11 @@ export default {
       this.options = response.data;
       this.dataCompany = response.data[0];
       this.loading.employement = false;
+    },
+    async getPeriodic() {
+      const querySuperAdmin = `?company_id=${this?.dataCompany?._id}`;
+      const response = await GetPeriodicActiveAPI(querySuperAdmin);
+      this.periodic = response.data;
     },
   },
 };
