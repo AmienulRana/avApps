@@ -10,7 +10,9 @@
         </h1>
       </section>
       <section class="bg-white w-full relative">
-        <Loading v-if="loading" />
+        <section class="bg-white w-full grid shadow-md md:h-64" v-if="loading">
+          <Loading />
+        </section>
         <section
           v-else
           class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
@@ -43,17 +45,11 @@
                 {{ personal_detail?.emp_fullname }}
               </h1>
               <Button
-                class="bg-primary m-auto md:mx-0 px-4 text-sm py-1 my-2 text-white rounded-full"
-                :class="
-                  employment?.emp_status === 'Permanent'
-                    ? 'bg-blue-500'
-                    : employment?.emp_status === 'Probation'
-                    ? 'bg-orange-500'
-                    : 'bg-red-600'
-                "
+                class="px-4 text-sm py-1 my-2 text-white rounded-full"
+                :style="`background:${employment?.emp_status?.empstatus_color}`"
               >
-                {{ employment?.emp_status }}</Button
-              >
+                {{ employment?.emp_status?.empstatus_name }}
+              </Button>
               <p class="text-sm text-gray-400">
                 {{ employment.emp_desid?.des_name }}
               </p>
