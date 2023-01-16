@@ -61,14 +61,27 @@
         @handleShowSelect="show_select = 'jabatan'"
         @selected="data.emp_desid = $event"
       />
-      <Select
+      <SelectSearch
+        :options="empStatus"
+        property="empstatus_name"
+        :selectedOption="data?.emp_status"
+        label="Status Karyawan"
+        position="bottom"
+        input_class="md:w-4/6 mt-2"
+        :isOpen="show_select === 'status'"
+        @handleShowSelect="show_select = 'status'"
+        @selected="data.emp_status = $event"
+      />
+      <!-- <Select
         label="Status Karyawan"
         input_class="md:w-4/6 mt-2"
         class="mb-2.5"
-        :value="data?.emp_status"
-        :options="['Permanent', 'Probation', 'Contract']"
+        property="empstatus_name"
+        :value="data?.emp_status?.empstatus_name"
+        :options="empStatus"
         @change="data.emp_status = $event"
-      />
+        select_property="_id"
+      /> -->
       <Select
         label="Tanggungan"
         input_class="md:w-4/6 mt-2"
@@ -80,6 +93,7 @@
       <SelectSearch
         :options="designation"
         label="Atasan Pertama"
+        property="des_name"
         @selected="data.emp_fsuperior = $event"
         :selectedOption="data?.emp_fsuperior"
         input_class="md:w-4/6 mt-2"
@@ -91,6 +105,7 @@
         :options="designation"
         :selectedOption="data?.emp_ssuperior"
         @selected="data.emp_ssuperior = $event"
+        property="des_name"
         label="Atasan Kedua"
         input_class="md:w-4/6 mt-2"
         position="top"
@@ -134,6 +149,8 @@ import { GetDepartementAPI } from "@/actions/departement";
 import { GetDesignationAPI } from "@/actions/designation";
 import { EditEmployementAPI } from "@/actions/employment";
 import { useToast } from "vue-toastification";
+import { GetEmpStatusAPI } from "@/actions/emp-status";
+
 import EmployementShift from "./EmploymentShift.vue";
 
 export default {
@@ -169,6 +186,7 @@ export default {
         company_id: this.employment?.company_id,
         emp_tanggungan: this.employment?.emp_tanggungan,
       },
+      empStatus: [],
       departement: [],
       designation: [],
     };
@@ -216,12 +234,24 @@ export default {
       }
       this.designation = response.data;
     },
+    async getEmpStatus() {
+      const queryAdminSuper = `?company_id=${this.data?.company_id}`;
+      const response = await GetEmpStatusAPI(queryAdminSuper);
+
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.empStatus = response.data;
+    },
     async handleEditEmployement() {
       this.loading = true;
       const data = {
         ...this.data,
         emp_depid: this.data?.emp_depid?._id,
         emp_desid: this.data?.emp_desid?._id,
+        emp_fsuperior: this.data?.emp_fsuperior?._id,
+        emp_ssuperior: this.data?.emp_ssuperior?._id,
       };
       const { id } = this.$route.params;
       const response = await EditEmployementAPI(id, data);
@@ -245,6 +275,7 @@ export default {
   mounted() {
     this.handleGetDepartement();
     this.handleGetDesignation();
+    this.getEmpStatus();
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
     const buttonWidth = this.$refs.first_tab?.offsetWidth;
     const buttonPosition = this.$refs.first_tab?.offsetLeft;
