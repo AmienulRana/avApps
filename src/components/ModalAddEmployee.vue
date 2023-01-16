@@ -200,9 +200,11 @@
               label="Status Karyawan"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
+              property="empstatus_name"
               :value="employment.emp_status"
               @change="employment.emp_status = $event"
-              :options="['Permanent', 'Probation', 'Contract']"
+              :options="empStatus"
+              select_property="_id"
             />
             <Select
               label="Tanggungan"
@@ -265,13 +267,14 @@
           >
             <Select
               :label="day.name"
-              input_class="md:w-4/6 mt-2 md:mt-0"
+              input_class="md:w-4/6 mt-2"
               class="w-full mr-6"
               property="shift_desc"
-              :options="shift_data"
-              :disabled="attadance_day[day.name.toLowerCase()].off_day"
               :value="attadance_day[day.name.toLowerCase()].shift"
               @change="attadance_day[day.name.toLowerCase()].shift = $event"
+              :options="shift_data"
+              select_property="_id"
+              :disabled="attadance_day[day.name.toLowerCase()].off_day"
             />
             <SwitchButton
               @update:model="
@@ -387,6 +390,7 @@ import SwitchButton from "./SwitchButton.vue";
 import { AddEmploymentAPI } from "@/actions/employment";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetAllCompanyAPI } from "@/actions/company";
+import { GetEmpStatusAPI } from "@/actions/emp-status";
 import { GetShiftAPI } from "@/actions/shift";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "./ChoiseCompany.vue";
@@ -411,20 +415,20 @@ export default {
       show_select: "",
       previewImage: null,
       personal: {
-        emp_firstname: "",
-        emp_lastname: "",
-        email: "",
-        emp_nikktp: "",
-        emp_phone: null,
-        emp_gender: "",
-        emp_marital_status: "",
-        emp_birthday: "",
-        emp_blood: "",
+        emp_firstname: "Amienul",
+        emp_lastname: "Rana",
+        email: "amienulrana@gmail.com",
+        emp_nikktp: "12312319231",
+        emp_phone: "0812607861212",
+        emp_gender: "Laki-Laki",
+        emp_marital_status: "Belum menikah",
+        emp_birthday: "13/10/2004",
+        emp_blood: "O+",
       },
       employment: {
-        username: "",
-        password: "",
-        emp_nik_karyawan: "",
+        username: "amienul",
+        password: "amienul",
+        emp_nik_karyawan: "121312",
         emp_depid: "",
         emp_desid: "",
         emp_status: "",
@@ -434,13 +438,13 @@ export default {
         emp_location: "",
       },
       attadance_day: {
-        senin: { shift: "", off_day: false, _id: "" },
-        selasa: { shift: "", off_day: false, _id: "" },
-        rabu: { shift: "", off_day: false, _id: "" },
-        kamis: { shift: "", off_day: false, _id: "" },
-        jumat: { shift: "", off_day: false, _id: "" },
-        sabtu: { shift: "", off_day: false, _id: "" },
-        minggu: { shift: "", off_day: false, _id: "" },
+        senin: { shift: "", off_day: false },
+        selasa: { shift: "", off_day: false },
+        rabu: { shift: "", off_day: false },
+        kamis: { shift: "", off_day: false },
+        jumat: { shift: "", off_day: false },
+        sabtu: { shift: "", off_day: false },
+        minggu: { shift: "", off_day: false },
       },
       basic_salary: {
         periode: "",
@@ -462,6 +466,7 @@ export default {
       tabActive: "Personal",
       departement: [],
       designation: [],
+      empStatus: [],
       options: [],
       superAdmin: false,
       dataCompany: {},
@@ -552,8 +557,8 @@ export default {
         ...this.employment,
         emp_depid: this.employment.emp_depid?._id,
         emp_desid: this.employment.emp_desid?._id,
-        emp_fsuperior: this.employment.emp_fsuperior?.des_name,
-        emp_ssuperior: this.employment.emp_ssuperior?.des_name,
+        emp_fsuperior: this.employment.emp_fsuperior?._id,
+        emp_ssuperior: this.employment.emp_ssuperior?._id,
       };
       const salary = {
         emp_salary: Number(this.basic_salary.salary),
@@ -562,18 +567,12 @@ export default {
         emp_periode: this.basic_salary.periode,
       };
 
-      for (const day in this.attadance_day) {
-        const value = this.attadance_day[day];
-        this.attadance_day[day] = {
-          shift: value.shift._id,
-          off_day: value.off_day,
-        };
-      }
-
       const data = {
         ...this.personal,
         ...employment,
       };
+      console.log(this.attadance_day);
+      console.log(employment);
       const formData = new FormData();
       formData.append("profile", this.$store.state.file);
       formData.append("attadance", JSON.stringify(this.attadance_day));
@@ -582,7 +581,6 @@ export default {
         formData.append(key, data[key]);
       }
 
-      // console.log(salary);
       const response = await AddEmploymentAPI(
         formData,
         `?company=${this.dataCompany?._id}`
@@ -611,6 +609,17 @@ export default {
         this.shift_data = getShiftDesc;
       }
     },
+    async getEmpStatus() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetEmpStatusAPI(queryAdminSuper);
+
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.empStatus = response.data;
+      this.loading.getStatus = false;
+    },
   },
   watch: {
     dataCompany: {
@@ -618,6 +627,7 @@ export default {
         this.handleGetDepartement();
         this.handleGetDesignation();
         this.getShift();
+        this.getEmpStatus();
       },
       deep: true,
     },
