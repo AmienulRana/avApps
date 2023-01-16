@@ -46,7 +46,7 @@
               </h1>
               <Button
                 class="px-4 text-sm py-1 my-2 text-white rounded-full"
-                :style="`background:${employe?.emp_status?.empstatus_color}`"
+                :style="`background:${employment?.emp_status?.empstatus_color}`"
               >
                 {{ employment?.emp_status?.empstatus_name }}
               </Button>
