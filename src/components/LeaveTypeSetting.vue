@@ -20,37 +20,48 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border-b h-max">
+          <tr
+            class="border-b h-max"
+            v-for="(leave, i) in leave_setting"
+            :key="i"
+          >
             <td class="p-3 text-sm">
-              <p class="text-sm">1</p>
+              <p class="text-sm">{{ i + 1 }}</p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm">Cuti Tahunan</p>
+              <p class="text-sm">{{ leave?.leave_name }}</p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm">Paid</p>
+              <p class="text-sm">{{ leave?.leave_type }}</p>
             </td>
             <td class="p-3 text-sm">
               <SwitchButton
                 class="w-max"
-                @update:model="(value) => updateStatus(value, periodic)"
-                :value="periodic?.periodic_status"
+                @update:model="(value) => updateStatus(value, leave)"
+                :value="leave?.leave_status"
               />
             </td>
-            <td class="p-3 text-right relative">
+            <td class="p-3 text-right relative flex">
               <Button
-                class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-                @click.stop="showActions = 0"
+                class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                @click="detailLeave(leave)"
               >
-                <font-awesome-icon icon="fa-ellipsis" />
+                <font-awesome-icon icon="fa-pen-to-square" />
+              </Button>
+              <Button
+                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                @click="handleDeleteLeaveType(leave?._id)"
+              >
+                <font-awesome-icon icon="fa-trash-alt" />
               </Button>
             </td>
           </tr>
         </tbody>
       </table>
+      <NoDataShowing v-if="leave_setting.length === 0" />
     </section>
     <Modal
-      title="Add Periodic"
+      :title="`${modeEdit ? 'Edit' : 'Add'} Leave Type`"
       modalClass="md:w-1/2"
       :showModal="showModal"
       @close="showModal = false"
@@ -69,6 +80,8 @@
           class="flex-col mt-4"
           label_class="w-full"
           input_class="mt-2"
+          @change="data.leave_name = $event"
+          :value="data.leave_name"
         />
         <Select
           class="flex-col mt-4"
@@ -76,6 +89,8 @@
           label_class="w-full"
           label="Type"
           :options="['Paid', 'Unpaid']"
+          @change="data.leave_type = $event"
+          :value="data.leave_type"
         />
       </section>
       <template #footer>
@@ -85,10 +100,19 @@
           </Button>
           <Button
             class="bg-green-500 w-24 py-2 text-white rounded-md"
-            @click="handleAddPeriodic"
+            @click="handleAddLeaveType"
             :disabled="loadingData"
+            v-if="!modeEdit"
           >
             Save
+          </Button>
+          <Button
+            class="bg-green-500 w-24 py-2 text-white rounded-md"
+            @click="handleEditLeaveType"
+            :disabled="loadingData"
+            v-else
+          >
+            Edit
           </Button>
         </section>
       </template>
@@ -105,22 +129,50 @@ import Select from "./Select/index.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
+import {
+  AddLeaveSettingAPI,
+  EditLeaveSettingAPI,
+  DeleteLeaveSettingAPI,
+  GetLeaveSettingAPI,
+} from "@/actions/leave-setting";
+
+import { useToast } from "vue-toastification";
+import NoDataShowing from "./NoDataShowing.vue";
 
 export default {
-  components: { Button, SwitchButton, Modal, Input, ChoiseCompany, Select },
+  components: {
+    Button,
+    SwitchButton,
+    Modal,
+    Input,
+    ChoiseCompany,
+    Select,
+    NoDataShowing,
+  },
   name: "LeaveTypeSetting",
   data() {
     return {
       showModal: false,
       superAdmin: false,
+      modeEdit: false,
       options: [],
       dataCompany: {},
       loadingData: false,
+      leave_setting: [],
+      data: {
+        leave_id: "",
+        leave_name: "",
+        leave_type: "",
+      },
       loading: {
         company: true,
         get: true,
       },
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     async getAllCompany() {
@@ -128,6 +180,86 @@ export default {
       this.options = response?.data;
       this.dataCompany = response?.data[0];
       this.loading.company = false;
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
+    async getLeaveType() {
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetLeaveSettingAPI(querySuperAdmin);
+      if (response?.status == 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      console.log(response);
+      if (response?.status === 200) {
+        this.leave_setting = response.data;
+      }
+    },
+    async handleAddLeaveType() {
+      this.loadingData = true;
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+      const response = await AddLeaveSettingAPI(querySuperAdmin, this.data);
+      if (response.status == 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.data.leave_name = "";
+        this.data.leave_type = "";
+        this.showModal = false;
+        this.getLeaveType();
+      }
+      this.showMessageStatus(response);
+      this.loadingData = false;
+    },
+    async handleDeleteLeaveType(id) {
+      const response = await DeleteLeaveSettingAPI(id);
+      if (response.status == 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.getLeaveType();
+      }
+      this.showMessageStatus(response);
+    },
+    async handleEditLeaveType() {
+      this.loadingData = true;
+      const response = await EditLeaveSettingAPI(this.data.leave_id, this.data);
+      if (response.status == 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.data.leave_name = "";
+        this.data.leave_type = "";
+        this.showModal = false;
+        this.getLeaveType();
+      }
+      this.showMessageStatus(response);
+      this.loadingData = false;
+    },
+    detailLeave(leave) {
+      this.modeEdit = true;
+      this.showModal = true;
+      this.data.leave_name = leave?.leave_name;
+      this.data.leave_type = leave?.leave_type;
+      this.data.leave_id = leave?._id;
+    },
+  },
+  watch: {
+    dataCompany: {
+      handler() {
+        this.getLeaveType();
+      },
+      deep: true,
     },
   },
   mounted() {
