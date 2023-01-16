@@ -11,11 +11,11 @@
             :dataCompany="dataCompany"
           />
         </section>
-        <Button
+        <!-- <Button
           class="bg-primary text-white px-6 py-2 text-sm rounded-md mt-2 md:mt-0"
           @click="showModal = true"
           >Add Holiday</Button
-        >
+        > -->
       </section>
       <section class="bg-white mt-10 py-5 px-10 mb-10">
         <section class="mb-2">
