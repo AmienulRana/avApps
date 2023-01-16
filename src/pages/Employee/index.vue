@@ -226,15 +226,9 @@
               </p>
               <Button
                 class="px-4 text-sm py-1 my-2 text-white rounded-full"
-                :class="
-                  employe?.emp_status === 'Permanent'
-                    ? 'bg-blue-500'
-                    : employe?.emp_status === 'Probation'
-                    ? 'bg-orange-500'
-                    : 'bg-red-600'
-                "
+                :style="`background:${employe?.emp_status?.empstatus_color}`"
               >
-                {{ employe?.emp_status }}
+                {{ employe?.emp_status?.empstatus_name }}
               </Button>
               <p class="text-sm md:text-base text-gray-400">
                 {{ employe?.emp_depid?.dep_name }}
