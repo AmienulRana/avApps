@@ -65,6 +65,7 @@
               </tr>
             </tbody>
           </table>
+          <NoDataShowing v-if="!loading.getStatus && empStatus.length === 0" />
           <Loading v-if="loading.getStatus" />
         </section>
       </section>
@@ -165,6 +166,7 @@ import {
   EditEmpStatusAPI,
 } from "@/actions/emp-status";
 import { useToast } from "vue-toastification";
+import NoDataShowing from "@/components/NoDataShowing.vue";
 
 export default {
   name: "EmploymentStatusPage",
@@ -176,6 +178,7 @@ export default {
     Input,
     Select,
     ChoiseCompany,
+    NoDataShowing,
   },
   data() {
     return {
