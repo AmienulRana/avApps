@@ -26,6 +26,18 @@ export const GetPeriodicAPI = async (query) => {
     return error.response;
   }
 };
+export const GetPeriodicActiveAPI = async (query) => {
+  try {
+    const response = await axios.get(`${URL_API}/periodic/status${query}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const ChangeStatusPeriodicAPI = async (id) => {
   try {
     const response = await axios.put(
