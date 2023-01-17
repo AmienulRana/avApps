@@ -30,22 +30,23 @@ export default {
 
 .dot {
   border-radius: 50%;
-  width: 10px;
-  height: 10px;
+  width: 8.5px;
+  height: 8.5px;
   margin: 0 5px;
-  animation: dot-blink 1.4s ease-in-out infinite;
+  opacity: 0.7;
+  animation: dot-blink 1s ease-in-out infinite;
 }
 
 .dot:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.1s;
 }
 
 .dot:nth-child(3) {
-  animation-delay: 0.5s;
+  animation-delay: 0.3s;
 }
 
 .dot:nth-child(4) {
-  animation-delay: 0.7s;
+  animation-delay: 0.5s;
 }
 
 @keyframes dot-blink {
@@ -53,7 +54,7 @@ export default {
     transform: scale(0);
   }
   20% {
-    transform: scale(1.5);
+    transform: scale(1.2);
   }
   100% {
     transform: scale(0);
