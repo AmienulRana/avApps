@@ -18,6 +18,7 @@ import Jabatan from "../pages/Organisasi/Jabatan.vue";
 import AllowDeduc from "../pages/Setting/AllowDeduc.vue";
 import Departement from "../pages/Organisasi/Departement.vue";
 import Holiday from "../pages/Administration/Holiday.vue";
+import Announcement from "../pages/Administration/Announcement.vue";
 import Home from "../pages/Home.vue";
 import Periodic from "../pages/Setting/Periodic.vue";
 import LeaveSetting from "../pages/Setting/LeaveSetting.vue";
@@ -134,6 +135,11 @@ const routes = [
   {
     path: "/administration/holiday",
     component: Holiday,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/administration/announcements",
+    component: Announcement,
     beforeEnter: requiredAuth,
   },
   {
