@@ -111,6 +111,15 @@ export default {
       },
       deep: true,
     },
+    holidays: {
+      handler: function () {
+        this.handleCalender(
+          this.periodic?.periodic_start_date,
+          this.periodic?.periodic_end_date
+        );
+      },
+      deep: true,
+    },
   },
   methods: {
     handleCalender(periodic_start_date, periodic_end_date) {
@@ -151,15 +160,19 @@ export default {
     },
     checkHoliday(date) {
       const holiday = this.holidays.find((holiday) => {
-        moment(holiday?.leavehol_startdate).isSameOrBefore(date) &&
-          moment(holiday?.leavehol_enddate).isSameOrAfter(date);
+        return moment(date).isBetween(
+          holiday?.leavehol_startdate,
+          holiday?.leavehol_enddate,
+          "days",
+          "[]"
+        );
       });
+      console.log(holiday);
       if (holiday) {
         return { isHoliday: true, holidayName: holiday.leavehol_desc };
       } else {
         return { isHoliday: false, holidayName: "" };
       }
-      // return { isHoliday: false, holidayName: "" };
     },
     isToday(day) {
       const newDate = `${day?.date}-${day?.month}-${day?.years}`;
@@ -184,11 +197,6 @@ export default {
       }
       this.periodic = response.data;
       this.getLeaveHoliday();
-
-      this.handleCalender(
-        response.data?.periodic_start_date,
-        response.data?.periodic_end_date
-      );
     },
     async getLeaveHoliday() {
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
@@ -198,7 +206,7 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      const selectPropertyHoliday = response?.data.map((holiday) => ({
+      const selectPropertyHoliday = response?.data?.map((holiday) => ({
         leavehol_desc: holiday?.leavehol_desc,
         leavehol_enddate: holiday?.leavehol_enddate,
         leavehol_startdate: holiday?.leavehol_startdate,
