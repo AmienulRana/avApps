@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <section class="md:px-8 px-4 mt-6 w-full">
+    <section class="md:px-8 px-4 mt-6 w-full relative">
       <section class="flex justify-between items-center flex-wrap">
         <section class="flex items-center">
           <h1 class="md:text-2xl text-lg">Holiday</h1>
@@ -60,6 +60,7 @@
           </div>
         </section>
       </section>
+      <Loading v-if="loading.calendar" />
     </section>
   </Layout>
 </template>
@@ -72,10 +73,11 @@ import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { GetPeriodicActiveAPI } from "@/actions/periodic";
 import { GetLeaveHolidayAPI } from "@/actions/leave-holiday";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "HolidayPage",
-  components: { Layout, ChoiseCompany },
+  components: { Layout, ChoiseCompany, Loading },
   data() {
     return {
       days: [
@@ -94,6 +96,7 @@ export default {
       superAdmin: false,
       dataCompany: {},
       loading: {
+        calendar: true,
         employement: true,
       },
     };
@@ -117,6 +120,7 @@ export default {
           this.periodic?.periodic_start_date,
           this.periodic?.periodic_end_date
         );
+        this.loading.calendar = false;
       },
       deep: true,
     },
@@ -167,7 +171,6 @@ export default {
           "[]"
         );
       });
-      console.log(holiday);
       if (holiday) {
         return { isHoliday: true, holidayName: holiday.leavehol_desc };
       } else {
