@@ -86,7 +86,7 @@ import NoDataShowing from "./NoDataShowing.vue";
 export default {
   name: "TableSettingPeriodic",
   components: { SwitchButton, Loading, NoDataShowing },
-  props: { periodics: Object, loading: Boolean },
+  props: { periodics: Object, loading: Boolean, handleGetPeriodic: Function },
   data() {
     return {
       showActions: null,
@@ -107,10 +107,12 @@ export default {
     async updateStatus(value, periodic) {
       periodic.periodic_status = value;
       const response = await ChangeStatusPeriodicAPI(periodic?._id);
-      console.log(response);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.handleGetPeriodic();
       }
     },
   },

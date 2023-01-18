@@ -17,12 +17,8 @@
           v-for="(option, i) in options"
           :key="i"
           class="px-2 py-1"
-          :selected="
-            property
-              ? option[property] === selectedOption
-              : option === selectedOption
-          "
-          :value="option"
+          :selected="property ? option[property] === value : option === value"
+          :value="select_property ? option[select_property] : option"
         >
           {{ property ? option[property] : option }}
         </option>
@@ -43,6 +39,7 @@ export default {
     disabled: Boolean,
     value: String,
     property: String,
+    select_property: String,
   },
   data() {
     return {

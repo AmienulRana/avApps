@@ -1,5 +1,8 @@
 <template>
-  <div class="md:flex justify-between items-center mb-5">
+  <div
+    class="md:flex justify-between items-center mb-5"
+    :class="disabled ? 'opacity-70' : ''"
+  >
     <label
       :class="label_class ? label_class : 'w-1/5'"
       class="text-sm text-gray-400"
@@ -52,7 +55,7 @@
             <p
               v-for="(option, i) in searchResult"
               :key="i"
-              @click="$emit('selected', option)"
+              @click="handleSelected(option)"
               class="px-4 py-2 text-gray-400 text-sm justify-between items-center duration-100 cursor-pointer flex"
               :class="
                 property
@@ -89,6 +92,7 @@ export default {
       type: String,
       default: "bottom",
     },
+    disabled: Boolean,
   },
   emits: ["handleShowSelect", "selected"],
   data() {
@@ -98,12 +102,24 @@ export default {
     };
   },
   methods: {
+    handleSelected(option) {
+      this.$emit("selected", option);
+    },
     handleSearchOption() {
       if (this.query.length >= 1) {
-        const result = this.options.filter((option) =>
-          option.toLowerCase().includes(this.query.toLowerCase())
-        );
-        this.searchResult = result;
+        if (this.property) {
+          const result = this.options.filter((option) =>
+            option[this.property]
+              .toLowerCase()
+              .includes(this.query.toLowerCase())
+          );
+          this.searchResult = result;
+        } else {
+          const result = this.options.filter((option) =>
+            option.toLowerCase().includes(this.query.toLowerCase())
+          );
+          this.searchResult = result;
+        }
       } else {
         this.searchResult = this.options;
       }

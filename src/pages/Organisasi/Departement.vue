@@ -288,15 +288,15 @@ export default {
       this.loading.departement = false;
     },
     async handleGetDepartement() {
+      this.loading.departement = true;
+
       const querySuperAdmin = `?company=${this.dataCompany._id}`;
-      const response = await GetDepartementAPI(
-        this.superAdmin ? querySuperAdmin : ""
-      );
+      const response = await GetDepartementAPI(querySuperAdmin);
       if (response.status === 401) {
         return (window.location.href = "/login");
       }
-      console.log(response);
       this.departements = response.data;
+      this.loading.departement = false;
     },
     async handleAddDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany._id}`;

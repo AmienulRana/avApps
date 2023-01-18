@@ -5,18 +5,22 @@
   <KeepAlive>
     <div
       class="flex items-center mb-2.5"
+      @click="show_select = ''"
       v-for="(day, i) in shift_day"
       :key="i"
     >
-      <Select
-        :label="i"
-        input_class="md:w-4/6 mt-2 md:mt-0"
-        class="w-full mr-6"
-        property="shift_desc"
+      <SelectSearch
         :options="shift_data"
-        :value="day.shift_desc"
+        :selectedOption="day"
+        @selected="handleSelected(i, $event)"
+        property="shift_desc"
+        :label="i"
+        input_class="md:w-4/6 md:mt-0"
+        class="w-full mr-6"
+        :position="i === 'minggu' ? 'bottom' : 'top'"
+        :isOpen="show_select === i"
+        @handleShowSelect="day.off_day ? () => {} : (show_select = i)"
         :disabled="day.off_day"
-        @change="day.shift_desc = $event"
       />
       <SwitchButton
         @update:model="(value) => (day.off_day = value)"
@@ -36,17 +40,19 @@
 
 <script>
 import SwitchButton from "./SwitchButton.vue";
-import Select from "./Select/index.vue";
+import SelectSearch from "./Select/SelectSearch.vue";
 import Button from "./Button.vue";
 import { EditWorkShiftAPI, GetShiftEmpAPI } from "@/actions/employment";
 import { useToast } from "vue-toastification";
+
 export default {
   name: "EmploymentShift",
-  components: { SwitchButton, Button, Select },
+  components: { SwitchButton, Button, SelectSearch },
   props: { emp_attadance: Object },
   data() {
     return {
       shift_data: [],
+      show_select: "",
       shift_day: {
         senin: {
           shift_desc: this.emp_attadance.senin?.shift?.shift_desc,
@@ -109,6 +115,10 @@ export default {
         }
       }
     },
+    handleSelected(day, value) {
+      this.shift_day[day].shift_desc = value?.shift_desc;
+      this.shift_day[day].shift = value?._id;
+    },
     async getShift() {
       const { id } = this.$route.params;
       const response = await GetShiftEmpAPI(id);
@@ -127,7 +137,7 @@ export default {
   },
   mounted() {
     this.getShift();
-    console.log(this.emp_attadance);
+    // console.log(this.emp_attadance);
   },
 };
 </script>

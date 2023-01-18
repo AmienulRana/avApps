@@ -205,7 +205,7 @@ export default {
           title: "Administration",
           icon: "fa-briefcase",
           contents: [
-            { text: "Users & Roles", to: "/administration/user-and-roles" },
+            // { text: "Users & Roles", to: "/administration/user-and-roles" },
             { text: "Holiday", to: "/administration/holiday" },
             { text: "Announcements", to: "/administration/announcements" },
           ],
@@ -224,8 +224,6 @@ export default {
             },
             { text: "App Settings", to: "/setting/app" },
             { text: "Leave Settings", to: "/setting/leave" },
-            { text: "Attadance Settings", to: "/setting/attadance" },
-            { text: "Payroll Settings", to: "/setting/payroll" },
           ],
         },
       ],
