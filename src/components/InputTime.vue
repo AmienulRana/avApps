@@ -19,7 +19,7 @@
     </div>
     <div
       v-if="isOpen"
-      class="origin-top-right flex absolute right-0 mt-2 rounded-md shadow-lg"
+      class="origin-top-right bg-white z-10 flex absolute right-0 mt-2 rounded-md shadow-lg"
     >
       <div
         class="rounded-md bg-white w-32 shadow-xs h-44 overflow-y-auto custom-scrollbar"
