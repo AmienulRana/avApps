@@ -8,6 +8,7 @@ export const GetAllCompanyAPI = async () => {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
+      withCredentials: true,
     });
     return response;
   } catch (error) {
@@ -20,6 +21,7 @@ export const GetDahsboardAPI = async (query) => {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
+      withCredentials: true,
     });
     return response;
   } catch (error) {
