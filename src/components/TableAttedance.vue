@@ -10,6 +10,7 @@
             <th class="text-left text-sm">Profile</th>
             <th class="text-left text-sm">Clock In</th>
             <th class="text-left text-sm">Clock out</th>
+            <th class="text-left text-sm">Status</th>
             <th class="text-left text-sm">Behaviour</th>
             <th class="text-left text-sm">Type</th>
             <th class="text-left text-sm">Total Hours</th>
@@ -25,7 +26,15 @@
               <div
                 class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
               >
-                <h2 class="text-md text-white">IA</h2>
+                <h2 class="text-md text-white">
+                  {{
+                    attedance?.emp_id?.emp_fullname.substr(0, 1) +
+                    attedance?.emp_id?.emp_fullname.substr(
+                      attedance?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                      1
+                    )
+                  }}
+                </h2>
               </div>
               <div class="ml-5">
                 <h1 class="text-blue-400 text-base">
@@ -52,8 +61,27 @@
             </td>
             <td class="p-3 text-sm">
               <p
+                class="text-sm"
+                :class="
+                  attedance?.attendance_status === 'Absent'
+                    ? 'text-red-500'
+                    : ''
+                "
+              >
+                {{ attedance?.attendance_status }}
+              </p>
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                v-if="attedance?.behavior_at !== '-'"
                 class="flex py-1 text-white w-24 items-center justify-center rounded-full"
                 :class="backgroundBehavior(attedance?.behavior_at)"
+              >
+                {{ attedance?.behavior_at }}
+              </p>
+              <p
+                v-else
+                class="flex py-1 text-gray-400 w-24 items-center justify-center rounded-full"
               >
                 {{ attedance?.behavior_at }}
               </p>
