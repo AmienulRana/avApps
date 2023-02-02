@@ -7,7 +7,7 @@
           <ChoiseCompany
             v-if="superAdmin"
             @selected:company="dataCompany = $event"
-            :options="optionsCompany"
+            :options="options"
             :dataCompany="dataCompany"
           />
         </section>
@@ -122,7 +122,7 @@ export default {
       },
       attendances: [],
       dates_periodic: [],
-      optionsCompany: [],
+      options: [],
       employment: [],
       superAdmin: false,
       dataCompany: {},
@@ -149,7 +149,7 @@ export default {
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
-      this.optionsCompany = response?.data;
+      this.options = response?.data;
       this.dataCompany = response?.data[0];
       this.loading.getCompany = false;
     },
