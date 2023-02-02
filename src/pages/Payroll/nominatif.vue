@@ -154,19 +154,21 @@
                       </li>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="status = 'Approve Finance'"
+                        @click="
+                          handleEditPayslip(payrun?._id, 'Approve Finance')
+                        "
                       >
                         Approve Finance
                       </li>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="status = 'Pending'"
+                        @click="handleEditPayslip(payrun?._id, 'Pending')"
                       >
                         Pending
                       </li>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="status = 'Cancel Payrun'"
+                        @click="handleEditPayslip(payrun?._id, 'Cancel Payrun')"
                       >
                         Cancel Payrun
                       </li>
@@ -317,7 +319,11 @@ import Loading from "../../components/Loading.vue";
 import NoDataShowing from "../../components/NoDataShowing.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
-import { GeneratePayslipAPI, GetPayslipAPI } from "@/actions/payrun";
+import {
+  GeneratePayslipAPI,
+  GetPayslipAPI,
+  EditPayrunStatusAPI,
+} from "@/actions/payrun";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
 
@@ -410,6 +416,21 @@ export default {
       this.loading.get = false;
       this.showMessageStatus(response);
     },
+    async handleEditPayslip(id, status) {
+      this.loading.get = true;
+      const queryStatus = `?status=${status}`;
+      const response = await EditPayrunStatusAPI(id, queryStatus);
+      if (response?.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      if (response?.status === 200) {
+        this.getPayrun();
+        // this.getPayrun();
+      }
+      this.loading.get = false;
+      this.showMessageStatus(response);
+    },
     async getPayrun() {
       this.loading.get = true;
       const querySuperAdmin = `?company_id=${this.dataCompany._id}`;
@@ -432,13 +453,13 @@ export default {
         case "Pending":
           backgroundStatus += " bg-gray-600";
           break;
-        case "Approve Finance":
+        case "Approve":
           backgroundStatus += " bg-green-400";
           break;
         case "Calculate":
           backgroundStatus += " bg-zinc-300";
           break;
-        case "Cancel Payrun":
+        case "Cancel":
           backgroundStatus += " bg-red-500";
           break;
         default:
