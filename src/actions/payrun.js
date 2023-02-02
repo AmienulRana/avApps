@@ -74,10 +74,11 @@ export const EditPayrunStatusAPI = async (id, query) => {
     return error.response;
   }
 };
-export const DeleteAllowDeductAPI = async (id) => {
+export const RecalculatePayrunAPI = async (id) => {
   try {
-    const response = await axios.delete(
-      `${URL_API}/allowance-deduction/${id}`,
+    const response = await axios.put(
+      `${URL_API}/payrun/recalculate/${id}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${tokenDecrypted()}`,
