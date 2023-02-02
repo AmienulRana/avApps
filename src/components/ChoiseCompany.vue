@@ -79,7 +79,17 @@ export default {
       }
     },
   },
-  mounted() {},
+  watch: {
+    options: {
+      handler: function (newData) {
+        this.searchResult = newData;
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    this.searchResult = this.options;
+  },
 };
 </script>
 
