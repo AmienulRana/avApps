@@ -51,7 +51,10 @@
                   </p>
                 </td>
                 <td class="p-3 relative">
-                  <button class="mr-3">
+                  <button
+                    class="mr-3"
+                    @click="handleDeleteDesignation(des?._id)"
+                  >
                     <font-awesome-icon
                       icon="fa-trash-alt"
                       class="text-red-500"
@@ -69,13 +72,20 @@
           </table>
           <Loading v-if="loading.designation" />
         </section>
+        <NoDataShowing
+          v-if="!loading.designation && designations.length === 0"
+        />
       </section>
     </section>
     <Modal
       :title="`${modalEdit ? 'Edit' : 'Add'} Designation`"
       class="md:w-9/12 w-full mx-auto h-max"
       :showModal="showModal"
-      @close="showModal = false"
+      @close="
+        showModal = false;
+        modalEdit = false;
+        clearInputValue();
+      "
     >
       <template #header>
         <ChoiseCompany
@@ -93,7 +103,7 @@
           :isOpen="modal.showSelect"
           @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
           class="flex-col"
-          property="emp_name"
+          property="emp_fullname"
           input_class="w-full mt-2"
           label_class="w-full text-black"
           @selected="emp_id = $event"
@@ -157,6 +167,7 @@ import {
   GetDesignationAPI,
   AddDesignationAPI,
   EditDesignationAPI,
+  DeleteDesignationAPI,
 } from "@/actions/designation";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
@@ -164,6 +175,8 @@ import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
 import { GetAllEmployementAPI } from "@/actions/employment";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
+import NoDataShowing from "@/components/NoDataShowing.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "EmployeeIndex",
@@ -175,6 +188,7 @@ export default {
     ChoiseCompany,
     Input,
     SelectSearch,
+    NoDataShowing,
   },
   data() {
     return {
@@ -198,6 +212,10 @@ export default {
       },
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -205,12 +223,25 @@ export default {
       this.dataCompany = response?.data[0];
       this.loading.designation = false;
     },
+    clearInputValue() {
+      this.name = "";
+      this.description = "";
+      this.emp_id = "";
+    },
+    showMessageStatus(response) {
+      if (response.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response.data.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
     async handleGetDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetDesignationAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
-      console.log(response);
       if (response.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
@@ -225,7 +256,6 @@ export default {
         des_desc: this.description,
         emp_id: this.emp_id?._id,
       };
-      console.log(data);
       const response = await AddDesignationAPI(data, querySuperAdmin);
       if (response?.status === 401) {
         this.$router.push("/login");
@@ -233,8 +263,10 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetDesignation();
+        this.clearInputValue();
         this.showModal = false;
       }
+      this.showMessageStatus(response);
     },
     handleDetailDesignation(designation) {
       this.showModal = true;
@@ -257,13 +289,25 @@ export default {
       }
       if (response?.status === 200) {
         this.handleGetDesignation();
+        this.clearInputValue();
         this.showModal = false;
         this.modalEdit = false;
       }
+      this.showMessageStatus(response);
     },
-    handleDeleteDesignation() {},
+    async handleDeleteDesignation(id) {
+      const response = await DeleteDesignationAPI(id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.handleGetDesignation();
+      }
+      this.showMessageStatus(response);
+    },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -273,7 +317,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
     },
@@ -282,7 +326,8 @@ export default {
     // const departement
     this.handleGetDesignation();
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
   watch: {

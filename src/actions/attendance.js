@@ -18,6 +18,19 @@ export const AddAttendanceAPI = async (query, payload) => {
     return error.response;
   }
 };
+export const EditAttendanceAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(`${URL_API}/attendance/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+
 export const GetAttendanceAPI = async (query) => {
   try {
     const response = await axios.get(`${URL_API}/attendance${query}`, {

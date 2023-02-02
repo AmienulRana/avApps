@@ -31,12 +31,13 @@
         </Button>
         <Dropdown
           title="Employment Status"
-          :options="['Permanent', 'Probation', 'Terminated']"
+          :options="empStatus"
+          property="empstatus_name"
           :showDropdown="activeDropdown === 'employee'"
           @update:activeDropdown="(e) => changeDropdownActive('employee')"
           @selected="
             handleFilter(
-              (filter.employment_status = $event),
+              (filter.employment_status = $event?._id),
               filter.designation,
               filter.departement,
               filter.workshifts,
@@ -62,7 +63,7 @@
           @selected="
             handleFilter(
               filter.employment_status,
-              (filter.designation = $event),
+              (filter.designation = $event?._id),
               filter.departement,
               filter.workshifts,
               filter.role
@@ -83,19 +84,13 @@
         <Dropdown
           title="Departement"
           :showDropdown="activeDropdown === 'departement'"
-          :options="[
-            'Main Departement',
-            'Admin & HRM',
-            'Account',
-            'Development',
-            'Software',
-            'UI & UX',
-          ]"
+          :options="departement"
+          property="dep_name"
           @selected="
             handleFilter(
               filter.employment_status,
               filter.designation,
-              (filter.departement = $event),
+              (filter.departement = $event?._id),
               filter.workshifts,
               filter.role
             )
@@ -112,7 +107,7 @@
           :selectedOption="filter.departement"
           @update:activeDropdown="changeDropdownActive('departement')"
         />
-        <Dropdown
+        <!-- <Dropdown
           title="Work Shift"
           :options="[
             'Regular work shift',
@@ -140,16 +135,16 @@
           :selectedOption="filter.workshifts"
           :showDropdown="activeDropdown === 'Work Shift'"
           @update:activeDropdown="changeDropdownActive('Work Shift')"
-        />
+        /> -->
         <Dropdown
-          title="Role"
+          title="Employee"
           @selected="
             handleFilter(
               filter.employment_status,
               filter.designation,
               filter.departement,
               filter.workshifts,
-              (filter.role = $event)
+              (filter.role = $event?._id)
             )
           "
           @clearSelected="
@@ -161,7 +156,8 @@
               (filter.role = $event)
             )
           "
-          :options="['App Admin', 'Manager', 'Employee', 'Department Manager']"
+          :options="employee"
+          property="emp_fullname"
           :selectedOption="filter.role"
           :showDropdown="activeDropdown === 'Role'"
           @update:activeDropdown="changeDropdownActive('Role')"
@@ -189,7 +185,7 @@
           >
             <section
               class="flex relative justify-center rounded mb-4 items-center flex-col bg-white p-4"
-              v-for="(employe, index) in paginatedItems"
+              v-for="(employe, index) in employeeFilter"
               :key="index"
             >
               <div
@@ -199,7 +195,7 @@
                   :src="`${urlImages}/${employe?.emp_profile}`"
                   :alt="`Profile
                   ${employe?.emp_fullname}`"
-                  class="rounded-full"
+                  class="profile"
                   v-if="employe?.emp_profile"
                 />
                 <h2 class="md:text-base text-sm text-white" v-else>
@@ -312,6 +308,12 @@
               </div>
             </section>
           </div>
+          <NoDataShowing
+            v-if="
+              employee.length === 0 ||
+              (employee.length > 0 && employeeFilter?.length === 0)
+            "
+          />
         </template>
 
         <TableEmployee
@@ -395,6 +397,8 @@ import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Paggination.vue";
 import { URL_IMAGES } from "@/config";
+import NoDataShowing from "@/components/NoDataShowing.vue";
+import { GetEmpStatusAPI } from "@/actions/emp-status";
 
 export default {
   name: "EmployeeIndex",
@@ -407,6 +411,7 @@ export default {
     ChoiseCompany,
     Loading,
     Pagination,
+    NoDataShowing,
   },
   data() {
     return {
@@ -419,7 +424,7 @@ export default {
       layoutData: "card",
       employee: [],
       pagination: {
-        perPage: 5,
+        perPage: 30,
         currentPage: this.$store.state.currentPage,
         changePerPage: null,
       },
@@ -433,6 +438,7 @@ export default {
       showModal: false,
       employeeFilter: false,
       options: [],
+      empStatus: [],
       superAdmin: false,
       dataCompany: {},
       loading: {
@@ -462,25 +468,43 @@ export default {
         this.contactEmployee = id;
       }
     },
-    handleFilter(status, designation, departement, workshifts, role) {
+    handleFilter(status, designation, departement, role) {
       const filterConditions = [
-        { key: "status", value: status },
-        { key: "designation", value: designation },
-        { key: "departement", value: departement },
-        { key: "workshifts", value: workshifts },
-        { key: "role", value: role },
+        { key: "emp_status", value: status },
+        { key: "emp_desid", value: designation },
+        { key: "emp_depid", value: departement },
+        { key: "_id", value: this.filter.role },
       ];
-      const dataFilter = (employee) =>
-        filterConditions.every(
-          ({ key, value }) => value === "" || employee[key] === value
-        );
-      this.employeeFilter = this.employee.filter(dataFilter);
+      if (this.filter.role) {
+        const dataFilter = (employee) =>
+          filterConditions.every(
+            ({ key, value }) => value === "" || employee[key] === value
+          );
+        this.employeeFilter = this.employee.filter(dataFilter);
+      } else {
+        const dataFilter = (employee) =>
+          filterConditions.every(
+            ({ key, value }) => value === "" || employee[key]?._id === value
+          );
+
+        this.employeeFilter = this.employee.filter(dataFilter);
+      }
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
       this.options = response.data;
       this.dataCompany = response.data[0];
-      this.loading.employement = false;
+    },
+    async getEmpStatus() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetEmpStatusAPI(queryAdminSuper);
+
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      console.log(response?.data);
+      this.empStatus = response?.data || [];
     },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
@@ -499,6 +523,7 @@ export default {
       this.designation = response.data;
     },
     async handleGetEmployement() {
+      this.loading.employement = true;
       const querySuperAdmin = `?company=${this.dataCompany._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
@@ -506,7 +531,16 @@ export default {
       if (response.status === 401) {
         return this.$router.push("/login");
       }
-      this.employee = response.data;
+      this.employee = response?.data;
+      this.paginatedItems(response?.data);
+      this.loading.employement = false;
+    },
+    paginatedItems(employment) {
+      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
+      this.employeeFilter = employment.slice(
+        start,
+        start + this.pagination.perPage
+      );
     },
   },
   watch: {
@@ -515,7 +549,7 @@ export default {
         this.loading.employement = true;
         this.handleGetDepartement();
         this.handleGetDesignation();
-        // if()
+        this.getEmpStatus();
         this.handleGetEmployement();
         this.loading.employement = false;
       },
@@ -524,17 +558,21 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
     // this.handleGetEmployement();
   },
-  computed: {
-    paginatedItems() {
-      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
-      return this.employee.slice(start, start + this.pagination.perPage);
-    },
-  },
+  computed: {},
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.profile {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+</style>

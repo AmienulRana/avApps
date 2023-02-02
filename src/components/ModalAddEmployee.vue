@@ -300,14 +300,29 @@
             :value="basic_salary.periode"
             @change="basic_salary.periode = $event"
           />
-          <Input
-            type="number"
-            label="Gaji pokok"
-            input_class="md:w-4/6 mt-2"
-            class="mb-2.5"
-            :value="basic_salary.salary"
-            @input="basic_salary.salary = $event"
-          />
+          <div class="md:flex justify-between items-center mb-5 mt-4">
+            <label
+              :class="'md:w-1/5 text-gray-400'"
+              class="text-sm min-w-max w-full"
+              >Gaji Pokok</label
+            >
+            <div class="w-full md:w-4/6">
+              <input
+                type="number"
+                class="text-sm w-full border outline-gray-600 focus:outline focus:outline-primary pr-4 py-1.5 pl-4 bg-white rounded"
+                autofocus
+                :value="basic_salary.salary"
+                @input="basic_salary.salary = $event.target.value"
+              />
+              <p
+                class="text-sm text-gray-400 mt-1.5"
+                v-if="basic_salary.salary"
+              >
+                Gaji per {{ basic_salary.periode }}:
+                {{ formatCurrency(basic_salary.salary) }}
+              </p>
+            </div>
+          </div>
           <section class="flex justify-between items-center">
             <p class="text-sm text-gray-400 md:w-1/5">Jumlah Hari kerja :</p>
             <div class="md:w-4/6 mb-2.5">
@@ -415,20 +430,20 @@ export default {
       show_select: "",
       previewImage: null,
       personal: {
-        emp_firstname: "Amienul",
-        emp_lastname: "Rana",
-        email: "amienulrana@gmail.com",
-        emp_nikktp: "12312319231",
-        emp_phone: "0812607861212",
-        emp_gender: "Laki-Laki",
-        emp_marital_status: "Belum menikah",
-        emp_birthday: "13/10/2004",
-        emp_blood: "O+",
+        emp_firstname: "",
+        emp_lastname: "",
+        email: "",
+        emp_nikktp: "",
+        emp_phone: "",
+        emp_gender: "",
+        emp_marital_status: "",
+        emp_birthday: "",
+        emp_blood: "",
       },
       employment: {
-        username: "amienul",
-        password: "amienul",
-        emp_nik_karyawan: "121312",
+        username: "",
+        password: "",
+        emp_nik_karyawan: "",
         emp_depid: "",
         emp_desid: "",
         emp_status: "",
@@ -449,6 +464,7 @@ export default {
       basic_salary: {
         periode: "",
         salary: null,
+        salary_number: 0,
         working_days: null,
         working_hours: null,
       },
@@ -555,6 +571,7 @@ export default {
       this.loadingAdd = true;
       const employment = {
         ...this.employment,
+        emp_location: "63ce2525b46704d7cee86657",
         emp_depid: this.employment.emp_depid?._id,
         emp_desid: this.employment.emp_desid?._id,
         emp_fsuperior: this.employment.emp_fsuperior?._id,
@@ -571,8 +588,6 @@ export default {
         ...this.personal,
         ...employment,
       };
-      console.log(this.attadance_day);
-      console.log(employment);
       const formData = new FormData();
       formData.append("profile", this.$store.state.file);
       formData.append("attadance", JSON.stringify(this.attadance_day));
@@ -634,7 +649,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getCompany();
     // this.handleGetDepartement();
   },

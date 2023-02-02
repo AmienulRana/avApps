@@ -444,6 +444,28 @@ export default {
         }
       }
     },
+    handleFilter(status, designation, departement, role) {
+      const filterConditions = [
+        { key: "emp_status", value: status },
+        { key: "emp_desid", value: designation },
+        { key: "emp_depid", value: departement },
+        { key: "_id", value: this.filter.role },
+      ];
+      if (this.filter.role) {
+        const dataFilter = (employee) =>
+          filterConditions.every(
+            ({ key, value }) => value === "" || employee[key] === value
+          );
+        this.employeeFilter = this.employee.filter(dataFilter);
+      } else {
+        const dataFilter = (employee) =>
+          filterConditions.every(
+            ({ key, value }) => value === "" || employee[key]?._id === value
+          );
+
+        this.employeeFilter = this.employee.filter(dataFilter);
+      }
+    },
     clearInputValue() {
       for (const key in this.data) {
         this.data[key] = "";
@@ -516,6 +538,7 @@ export default {
       if (response.status === 200) {
         this.loading.getLeaveRequest = false;
       }
+      console.log(response?.data);
       this.leave_request = response?.data;
     },
     async handleLeaveRequest() {
@@ -579,9 +602,6 @@ export default {
         emp_name: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
-      // this.employee = response.data;
-
-      // console.log(response.data);
     },
   },
   watch: {
@@ -595,7 +615,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
 };

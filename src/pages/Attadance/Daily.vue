@@ -5,7 +5,7 @@
         <section class="flex items-center">
           <h1 class="text-2xl">Daily Log</h1>
           <ChoiseCompany
-            v-if="superAdmin"
+            v-if="superAdmin && !loading.getCompany"
             @selected:company="dataCompany = $event"
             :options="optionsCompany"
             :dataCompany="dataCompany"
@@ -70,15 +70,165 @@
         <p class="text-sm text-gray-300 mt-5 mb-3">
           Showing 1 to 10 items of 11
         </p>
-        <TableAttedance
-          :attendances="attendances"
-          :loading="loading.addAttendance"
-        />
+        <section class="relative">
+          <section
+            class="w-full overflow-x-auto custom-scrollbar relative"
+            :class="loading.getAttendance ? 'h-96' : ''"
+          >
+            <table
+              class="bg-white min-w-max mt-6 w-full pb-4"
+              @click="showActions = null"
+            >
+              <thead class="border-b bg-white border-gray-200 text-gray-400">
+                <tr>
+                  <th class="text-left text-sm">Profile</th>
+                  <th class="text-left text-sm">Clock In</th>
+                  <th class="text-left text-sm">Clock out</th>
+                  <th class="text-left text-sm">Status</th>
+                  <th class="text-left text-sm">Behaviour</th>
+                  <th class="text-left text-sm">Type</th>
+                  <th class="text-left text-sm">Total Hours</th>
+                  <th class="text-left text-sm">Break</th>
+                  <th class="text-left text-sm">Orthers Break</th>
+                  <th class="text-left text-sm">Deducation</th>
+                  <th class="text-left text-sm">Actions</th>
+                </tr>
+              </thead>
+              <tbody v-if="!loading.addAttendance">
+                <tr
+                  class="border-b"
+                  v-for="(attedance, i) in attendances"
+                  :key="i"
+                >
+                  <td class="flex items-center p-3 text-sm">
+                    <div
+                      class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
+                    >
+                      <h2 class="text-md text-white">
+                        {{
+                          attedance?.emp_id?.emp_fullname.substr(0, 1) +
+                          attedance?.emp_id?.emp_fullname.substr(
+                            attedance?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                            1
+                          )
+                        }}
+                      </h2>
+                    </div>
+                    <div class="ml-5">
+                      <h1 class="text-blue-400 text-base">
+                        {{ attedance?.emp_id?.emp_fullname }}
+                      </h1>
+                      <p class="text-sm mb-1 text-gray-600">
+                        {{ attedance?.emp_id?.emp_depid?.dep_name }}
+                      </p>
+                      <p class="text-xs text-gray-400">
+                        {{ attedance?.shift_id?.shift_name }} ({{
+                          attedance?.workhours_in
+                        }}
+                        - {{ attedance?.workhours_out }})
+                      </p>
+                    </div>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400">
+                      {{ attedance?.clock_in }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400">
+                      {{ attedance?.clock_out }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p
+                      class="text-sm"
+                      :class="
+                        attedance?.attendance_status === 'Absent'
+                          ? 'text-red-500'
+                          : ''
+                      "
+                    >
+                      {{ attedance?.attendance_status }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p
+                      v-if="attedance?.behavior_at !== '-'"
+                      class="flex text-sm py-1 text-white w-24 items-center justify-center rounded-full"
+                      :class="backgroundBehavior(attedance?.behavior_at)"
+                    >
+                      {{ attedance?.behavior_at }}
+                    </p>
+                    <p
+                      v-else
+                      class="flex py-1 text-gray-400 w-24 items-center justify-center rounded-full"
+                    >
+                      {{ attedance?.behavior_at }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400">{{ attedance?.type }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400">
+                      {{ attedance?.workhours }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400">
+                      Break in : {{ attedance?.break_in }}
+                    </p>
+                    <p class="text-sm text-gray-400">
+                      Break out : {{ attedance?.break_out }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm text-gray-400 underline">
+                      View orthers Break
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <router-link to="/attedance/detail">
+                      <p class="text-sm text-gray-400 underline">
+                        View Potongan
+                      </p>
+                    </router-link>
+                  </td>
+                  <td class="p-3 text-right relative">
+                    <Button
+                      class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
+                      @click.stop="showActions = i"
+                    >
+                      <font-awesome-icon icon="fa-ellipsis" />
+                    </Button>
+                    <div
+                      class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
+                      v-if="showActions === i"
+                    >
+                      <ul class="text-sm cursor-pointer">
+                        <li
+                          class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400"
+                          @click="handleDetailAttendance(attedance)"
+                        >
+                          Edit
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <Loading v-if="loading.getAttendance" />
+          <NoDataShowing
+            v-if="!loading.getAttendance && attendances.length === 0"
+          />
+        </section>
       </section>
       <section class="flex justify-between my-6"></section>
     </section>
     <Modal
-      title="Add Workshift"
+      :title="`${modal.modeEdit ? 'Edit' : 'Add'} Workshift`"
       :showModal="modal.showModal"
       @close="modal.showModal = false"
     >
@@ -102,29 +252,29 @@
           :isOpen="modal.showSelect === 'employment'"
           @handleShowSelect="() => (modal.showSelect = 'employment')"
           class="flex-col"
-          property="emp_name"
+          property="emp_fullname"
           input_class="w-full mt-2"
           label_class="w-full text-black"
           @selected="data.emp_id = $event"
           :selectedOption="data.emp_id"
         />
-        <!-- <SelectSearch
-          label="Location"
-          placeholder="Select location attedance for employment"
-          :options="['Company Location']"
-          :isOpen="modal.showSelect === 'location'"
-          @handleShowSelect="() => (modal.showSelect = 'location')"
-          class="flex-col"
-          input_class="w-full mt-2"
-          label_class="w-full text-black"
-          @selected="data.company_location = $event"
-          :selectedOption="data.company_location"
-        /> -->
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="Enter Date Attendance"
+          label_class="w-full"
+          input_class="mt-2"
+          v-if="!modal.modeEdit"
+          @change="data.attendance_date = $event"
+          :value="data?.attendance_date"
+        />
         <section class="my-4 flex justify-between items-center">
           <InputTime
             label="Clock In"
             :isOpen="modal.showTime === 'in'"
             @showTime="modal.showTime = 'in'"
+            :hourValue="modal.time_clockin.hour"
+            :minuteValue="modal.time_clockin.minute"
             @selected-hour="modal.time_clockin.hour = $event"
             @selected-minute="modal.time_clockin.minute = $event"
           />
@@ -132,6 +282,8 @@
             label="Clock Out"
             :isOpen="modal.showTime === 'out'"
             @showTime="modal.showTime = 'out'"
+            :hourValue="modal.time_clockout.hour"
+            :minuteValue="modal.time_clockout.minute"
             @selected-hour="modal.time_clockout.hour = $event"
             @selected-minute="modal.time_clockout.minute = $event"
           />
@@ -141,6 +293,8 @@
             label="Break In"
             :isOpen="modal.showTime === 'bin'"
             @showTime="modal.showTime = 'bin'"
+            :hourValue="modal.time_breakin.hour"
+            :minuteValue="modal.time_breakin.minute"
             @selected-hour="modal.time_breakin.hour = $event"
             @selected-minute="modal.time_breakin.minute = $event"
           />
@@ -148,6 +302,8 @@
             label="Break Out"
             :isOpen="modal.showTime === 'bout'"
             @showTime="modal.showTime = 'bout'"
+            :hourValue="modal.time_breakout.hour"
+            :minuteValue="modal.time_breakout.minute"
             @selected-hour="modal.time_breakout.hour = $event"
             @selected-minute="modal.time_breakout.minute = $event"
           />
@@ -162,8 +318,17 @@
             class="bg-green-500 w-24 py-2 text-white rounded-md"
             :disabled="!data.emp_id || loading.addAttendance"
             @click="handleAddAttendance"
+            v-if="!modal.modeEdit"
           >
             Save
+          </Button>
+          <Button
+            v-else
+            class="bg-green-500 w-24 py-2 text-white rounded-md"
+            :disabled="!data.emp_id || loading.addAttendance"
+            @click="handleEditAttendance"
+          >
+            Edit
           </Button>
         </section>
       </template>
@@ -175,30 +340,36 @@
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
-import TableAttedance from "../../components/TableAttedance.vue";
 import Modal from "../../components/Modal.vue";
-import Input from "@/components/Input.vue";
 import InputTime from "@/components/InputTime.vue";
+import Input from "@/components/Input.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
 import { GetAllEmployementAPI } from "@/actions/employment";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
-import { AddAttendanceAPI, GetAttendanceAPI } from "@/actions/attendance";
+import {
+  AddAttendanceAPI,
+  GetAttendanceAPI,
+  EditAttendanceAPI,
+} from "@/actions/attendance";
+import Loading from "@/components/Loading.vue";
+import NoDataShowing from "@/components/NoDataShowing.vue";
 
 export default {
   name: "DailyAttedance",
   components: {
     LayoutAdmin,
     Button,
-    TableAttedance,
     Dropdown,
     Modal,
-    Input,
     InputTime,
     ChoiseCompany,
     SelectSearch,
+    Loading,
+    NoDataShowing,
+    Input,
   },
   data() {
     return {
@@ -206,34 +377,39 @@ export default {
       contactEmployee: 0,
       layoutData: "card",
       modal: {
+        modeEdit: false,
         showTime: "",
         showModal: false,
         time_clockin: {
-          hour: null,
-          minute: null,
+          hour: "",
+          minute: "00",
         },
         time_clockout: {
-          hour: null,
-          minute: null,
+          hour: "",
+          minute: "00",
         },
         time_breakin: {
-          hour: null,
-          minute: null,
+          hour: "",
+          minute: "00",
         },
         time_breakout: {
-          hour: null,
-          minute: null,
+          hour: "",
+          minute: "00",
         },
       },
       data: {
         emp_id: "",
+        id_attendance: "",
+        attendance_date: "",
       },
+      showActions: null,
       attendances: [],
       optionsCompany: [],
       employment: [],
       superAdmin: false,
       dataCompany: {},
       loading: {
+        getAttendance: true,
         getCompany: true,
         addAttendance: false,
       },
@@ -244,6 +420,13 @@ export default {
     return { toast };
   },
   methods: {
+    backgroundBehavior(behavior) {
+      return behavior === "Regular"
+        ? "bg-green-500"
+        : behavior === "Early"
+        ? "bg-coral"
+        : "bg-red-500";
+    },
     handleShowLayoutData() {
       this.layoutData = this.layoutData === "card" ? "table" : "card";
     },
@@ -265,21 +448,14 @@ export default {
       for (const key in this.data) {
         this.data[key] = "";
       }
-    },
-    async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
-      const response = await GetAllEmployementAPI(
-        this.superAdmin ? querySuperAdmin : ""
-      );
-      if (response.status === 401) {
-        this.$store.commit("changeIsLoggedIn", false);
-        return this.$router.push("/login");
+      for (const key in this.modal) {
+        if (Object.prototype.hasOwnProperty.call(this.modal[key], "hour")) {
+          this.modal[key].hour = "";
+        }
+        if (Object.prototype.hasOwnProperty.call(this.modal[key], "minute")) {
+          this.modal[key].minute = "";
+        }
       }
-      const getIdNameEmp = response?.data?.map((employment) => ({
-        _id: employment?._id,
-        emp_name: employment?.emp_fullname,
-      }));
-      this.employment = getIdNameEmp;
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -301,18 +477,11 @@ export default {
 
       const payload = {
         emp_id: this.data?.emp_id?._id,
-        clock_in: `${this.modal.time_clockin?.hour}:${
-          this.modal.time_clockin?.minute || "00"
-        }`,
-        clock_out: `${this.modal.time_clockout?.hour}:${
-          this.modal.time_clockout?.minute || "00"
-        }`,
-        break_in: `${this.modal.time_breakin?.hour}:${
-          this.modal.time_breakin?.minute || "00"
-        }`,
-        break_out: `${this.modal.time_breakout?.hour}:${
-          this.modal.time_breakout?.minute || "00"
-        }`,
+        attendance_date: this.data.attendance_date,
+        clock_in: `${this.modal.time_clockin?.hour}:${this.modal.time_clockin?.minute}`,
+        clock_out: `${this.modal.time_clockout?.hour}:${this.modal.time_clockout?.minute}`,
+        break_in: `${this.modal.time_breakin?.hour}:${this.modal.time_breakin?.minute}`,
+        break_out: `${this.modal.time_breakout?.hour}:${this.modal.time_breakout?.minute}`,
       };
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await AddAttendanceAPI(queryAdminSuper, payload);
@@ -329,7 +498,6 @@ export default {
       this.loading.addAttendance = false;
     },
     async handleGetAttendance() {
-      this.loading.addAttendance = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await GetAttendanceAPI(queryAdminSuper);
       if (response?.status === 401) {
@@ -337,24 +505,111 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
-        console.log(response.data);
-        this.attendances = response.data;
+        const dateObject = new Date();
+        const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+        const day = dateObject.getDate().toString().padStart(2, "0");
+        const year = dateObject.getFullYear();
+        const formatDate = `${month}/${day}/${year}`;
+        const filterAttedanceToday = response.data.filter(
+          (attedance) => attedance?.attendance_date === formatDate
+        );
+        this.attendances = filterAttedanceToday;
       }
+      this.loading.getAttendance = false;
+    },
+    getHourMinute(time) {
+      if (time !== "-") {
+        const timeArray = time.split(" ")[0].split(":");
+        return [timeArray[0], timeArray[1]];
+      }
+      return ["", "00"];
+    },
+    handleDetailAttendance(attendance) {
+      this.modal.modeEdit = true;
+      this.modal.showModal = true;
+      this.data.id_attendance = attendance?._id;
+      this.data.emp_id = attendance?.emp_id;
+      this.modal.time_clockin.hour = this.getHourMinute(
+        attendance?.clock_in
+      )[0];
+      this.modal.time_clockin.minute = this.getHourMinute(
+        attendance?.clock_in
+      )[1];
+      this.modal.time_clockout.hour = this.getHourMinute(
+        attendance?.clock_out
+      )[0];
+      this.modal.time_clockout.minute = this.getHourMinute(
+        attendance?.clock_out
+      )[1];
+      this.modal.time_breakin.hour = this.getHourMinute(
+        attendance?.break_in
+      )[0];
+      this.modal.time_breakin.minute = this.getHourMinute(
+        attendance?.break_in
+      )[1];
+      this.modal.time_breakout.hour = this.getHourMinute(
+        attendance?.break_out
+      )[0];
+      this.modal.time_breakout.minute = this.getHourMinute(
+        attendance?.break_out
+      )[1];
+    },
+    async handleEditAttendance() {
+      this.loading.addAttendance = true;
+
+      const payload = {
+        emp_id: this.data?.emp_id?._id,
+        clock_in: `${this.modal.time_clockin?.hour}:${this.modal.time_clockin?.minute}`,
+        clock_out: `${this.modal.time_clockout?.hour}:${this.modal.time_clockout?.minute}`,
+        break_in: `${this.modal.time_breakin?.hour}:${this.modal.time_breakin?.minute}`,
+        break_out: `${this.modal.time_breakout?.hour}:${this.modal.time_breakout?.minute}`,
+      };
+      // const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await EditAttendanceAPI(
+        this.data.id_attendance,
+        payload
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.clearInputValue();
+        this.handleGetAttendance();
+        this.modal.showModal = false;
+      }
+      this.showMessageStatus(response);
       this.loading.addAttendance = false;
+    },
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_fullname: employment?.emp_fullname,
+      }));
+      this.employment = getIdNameEmp;
     },
   },
   watch: {
     dataCompany: {
       handler: function () {
-        this.handleGetEmployement();
         this.handleGetAttendance();
+        this.handleGetEmployement();
       },
       deep: true,
     },
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
 };

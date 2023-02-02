@@ -62,12 +62,17 @@
 <script>
 export default {
   name: "InputTime",
-  props: { label: String, isOpen: Boolean },
+  props: {
+    label: String,
+    isOpen: Boolean,
+    hourValue: String,
+    minuteValue: String,
+  },
   data() {
     return {
       selectedTime: "",
-      hour: "",
-      menit: "00",
+      hour: this.hourValue,
+      menit: this.minuteValue,
       hours: [],
       minutes: [],
     };

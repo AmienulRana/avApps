@@ -355,7 +355,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
 
     // this.handleGetEmployement();

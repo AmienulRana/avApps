@@ -55,7 +55,11 @@ ChartJS.register(
 
 export default {
   name: "DepartementPage",
-  props: { total_employment_status: Object },
+  props: {
+    total_employment_status: Array,
+    departement_statistic: Array,
+    designation_statistic: Array,
+  },
   data() {
     return {
       employment_status: this.total_employment_status,
@@ -126,22 +130,21 @@ export default {
             ],
           };
           break;
-        case "designation":
+        case "departement":
           this.data = {
             datasets: [
               {
-                data: [3, 1, 3, 4, 4, 8],
+                data: this.getValueWithoutProperty(
+                  this.departement_statistic,
+                  "total_departement"
+                ),
                 ...this.data.datasets,
               },
             ],
-            labels: [
-              "Director",
-              "CTO",
-              "General Manager",
-              "HR Manager",
-              "Project Manager",
-              "Software Enginner",
-            ],
+            labels: this.getValueWithoutProperty(
+              this.departement_statistic,
+              "departement"
+            ),
           };
           break;
 
@@ -149,17 +152,17 @@ export default {
           this.data = {
             datasets: [
               {
-                data: [7, 4, 2, 8, 9],
+                data: this.getValueWithoutProperty(
+                  this.designation_statistic,
+                  "total_designation"
+                ),
                 ...this.data.datasets,
               },
             ],
-            labels: [
-              "Accounts",
-              "UI & UX",
-              "Admin & HRM",
-              "Development",
-              "Software",
-            ],
+            labels: this.getValueWithoutProperty(
+              this.designation_statistic,
+              "designation"
+            ),
           };
           break;
       }

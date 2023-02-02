@@ -43,7 +43,7 @@
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{ departement?.dep_manager }}
+                    {{ departement?.dep_manager?.emp_fullname }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
@@ -80,7 +80,7 @@
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm text-gray-400">
-                    {{ departement?.dep_created }}
+                    {{ localDateString(departement?.dep_created) }}
                   </p>
                 </td>
                 <td class="p-3 text-right relative">
@@ -107,6 +107,9 @@
             </tbody>
           </table>
           <Loading v-if="loading.departement" />
+          <NoDataShowing
+            v-if="!loading.departement && departements.length === 0"
+          />
         </section>
       </section>
     </section>
@@ -114,11 +117,15 @@
       :title="`${modal.edit ? 'Edit' : 'Add'} Departement`"
       class="md:w-9/12 w-full mx-auto z-20"
       :showModal="modal.showModal"
-      @close="modal.showModal = false"
+      @close="
+        modal.showModal = false;
+        modal.edit = false;
+        clearInputValue();
+      "
     >
       <template #header>
         <ChoiseCompany
-          v-if="superAdmin && !loading.departement"
+          v-if="superAdmin && !loading.departement && !modal.edit"
           @selected:company="dataCompany = $event"
           :options="options"
           :dataCompany="dataCompany"
@@ -135,8 +142,9 @@
       />
       <SelectSearch
         label="Manager"
+        property="emp_fullname"
         :placeholder="manager || 'Choose a manager'"
-        :options="getAllEmployee"
+        :options="employee"
         :isOpen="modal.showSelect === 'choose_manager'"
         @handleShowSelect="
           modal.showSelect === 'choose_manager'
@@ -225,7 +233,7 @@ import Input from "../../components/Input.vue";
 import SelectSearch from "../../components/Select/SelectSearch.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
-import employee from "@/employee.json";
+import NoDataShowing from "@/components/NoDataShowing.vue";
 import {
   AddDepartementAPI,
   GetDepartementAPI,
@@ -234,6 +242,8 @@ import {
 } from "@/actions/departement";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
+import { GetAllEmployementAPI } from "@/actions/employment";
+import { GetShiftAPI } from "@/actions/shift";
 
 export default {
   name: "DepartementPage",
@@ -245,6 +255,7 @@ export default {
     SelectSearch,
     ChoiseCompany,
     Loading,
+    NoDataShowing,
   },
 
   data() {
@@ -260,7 +271,7 @@ export default {
       name: "",
       work_shift: "",
       location: "",
-      employee: employee,
+      employee: [],
       description: "",
       departements: [],
       superAdmin: false,
@@ -278,51 +289,72 @@ export default {
       const month = date.getMonth() + 1; // bulan dimulai dari 0, sehingga perlu ditambah 1
       const day = date.getDate();
       const year = date.getFullYear();
-      const formattedDate = `${month}-${day}-${year}`;
+      const formattedDate = `${year}-${month}-${day}`;
       return formattedDate;
+    },
+    localDateString(date) {
+      let new_date = new Date(date);
+      return new_date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    },
+    clearInputValue() {
+      this.name = "";
+      this.description = "";
+      this.work_shift = "";
+      this.manager = {};
+      this.location = "";
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
-      this.options = response.data;
-      this.dataCompany = response.data[0];
+      this.options = response?.data;
+      this.dataCompany = response?.data[0];
       this.loading.departement = false;
     },
     async handleGetDepartement() {
       this.loading.departement = true;
-
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetDepartementAPI(querySuperAdmin);
-      if (response.status === 401) {
-        return (window.location.href = "/login");
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.toast.error(response?.data?.message);
+        this.$store.commit("changeIsLoggedIn", false);
       }
-      this.departements = response.data;
+      this.departements = response?.data;
       this.loading.departement = false;
     },
     async handleAddDepartement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const data = {
         dep_name: this.name,
         dep_desc: this.description,
         dep_workshift: this.work_shift,
-        dep_manager: this.manager,
+        dep_manager: this.manager?._id,
         dep_location: this.location,
         dep_status: "Active",
         dep_created: this.dateNow(),
       };
       const response = await AddDepartementAPI(data, querySuperAdmin);
       if (response.status === 401) {
-        return (window.location.href = "/login");
+        this.$router.push("/login");
+        this.toast.error(response?.data?.message);
+        this.$store.commit("changeIsLoggedIn", false);
       }
-      this.handleGetDepartement();
-      this.modal.showModal = false;
+      if (response?.status === 200) {
+        this.handleGetDepartement();
+        this.clearInputValue();
+        this.modal.showModal = false;
+      }
     },
     async handleDetailDepartement(id) {
       this.modal.showModal = true;
       this.modal.edit = true;
-      this.superAdmin = false;
+      // this.superAdmin = false;
       this.id_dep = id;
       const response = await DetailDepartementAPI(id);
-
+      console.log(response.data);
       this.name = response?.data?.dep_name;
       this.description = response?.data?.dep_desc;
       this.work_shift = response?.data?.dep_workshift;
@@ -334,38 +366,68 @@ export default {
         dep_name: this.name,
         dep_desc: this.description,
         dep_workshift: this.work_shift,
-        dep_manager: this.manager,
+        dep_manager: this.manager?._id,
         dep_location: this.location,
+        dep_created: this.dateNow(),
       };
       const response = await EditDepartementAPI(this.id_dep, data);
       if (response.status === 401) {
         this.$store.commit("changeIsLoggedIn", false);
         this.$router.push("/login");
-      } else if (response.status === 200) {
-        this.handleGetDepartement();
       }
-      this.modal.showModal = false;
+      if (response?.status === 200) {
+        this.handleGetDepartement();
+        this.clearInputValue();
+        this.modal.showModal = false;
+      }
     },
     handleDeleteDepartement() {},
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_fullname: employment?.emp_fullname,
+      }));
+      this.employee = getIdNameEmp;
+      // this.replace_emplyoment = getIdNameEmp;
+    },
+    async getShift() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetShiftAPI(queryAdminSuper);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.shifts = response?.data;
+      }
+    },
   },
+
   mounted() {
     // const departement
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
   watch: {
     dataCompany: {
       handler: function () {
         this.handleGetDepartement();
+        this.handleGetEmployement();
       },
       deep: true,
     },
   },
   computed: {
-    getAllEmployee() {
-      return this.employee.map((employe) => employe.name);
-    },
     // onlyDepartementName() {
     //   //   return this.departements.map((dep) => dep?.name);
     // },

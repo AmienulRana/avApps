@@ -2,10 +2,10 @@ import { URL_API } from "@/config";
 import { tokenDecrypted } from "@/utils/decryptToken";
 import axios from "axios";
 
-export const AddDesignationAPI = async (payload, query) => {
+export const AddChangeShiftRequest = async (query, payload) => {
   try {
     const response = await axios.post(
-      `${URL_API}/designation${query}`,
+      `${URL_API}/change-shift${query}`,
       payload,
       {
         headers: {
@@ -18,9 +18,9 @@ export const AddDesignationAPI = async (payload, query) => {
     return error.response;
   }
 };
-export const EditDesignationAPI = async (payload, id) => {
+export const EditChangeWorkshiftAPI = async (id, payload) => {
   try {
-    const response = await axios.put(`${URL_API}/designation/${id}`, payload, {
+    const response = await axios.put(`${URL_API}/change-shift/${id}`, payload, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -30,9 +30,9 @@ export const EditDesignationAPI = async (payload, id) => {
     return error.response;
   }
 };
-export const DeleteDesignationAPI = async (id) => {
+export const GetShiftRequestAPI = async (query) => {
   try {
-    const response = await axios.delete(`${URL_API}/designation/${id}`, {
+    const response = await axios.get(`${URL_API}/change-shift${query}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -42,13 +42,29 @@ export const DeleteDesignationAPI = async (id) => {
     return error.response;
   }
 };
-export const GetDesignationAPI = async (query) => {
+export const GetOffdayEmploymentAPI = async (id) => {
   try {
-    const response = await axios.get(`${URL_API}/designation${query}`, {
+    const response = await axios.get(`${URL_API}/off-day/${id}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
     });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+export const EditOvertimeRequestAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/outside-request/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
     return response;
   } catch (error) {
     return error.response;
