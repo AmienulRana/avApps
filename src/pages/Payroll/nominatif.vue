@@ -148,7 +148,7 @@
                     <ul>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="status = 'Calculate'"
+                        @click="recalculatePayslip(payrun?._id)"
                       >
                         Calculate/Recalculate
                       </li>
@@ -323,6 +323,7 @@ import {
   GeneratePayslipAPI,
   GetPayslipAPI,
   EditPayrunStatusAPI,
+  RecalculatePayrunAPI,
 } from "@/actions/payrun";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
@@ -413,6 +414,20 @@ export default {
         // this.getPayrun();
       }
       this.loading.add = false;
+      this.loading.get = false;
+      this.showMessageStatus(response);
+    },
+    async recalculatePayslip(id) {
+      this.loading.get = true;
+      const response = await RecalculatePayrunAPI(id);
+      if (response?.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      if (response?.status === 200) {
+        this.getPayrun();
+        // this.getPayrun();
+      }
       this.loading.get = false;
       this.showMessageStatus(response);
     },
