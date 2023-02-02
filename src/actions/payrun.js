@@ -58,11 +58,11 @@ export const ChangeStatusPeriodicAPI = async (id) => {
     return error.response;
   }
 };
-export const EditAllowDeductAPI = async (id, payload) => {
+export const EditPayrunStatusAPI = async (id, query) => {
   try {
     const response = await axios.put(
-      `${URL_API}/allowance-deduction/${id}`,
-      payload,
+      `${URL_API}/payrun/${id}${query}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${tokenDecrypted()}`,
