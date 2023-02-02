@@ -76,7 +76,15 @@
                   <div
                     class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
                   >
-                    <h2 class="text-md text-white">AR</h2>
+                    <h2 class="text-md text-white">
+                      {{
+                        payrun?.emp_id?.emp_fullname.substr(0, 1) +
+                        payrun?.emp_id?.emp_fullname.substr(
+                          payrun?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                          1
+                        )
+                      }}
+                    </h2>
                   </div>
                   <div class="ml-3.5">
                     <h1 class="text-md text-blue-400 mb-0">
