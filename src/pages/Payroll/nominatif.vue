@@ -7,7 +7,13 @@
             <h1 class="text-2xl">Nominatif Penerima Gaji</h1>
             <p class="mt-2">
               Periode :
-              <span class="underline text-primary">Desember 2022</span>
+              <span class="underline text-primary">
+                <template v-if="payruns[0]?.payrun_period?.periodic_start_date">
+                  {{ payruns[0]?.payrun_period?.periodic_month }}
+                  {{ payruns[0]?.payrun_period?.periodic_years }}
+                </template>
+                <template v-else> No Periode </template>
+              </span>
             </p>
           </section>
           <ChoiseCompany
@@ -372,8 +378,9 @@ export default {
       return formatter.format(number);
     },
     async getAllCompany() {
+      this.loading.company = true;
       const response = await GetAllCompanyAPI();
-      this.optionsCompany = response?.data;
+      this.options = response?.data;
       this.dataCompany = response?.data[0];
       this.loading.company = false;
     },
@@ -415,7 +422,6 @@ export default {
       }
       if (response?.status === 200) {
         this.payruns = response?.data;
-        console.log(response.data);
         this.loading.get = false;
       }
     },
@@ -456,10 +462,12 @@ export default {
     const payload = decryptToken();
     this.superAdmin =
       payload?.role === "Super Admin" || payload?.role === "Group Admin";
-    if (payload?.role === "Super Admin" || payload?.role === "Group Admin") {
-      this.getAllCompany();
+    // if (payload?.role === "Super Admin" || payload?.role === "Group Admin") {
+    this.getAllCompany();
+    // }
+    if (payload?.role !== "Super Admin" || payload?.role !== "Group Admin") {
+      this.getPayrun();
     }
-    this.getPayrun();
   },
 };
 </script>
