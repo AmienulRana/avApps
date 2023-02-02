@@ -92,11 +92,14 @@
                     {{ payrun?.payrun_period?.periodic_month }}
                     {{ payrun?.payrun_period?.periodic_years }}
                   </p>
-                  <p class="text-sm text-gray-400">26 November - 25 Desember</p>
+                  <p class="text-sm text-gray-400">
+                    {{ formatDate(payrun?.payrun_period?.periodic_start_date) }}
+                    - {{ formatDate(payrun?.payrun_period?.periodic_end_date) }}
+                  </p>
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm">
-                    {{ payrun?.payrun_type_periodic }}
+                    {{ payrun?.payrun_type_period }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
@@ -347,6 +350,11 @@ export default {
         }
       }
     },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { day: "numeric", month: "long" };
+      return new Intl.DateTimeFormat("id-ID", options).format(date);
+    },
     formatCurrency(number) {
       const formatter = new Intl.NumberFormat("id-ID", {
         style: "currency",
@@ -370,6 +378,7 @@ export default {
     },
     async handleGeneratePayslip() {
       this.loading.add = true;
+      this.loading.get = true;
       const querySuperAdmin = `?company_id=${this.dataCompany._id}`;
       const response = await GeneratePayslipAPI(
         this.superAdmin ? querySuperAdmin : ""
@@ -379,11 +388,11 @@ export default {
         return this.$router.push("/login");
       }
       if (response?.status === 200) {
-        console.log(response.data);
         this.getPayrun();
         // this.getPayrun();
       }
       this.loading.add = false;
+      this.loading.get = false;
       this.showMessageStatus(response);
     },
     async getPayrun() {
@@ -398,6 +407,7 @@ export default {
       }
       if (response?.status === 200) {
         this.payruns = response?.data;
+        console.log(response.data);
         this.loading.get = false;
       }
     },
@@ -438,7 +448,10 @@ export default {
     const payload = decryptToken();
     this.superAdmin =
       payload?.role === "Super Admin" || payload?.role === "Group Admin";
-    this.getAllCompany();
+    if (payload?.role === "Super Admin" || payload?.role === "Group Admin") {
+      this.getAllCompany();
+    }
+    this.getPayrun();
   },
 };
 </script>
