@@ -228,7 +228,7 @@
       <section class="flex justify-between my-6"></section>
     </section>
     <Modal
-      :title="`${modal.modeEdit ? 'Edit' : 'Add'} Workshift`"
+      :title="`${modal.modeEdit ? 'Edit' : 'Add'} Attendance`"
       :showModal="modal.showModal"
       @close="modal.showModal = false"
     >
@@ -261,10 +261,9 @@
         <Input
           type="date"
           class="flex-col mt-4"
-          label="Enter Date Attendance"
+          label="Date Clock in Attendance"
           label_class="w-full"
           input_class="mt-2"
-          v-if="!modal.modeEdit"
           @change="data.attendance_date = $event"
           :value="data?.attendance_date"
         />
@@ -288,6 +287,15 @@
             @selected-minute="modal.time_clockout.minute = $event"
           />
         </section>
+        <Input
+          type="date"
+          class="flex-col mt-4"
+          label="Date Clock out Attendance"
+          label_class="w-full"
+          input_class="mt-2"
+          @change="data.attendance_date_out = $event"
+          :value="data?.attendance_date_out"
+        />
         <section class="my-4 flex justify-between items-center">
           <InputTime
             label="Break In"
@@ -401,6 +409,7 @@ export default {
         emp_id: "",
         id_attendance: "",
         attendance_date: "",
+        attendance_date_out: "",
       },
       showActions: null,
       attendances: [],
@@ -482,6 +491,7 @@ export default {
         clock_out: `${this.modal.time_clockout?.hour}:${this.modal.time_clockout?.minute}`,
         break_in: `${this.modal.time_breakin?.hour}:${this.modal.time_breakin?.minute}`,
         break_out: `${this.modal.time_breakout?.hour}:${this.modal.time_breakout?.minute}`,
+        attendance_date_out: this.data.attendance_date_out,
       };
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await AddAttendanceAPI(queryAdminSuper, payload);
@@ -528,6 +538,8 @@ export default {
       this.modal.modeEdit = true;
       this.modal.showModal = true;
       this.data.id_attendance = attendance?._id;
+      this.data.attendance_date = attendance?.attendance_date;
+      this.data.attendance_date_out = attendance?.attendance_date_out;
       this.data.emp_id = attendance?.emp_id;
       this.modal.time_clockin.hour = this.getHourMinute(
         attendance?.clock_in
