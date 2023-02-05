@@ -485,7 +485,9 @@ export default {
       empStatus: [],
       options: [],
       superAdmin: false,
-      dataCompany: {},
+      dataCompany: {
+        _id: "",
+      },
       loading: {
         company: true,
       },
@@ -541,31 +543,27 @@ export default {
     },
     async getCompany() {
       const response = await GetAllCompanyAPI();
-      this.options = response.data;
-      this.dataCompany = response.data[0];
+      this.options = response?.data;
+      this.dataCompany = response?.data[0];
       this.loading.company = false;
     },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
-      if (this?.dataCompany?._id) {
-        const response = await GetDepartementAPI(querySuperAdmin);
-        if (response.status === 401) {
-          this.$router.push("/login");
-          this.$store.commit("changeIsLoggedIn", false);
-        }
-        this.departement = response.data;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
+      this.departement = response?.data;
     },
     async handleGetDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
-      if (this?.dataCompany?._id) {
-        const response = await GetDesignationAPI(querySuperAdmin);
-        if (response.status === 401) {
-          this.$router.push("/login");
-          this.$store.commit("changeIsLoggedIn", false);
-        }
-        this.designation = response.data;
+      const response = await GetDesignationAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
+      this.designation = response?.data;
     },
     async handleAddEmployment() {
       this.loadingAdd = true;
