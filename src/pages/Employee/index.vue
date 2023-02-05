@@ -40,7 +40,6 @@
               (filter.employment_status = $event?._id),
               filter.designation,
               filter.departement,
-              filter.workshifts,
               filter.role
             )
           "
@@ -49,7 +48,6 @@
               (filter.employment_status = $event),
               filter.designation,
               filter.departement,
-              filter.workshifts,
               filter.role
             )
           "
@@ -65,7 +63,6 @@
               filter.employment_status,
               (filter.designation = $event?._id),
               filter.departement,
-              filter.workshifts,
               filter.role
             )
           "
@@ -74,7 +71,6 @@
               filter.employment_status,
               (filter.designation = $event),
               filter.departement,
-              filter.workshifts,
               filter.role
             )
           "
@@ -91,7 +87,6 @@
               filter.employment_status,
               filter.designation,
               (filter.departement = $event?._id),
-              filter.workshifts,
               filter.role
             )
           "
@@ -100,7 +95,6 @@
               filter.employment_status,
               filter.designation,
               (filter.departement = $event),
-              filter.workshifts,
               filter.role
             )
           "
@@ -143,7 +137,6 @@
               filter.employment_status,
               filter.designation,
               filter.departement,
-              filter.workshifts,
               (filter.role = $event?._id)
             )
           "
@@ -152,7 +145,6 @@
               filter.employment_status,
               filter.designation,
               filter.departement,
-              filter.workshifts,
               (filter.role = $event)
             )
           "
@@ -429,18 +421,20 @@ export default {
         changePerPage: null,
       },
       filter: {
-        employment_status: "",
-        designation: "",
-        departement: "",
-        workshifts: "",
-        role: "",
+        employment_status: this.$store.state.filter.employment_status,
+        designation: this.$store.state.filter.designation,
+        departement: this.$store.state.filter.departement,
+        workshifts: this.$store.state.filter.workshift,
+        role: this.$store.state.filter.role,
       },
       showModal: false,
       employeeFilter: false,
       options: [],
       empStatus: [],
       superAdmin: false,
-      dataCompany: {},
+      dataCompany: {
+        _id: null,
+      },
       loading: {
         employement: true,
       },
@@ -469,13 +463,16 @@ export default {
       }
     },
     handleFilter(status, designation, departement, role) {
+      console.log(role);
       const filterConditions = [
         { key: "emp_status", value: status },
         { key: "emp_desid", value: designation },
         { key: "emp_depid", value: departement },
-        { key: "_id", value: this.filter.role },
+        { key: "_id", value: role },
       ];
-      if (this.filter.role) {
+      this.$store.commit("setValueFilter", this.filter);
+
+      if (role) {
         const dataFilter = (employee) =>
           filterConditions.every(
             ({ key, value }) => value === "" || employee[key] === value
@@ -489,21 +486,21 @@ export default {
 
         this.employeeFilter = this.employee.filter(dataFilter);
       }
+      console.log("handle filter dijalankan");
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
-      this.options = response.data;
-      this.dataCompany = response.data[0];
+      this.options = response?.data;
+      this.dataCompany = response?.data[0];
     },
     async getEmpStatus() {
-      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const queryAdminSuper = `?company_id=${this?.dataCompany?._id || null}`;
       const response = await GetEmpStatusAPI(queryAdminSuper);
 
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response?.data);
       this.empStatus = response?.data || [];
     },
     async handleGetDepartement() {
@@ -524,7 +521,7 @@ export default {
     },
     async handleGetEmployement() {
       this.loading.employement = true;
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this?.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -534,6 +531,12 @@ export default {
       this.employee = response?.data;
       this.paginatedItems(response?.data);
       this.loading.employement = false;
+      this.handleFilter(
+        this.filter.employment_status,
+        this.filter.designation,
+        this.filter.departement,
+        this.filter.role
+      );
     },
     paginatedItems(employment) {
       const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
