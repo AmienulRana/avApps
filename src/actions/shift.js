@@ -39,6 +39,18 @@ export const GetShiftAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteShiftAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/shift/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
 export const ChangeStatusShiftAPI = async (id) => {
   try {
