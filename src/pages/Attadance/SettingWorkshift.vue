@@ -80,13 +80,14 @@
                   >
                     <ul>
                       <li
-                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer hover:text-blue-400 text-sm"
                         @click="assignDetailShift(shift)"
                       >
                         Edit
                       </li>
                       <li
-                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                        class="px-4 py-2 cursor-pointer hover:bg-gray-100 hover:text-blue-400 text-sm"
+                        @click="deleteNewShift(shift?._id)"
                       >
                         Delete
                       </li>
@@ -222,6 +223,7 @@ import {
   GetShiftAPI,
   EditShiftAPI,
   ChangeStatusShiftAPI,
+  DeleteShiftAPI,
 } from "@/actions/shift";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
@@ -246,11 +248,11 @@ export default {
         showModal: false,
         time_clockin: {
           hour: null,
-          minute: null,
+          minute: "00",
         },
         time_clockout: {
           hour: null,
-          minute: null,
+          minute: "00",
         },
       },
       showActions: null,
@@ -291,9 +293,9 @@ export default {
         this.data[key] = "";
       }
       this.modal.time_clockin.hour = "";
-      this.modal.time_clockin.minute = "";
+      this.modal.time_clockin.minute = "00";
       this.modal.time_clockout.hour = "";
-      this.modal.time_clockout.minute = "";
+      this.modal.time_clockout.minute = "00";
     },
 
     async updateStatus(value, shift) {
@@ -366,6 +368,7 @@ export default {
 
       if (response?.status === 200) {
         this.modal.showModal = false;
+        this.modal.edit = false;
         this.clearInputValue();
         this.getShift();
       }
@@ -378,10 +381,7 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-
       if (response?.status === 200) {
-        this.modal.showModal = false;
-        this.clearInputValue();
         this.getShift();
       }
       this.showMessageStatus(response);
@@ -394,7 +394,6 @@ export default {
       return ["", "00"];
     },
     assignDetailShift(shift) {
-      console.log(shift);
       this.modal.edit = true;
       this.modal.showModal = true;
       this.data._id = shift?._id;
