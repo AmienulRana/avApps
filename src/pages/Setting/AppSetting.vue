@@ -2,19 +2,19 @@
   <LayoutAdmin>
     <section class="md:px-8 px-4 mt-6 w-full">
       <section class="flex items-center mb-10">
-        <h1 class="text-lg md:text-2xl">Leave Settings</h1>
-        <ChoiseCompany
+        <h1 class="text-lg md:text-2xl">App Settings</h1>
+        <!-- <ChoiseCompany
           v-if="superAdmin && !loading.company"
           @selected:company="dataCompany = $event"
           :options="options"
           :dataCompany="dataCompany"
-        />
+        /> -->
       </section>
       <section
         class="flex justify-between flex-col md:flex-row w-full h-auto mb-6"
       >
         <section class="w-full bg-white">
-          <LeaveTypeSetting v-if="sideTabActive === 'Leave Type'" />
+          <AppSettingTable v-if="sideTabActive === 'Leave Type'" />
         </section>
       </section>
     </section>
@@ -23,8 +23,7 @@
 
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
-import Loading from "../../components/Loading.vue";
-import LeaveTypeSetting from "@/components/LeaveTypeSetting.vue";
+import AppSettingTable from "@/components/AppSettingTable.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
 import decryptToken from "@/utils/decryptToken";
@@ -33,8 +32,7 @@ export default {
   name: "LeaveSetting",
   components: {
     LayoutAdmin,
-    LeaveTypeSetting,
-    Loading,
+    AppSettingTable,
     ChoiseCompany,
   },
   data() {
@@ -63,8 +61,7 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin =
-      payload?.role === "Super Admin" || payload?.role === "Group Admin";
+    this.superAdmin = payload?.role === "Super Admin";
     this.getAllCompany();
   },
 };

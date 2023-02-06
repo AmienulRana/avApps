@@ -31,15 +31,22 @@
         Hai! <br />
         Login to your dashboard
       </p>
-      <div class="mb-5">
+      <!-- <div class="mb-5">
         <Select
           label="Login as"
           class="flex-col"
           label_class="w-full mb-2 text-gray-400"
-          :options="['Admin Group', 'App Admin', 'Employee']"
+          :options="[
+            'Mufidah Group',
+            'Mufidah Terminal Print',
+            'Mufidah Studio',
+            'Mufidah Stationery',
+            'Mufidah Babyshop',
+            'UD Wahyu',
+          ]"
           @change="changeAccount($event)"
         />
-      </div>
+      </div> -->
       <div class="mb-5">
         <label class="text-sm text-gray-400">Email</label>
         <input
@@ -118,12 +125,24 @@ export default {
   methods: {
     changeAccount(role) {
       this.login_as = role;
-      if (role === "Admin Group") {
+      if (role === "Mufidah Group") {
         this.email = "superadmin@demo.com";
         this.password = "superAdmin123";
-      } else if (role === "App Admin") {
-        this.email = "armadavision@test.com";
-        this.password = "armadaVision123";
+      } else if (role === "Mufidah Stationery") {
+        this.email = "admin@stationery.com";
+        this.password = "12345";
+      } else if (role === "Mufidah Studio") {
+        this.email = "admin@studio.com";
+        this.password = "12345";
+      } else if (role === "Mufidah Terminal Print") {
+        this.email = "admin@mtp.com";
+        this.password = "12345";
+      } else if (role === "Mufidah Babyshop") {
+        this.email = "admin@babyshop.com";
+        this.password = "12345";
+      } else if (role === "UD Wahyu") {
+        this.email = "admin@wahyu.com";
+        this.password = "12345";
       }
     },
     encrypt(token) {
@@ -151,16 +170,18 @@ export default {
     async handleLoginCompany() {
       this.loading = true;
       const { email, password } = this;
-      if (!this.login_as) {
-        return alert("Select role to Login");
-      }
-      if (this.login_as === "Admin Group") {
-        const response = await LoginSuperAPI({ email, password });
-        this.validationResponse(response);
-      } else if (this.login_as === "App Admin") {
-        const response = await LoginAdminAPI({ email, password });
-        this.validationResponse(response);
-      }
+      // if (!this.login_as) {
+      //   return alert("Select role to Login");
+      // }
+      // if (this.login_as === "Mufidah Group") {
+      //   const response = await LoginSuperAPI({ email, password });
+      //   console.log(response);
+      //   this.validationResponse(response);
+      // } else if (this.login_as !== "Mufidah Group") {
+      const response = await LoginAdminAPI({ email, password });
+      this.validationResponse(response);
+      this.loading = false;
+      // }
     },
   },
 };

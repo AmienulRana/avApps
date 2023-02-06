@@ -10,9 +10,10 @@
       <h1
         class="text-2xl hidden md:block text-white text-center duration-300 h-8 truncate"
       >
-        M<span :class="modeSidebar === 'icon' ? 'scale-0 hidden' : ''"
+        {{ company_header || company_name }}
+        <!-- M<span :class="modeSidebar === 'icon' ? 'scale-0 hidden' : ''"
           >ufidah Group</span
-        >
+        > -->
       </h1>
       <span
         class="w-full h-px bg-white mt-5 lg:opacity-80 opacity-0 block"
@@ -130,6 +131,7 @@
 
 <script>
 import Accordion from "../Accordion.vue";
+import decryptToken from "@/utils/decryptToken";
 
 export default {
   name: "SidebarComponent",
@@ -142,27 +144,29 @@ export default {
     return {
       isOpen: this.$store.state.sidebarMenuActive,
       accordionPosition: this.modeSidebar === "icon" ? "side" : "down",
+      company_name: "",
+      company_header: null,
       menuSidebar: [
         {
-          title: "Organisasi",
+          title: "Organization",
           icon: "fa-user-tie",
           contents: [
-            { text: "Departemen", to: "/organisasi/departemen" },
-            { text: "Jabatan", to: "/organisasi/jabatan" },
+            { text: "Department", to: "/organisasi/departemen" },
+            { text: "Designation", to: "/organisasi/jabatan" },
           ],
         },
         {
-          title: "Karyawan",
+          title: "Employee",
           icon: "fa-users",
           contents: [
-            { text: "Data karyawan", to: "/employee" },
-            { text: "Status Karyawan", to: "/employee-status" },
-            { text: "Peringatan", to: "/employee-warning" },
+            { text: "Employment Data", to: "/employee" },
+            { text: "Employment Status", to: "/employee-status" },
+            { text: "Warning", to: "/employee-warning" },
             { text: "Mutasi / Resign", to: "/designation" },
           ],
         },
         {
-          title: "Pengajuan",
+          title: "Request",
           icon: "fa-clock",
           contents: [
             { text: "Leave Request", to: "/leave-request" },
@@ -174,7 +178,7 @@ export default {
           ],
         },
         {
-          title: "Absensi",
+          title: "Attendance",
           icon: "fa-calendar",
           contents: [
             { text: "Daily Log Absensi", to: "/attedance/daily" },
@@ -183,10 +187,6 @@ export default {
             {
               text: "Setting Cuti Bersama / Off Days",
               to: "/attedance/setting-cuti",
-            },
-            {
-              text: "Setting Potongan Absensi",
-              to: "/attedance/setting-absensi",
             },
             { text: "Setting Work Shift", to: "/attedance/setting-workshift" },
           ],
@@ -222,8 +222,8 @@ export default {
               text: "Periodic Settings",
               to: "/setting/periodic",
             },
-            { text: "App Settings", to: "/setting/app" },
             { text: "Leave Settings", to: "/setting/leave" },
+            { text: "App Settings", to: "/setting/app" },
           ],
         },
       ],
@@ -259,6 +259,9 @@ export default {
     } else {
       this.isOpen = localStorage.getItem("sidebarMenuActive");
     }
+    const payload = decryptToken();
+    this.company_name = payload?.company_name;
+    this.company_header = payload?.company_header;
   },
 };
 </script>

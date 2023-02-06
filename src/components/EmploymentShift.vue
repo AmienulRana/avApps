@@ -17,14 +17,14 @@
         :label="i"
         input_class="md:w-4/6 md:mt-0"
         class="w-full mr-6"
-        :position="i === 'minggu' ? 'bottom' : 'top'"
+        :position="i === 'minggu' || i === 'sabtu' ? 'top' : 'buttom'"
         :isOpen="show_select === i"
-        @handleShowSelect="day.off_day ? () => {} : (show_select = i)"
-        :disabled="day.off_day"
+        @handleShowSelect="day?.off_day ? () => {} : (show_select = i)"
+        :disabled="day?.off_day"
       />
       <SwitchButton
         @update:model="(value) => (day.off_day = value)"
-        :value="day.off_day"
+        :value="day?.off_day"
       />
     </div>
   </KeepAlive>
@@ -48,46 +48,46 @@ import { useToast } from "vue-toastification";
 export default {
   name: "EmploymentShift",
   components: { SwitchButton, Button, SelectSearch },
-  props: { emp_attadance: Object },
+  props: { emp_attadance: Object, handleDetailEmployment: Function },
   data() {
     return {
       shift_data: [],
       show_select: "",
       shift_day: {
         senin: {
-          shift_desc: this.emp_attadance.senin?.shift?.shift_desc,
-          shift: this.emp_attadance.senin?.shift?._id,
-          off_day: this.emp_attadance.senin.off_day,
+          shift_desc: this.emp_attadance?.senin?.shift?.shift_desc,
+          shift: this.emp_attadance?.senin?.shift?._id,
+          off_day: this.emp_attadance?.senin?.off_day || false,
         },
         selasa: {
-          shift_desc: this.emp_attadance.selasa?.shift?.shift_desc,
-          shift: this.emp_attadance.selasa?.shift?._id,
-          off_day: this.emp_attadance.selasa.off_day,
+          shift_desc: this.emp_attadance?.selasa?.shift?.shift_desc,
+          shift: this.emp_attadance?.selasa?.shift?._id,
+          off_day: this.emp_attadance?.selasa?.off_day || false,
         },
         rabu: {
-          shift_desc: this.emp_attadance.rabu?.shift?.shift_desc,
-          shift: this.emp_attadance.rabu?.shift?._id,
-          off_day: this.emp_attadance.rabu.off_day,
+          shift_desc: this.emp_attadance?.rabu?.shift?.shift_desc,
+          shift: this.emp_attadance?.rabu?.shift?._id,
+          off_day: this.emp_attadance?.rabu?.off_day || false,
         },
         kamis: {
-          shift_desc: this.emp_attadance.kamis?.shift?.shift_desc,
-          shift: this.emp_attadance.kamis?.shift?._id,
-          off_day: this.emp_attadance.kamis.off_day,
+          shift_desc: this.emp_attadance?.kamis?.shift?.shift_desc,
+          shift: this.emp_attadance?.kamis?.shift?._id,
+          off_day: this.emp_attadance?.kamis?.off_day || false,
         },
         jumat: {
-          shift_desc: this.emp_attadance.jumat?.shift?.shift_desc,
-          shift: this.emp_attadance.jumat?.shift?._id,
-          off_day: this.emp_attadance.jumat.off_day,
+          shift_desc: this.emp_attadance?.jumat?.shift?.shift_desc,
+          shift: this.emp_attadance?.jumat?.shift?._id,
+          off_day: this.emp_attadance?.jumat?.off_day || false,
         },
         sabtu: {
-          shift_desc: this.emp_attadance.sabtu?.shift?.shift_desc,
-          shift: this.emp_attadance.sabtu?.shift?._id,
-          off_day: this.emp_attadance.sabtu.off_day,
+          shift_desc: this.emp_attadance?.sabtu?.shift?.shift_desc,
+          shift: this.emp_attadance?.sabtu?.shift?._id,
+          off_day: this.emp_attadance?.sabtu?.off_day || false,
         },
         minggu: {
-          shift_desc: this.emp_attadance.minggu?.shift?.shift_desc,
-          shift: this.emp_attadance.minggu?.shift?._id,
-          off_day: this.emp_attadance.minggu.off_day,
+          shift_desc: this.emp_attadance?.minggu?.shift?.shift_desc,
+          shift: this.emp_attadance?.minggu?.shift?._id,
+          off_day: this.emp_attadance?.minggu?.off_day || false,
         },
       },
     };
@@ -108,6 +108,7 @@ export default {
   methods: {
     showMessageStatus(response) {
       if (response.status === 200) {
+        this.handleDetailEmployment();
         this.toast.success(response?.data?.message);
       } else {
         if (response.data.message) {

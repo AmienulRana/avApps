@@ -17,7 +17,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b h-max" v-for="dataAd in data" :key="dataAd._id">
+        <tr
+          class="border-b h-max"
+          v-for="(dataAd, i) in data"
+          :key="dataAd._id"
+        >
           <td class="p-3 text-sm">
             <p class="text-sm">{{ dataAd?.ad_name }}</p>
           </td>
@@ -46,13 +50,13 @@
           <td class="p-3 text-right relative">
             <Button
               class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-              @click.stop="showActions = 0"
+              @click.stop="showActions = i"
             >
               <font-awesome-icon icon="fa-ellipsis" />
             </Button>
             <div
               class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-              v-if="showActions === 0"
+              v-if="showActions === i"
             >
               <ul>
                 <li

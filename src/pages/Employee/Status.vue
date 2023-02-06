@@ -54,12 +54,19 @@
                 <td class="p-3 text-sm">
                   <p class="text-sm">{{ data?.empstatus_desc || "-" }}</p>
                 </td>
-                <td class="p-3 text-right relative">
+                <td class="p-3 text-right relative flex">
                   <Button
                     class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
                     @click="detailEmpStatus(data)"
                   >
                     <font-awesome-icon icon="fa-pen-to-square" />
+                  </Button>
+                  <Button
+                    class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                    @click="deleteEmpStatus(data?._id)"
+                    :disabled="loading.deleteStatus"
+                  >
+                    <font-awesome-icon icon="fa-trash-alt" />
                   </Button>
                 </td>
               </tr>
@@ -72,9 +79,13 @@
     </section>
   </LayoutAdmin>
   <Modal
-    title="Add Status"
+    :title="`${modeEdit ? 'Edit' : 'Add'} Status`"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modeEdit = false;
+      clearInputValue();
+    "
     modalClass="md:w-1/2"
   >
     <template #header>
@@ -99,7 +110,7 @@
         label_class="w-full"
         input_class="w-full mt-2"
         class="mb-2.5 flex-col"
-        :options="['Success', 'Info', 'Primary', 'Danger', 'Warning']"
+        :options="['Success', 'Primary', 'Danger', 'Warning']"
         @change="selectedStatus = $event"
         :value="selectedStatus"
       />
@@ -164,6 +175,7 @@ import {
   AddEmpStatusAPI,
   GetEmpStatusAPI,
   EditEmpStatusAPI,
+  DeleteEmpStatusAPI,
 } from "@/actions/emp-status";
 import { useToast } from "vue-toastification";
 import NoDataShowing from "@/components/NoDataShowing.vue";
@@ -202,6 +214,7 @@ export default {
         getCompany: true,
         addStatus: false,
         getStatus: true,
+        deleteStatus: false,
       },
     };
   },
@@ -262,7 +275,22 @@ export default {
       this.data.empstatus_name = status?.empstatus_name;
       this.data.empstatus_color = status?.empstatus_color;
       this.data.empstatus_desc = status?.empstatus_desc;
+      this.selectedStatus = this.getBackgroundStatus(status?.empstatus_color);
       this.data._id = status?._id;
+    },
+    getBackgroundStatus(status) {
+      switch (status) {
+        case "#1976d3":
+          return "Primary";
+        case "rgb(34 197 94)":
+          return "Success";
+        case "rgb(239 68 68)":
+          return "Danger";
+        case "rgb(249 115 22)":
+          return "Warning";
+        default:
+          return "#1976d3";
+      }
     },
     async handleEditEmpStatus() {
       this.loading.addStatus = true;
@@ -291,6 +319,21 @@ export default {
       this.dataCompany = response.data[0];
       this.loading.getCompany = false;
     },
+    async deleteEmpStatus(id) {
+      this.deleteStatus = true;
+      const response = await DeleteEmpStatusAPI(id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.modal.showModal = false;
+        this.getEmpStatus();
+        this.clearInputValue();
+      }
+      this.deleteStatus = false;
+      this.showMessageStatus(response);
+    },
   },
   watch: {
     dataCompany: {
@@ -302,7 +345,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
   computed: {

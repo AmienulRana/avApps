@@ -94,7 +94,11 @@
   <Modal
     :title="`${modeEdit ? 'Edit' : 'Add'} Status`"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modeEdit = false;
+      clearInputValue();
+    "
     modalClass="md:w-1/2"
   >
     <template #header v-if="!modeEdit">
@@ -329,6 +333,7 @@ export default {
         this.modal.showModal = false;
         this.getEmpWarning();
         this.clearInputValue();
+        this.modeEdit = false;
       }
       this.showMessageStatus(response);
       this.loading.addStatus = false;
@@ -355,7 +360,7 @@ export default {
       this.loading.getCompany = false;
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -381,7 +386,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
   computed: {

@@ -20,17 +20,14 @@
           <section
             class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
           >
-            <img
-              :src="`${urlImageServer}/${personal_detail.emp_profile}`"
-              alt="profile image"
-              class="profile w-32 h-32 rounded-full"
-              v-if="personal_detail?.emp_profile"
-            />
             <div
-              v-else
-              class="profile w-32 h-32 flex justify-center items-center rounded-full bg-zinc-400"
+              @click="openFilePicker"
+              class="relative bg-zinc-400 w-32 h-32 rounded-full overflow-hidden flex justify-center items-center cursor-pointer"
             >
-              <h2 class="text-3xl text-white">
+              <h2
+                class="text-3xl text-white"
+                v-if="!personal_detail?.emp_profile && !blobImgUrl"
+              >
                 {{
                   personal_detail?.emp_fullname.substr(0, 1) +
                   personal_detail?.emp_fullname.substr(
@@ -39,6 +36,27 @@
                   )
                 }}
               </h2>
+              <img
+                v-else
+                :src="
+                  blobImgUrl
+                    ? blobImgUrl
+                    : `${urlImageServer}/${personal_detail.emp_profile}`
+                "
+                alt="profile image"
+                class="profile w-full h-full cursor-pointer"
+              />
+              <div
+                class="absolute bottom-0 left-0 w-full text-white text-sm text-center opacity-0 py-1 duration-300"
+              >
+                Change
+              </div>
+              <input
+                ref="fileInput"
+                type="file"
+                class="hidden"
+                @change="changeImage"
+              />
             </div>
             <div class="md:ml-9 ml-0 text-center md:text-start">
               <h1 class="md:text-xl mt-2 text-base">
@@ -193,7 +211,7 @@ import Experience from "../../components/Education.vue";
 import Rekening from "../../components/Rekening.vue";
 import Payroll from "../../components/Payroll.vue";
 import Cuti from "../../components/Cuti.vue";
-import { DetailEmployementAPI } from "@/actions/employment";
+import { DetailEmployementAPI, UpdateProfileAPI } from "@/actions/employment";
 import { URL_IMAGES } from "@/config";
 
 import Button from "@/components/Button.vue";
@@ -232,6 +250,7 @@ export default {
       isOpenAccordion: false,
       loading: true,
       urlImageServer: URL_IMAGES,
+      blobImgUrl: "",
       sideTabActive: "Personal Detail",
       personal_detail: {
         emp_firstname: "",
@@ -255,12 +274,25 @@ export default {
         emp_fsuperior: "",
         emp_ssuperior: "",
         emp_location: "",
+        emp_tanggungan: "",
         emp_attadance: {},
         company_id: "",
       },
     };
   },
   methods: {
+    openFilePicker() {
+      this.$refs.fileInput.click();
+    },
+    async changeImage(event) {
+      const file = event.target.files[0];
+      const blobImage = URL.createObjectURL(file);
+      this.blobImgUrl = blobImage;
+
+      const fd = new FormData();
+      fd.append("profile", file);
+      await UpdateProfileAPI(this.$route.params.id, fd);
+    },
     handleAssignPersonalData(data) {
       this.personal_detail.emp_firstname = data?.emp_firstname;
       this.personal_detail.emp_lastname = data?.emp_lastname;
@@ -287,13 +319,13 @@ export default {
       employment.emp_ssuperior = data?.emp_ssuperior;
       employment.emp_location = data?.emp_location;
       employment.emp_attadance = data?.emp_attadance;
+      employment.emp_tanggungan = data?.emp_tanggungan;
       employment.company_id = data?.company_id?._id;
     },
     async handleDetailEmployment() {
       const { id } = this.$route.params;
       const response = await DetailEmployementAPI(id);
       const data = response?.data;
-      console.log(response.data);
       if (response.status === 401) {
         return this.$router.push("/login");
       }
@@ -312,5 +344,10 @@ export default {
 .profile {
   min-width: 128px;
   min-height: 128px;
+}
+.profile:hover ~ .absolute {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  opacity: 1 !important;
+  transition: 0.3s;
 }
 </style>

@@ -72,16 +72,6 @@
         @handleShowSelect="show_select = 'status'"
         @selected="data.emp_status = $event"
       />
-      <!-- <Select
-        label="Status Karyawan"
-        input_class="md:w-4/6 mt-2"
-        class="mb-2.5"
-        property="empstatus_name"
-        :value="data?.emp_status?.empstatus_name"
-        :options="empStatus"
-        @change="data.emp_status = $event"
-        select_property="_id"
-      /> -->
       <Select
         label="Tanggungan"
         input_class="md:w-4/6 mt-2"
@@ -112,17 +102,16 @@
         :isOpen="show_select === 'atasan-2'"
         @handleShowSelect="show_select = 'atasan-2'"
       />
-      <Select
-        label="Lokasi Absensi"
+      <SelectSearch
+        :options="locations"
+        label="Lokasi Abesensi"
+        property="loc_name"
+        @selected="data.emp_location = $event"
+        :selectedOption="data?.emp_location"
         input_class="md:w-4/6 mt-2"
-        class="mb-2.5"
-        :value="data?.emp_location"
-        @change="data.emp_location = $event"
-        :options="[
-          'Mufidah Stationery',
-          'Mufidah Terminal Print',
-          'Jojo House',
-        ]"
+        position="top"
+        :isOpen="show_select === 'lokasi'"
+        @handleShowSelect="show_select = 'lokasi'"
       />
       <div class="flex justify-end w-full my-4">
         <Button
@@ -135,7 +124,10 @@
       </div>
     </section>
     <section class="mt-4" v-if="tab_active === '2'">
-      <EmployementShift :emp_attadance="employment?.emp_attadance" />
+      <EmployementShift
+        :emp_attadance="employment?.emp_attadance"
+        :handleDetailEmployment="handleDetailEmployment"
+      />
     </section>
   </section>
 </template>
@@ -150,7 +142,7 @@ import { GetDesignationAPI } from "@/actions/designation";
 import { EditEmployementAPI } from "@/actions/employment";
 import { useToast } from "vue-toastification";
 import { GetEmpStatusAPI } from "@/actions/emp-status";
-
+import { GetLocationAPI } from "@/actions/location";
 import EmployementShift from "./EmploymentShift.vue";
 
 export default {
@@ -189,6 +181,7 @@ export default {
       empStatus: [],
       departement: [],
       designation: [],
+      locations: [],
     };
   },
   setup() {
@@ -207,11 +200,11 @@ export default {
       this.tab_active = tab;
     },
     showMessageStatus(response) {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         this.handleDetailEmployment();
         this.toast.success(response?.data?.message);
       } else {
-        if (response.data.message) {
+        if (response?.data.message) {
           this.toast.error(response?.data?.message);
         }
       }
@@ -219,20 +212,29 @@ export default {
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.data?.company_id}`;
       const response = await GetDepartementAPI(querySuperAdmin);
-      if (response.status === 401) {
+      if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      this.departement = response.data;
+      this.departement = response?.data;
     },
     async handleGetDesignation() {
       const querySuperAdmin = `?company=${this.data?.company_id}`;
       const response = await GetDesignationAPI(querySuperAdmin);
-      if (response.status === 401) {
+      if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      this.designation = response.data;
+      this.designation = response?.data;
+    },
+    async handleGetLocation() {
+      const querySuperAdmin = `?company_id=${this.data?.company_id}`;
+      const response = await GetLocationAPI(querySuperAdmin);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.locations = response?.data;
     },
     async getEmpStatus() {
       const queryAdminSuper = `?company_id=${this.data?.company_id}`;
@@ -242,7 +244,7 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      this.empStatus = response.data;
+      this.empStatus = response?.data;
     },
     async handleEditEmployement() {
       this.loading = true;
@@ -252,10 +254,11 @@ export default {
         emp_desid: this.data?.emp_desid?._id,
         emp_fsuperior: this.data?.emp_fsuperior?._id,
         emp_ssuperior: this.data?.emp_ssuperior?._id,
+        emp_location: this.data?.emp_location?._id,
       };
       const { id } = this.$route.params;
       const response = await EditEmployementAPI(id, data);
-      if (response.status === 401) {
+      if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
@@ -275,6 +278,7 @@ export default {
   mounted() {
     this.handleGetDepartement();
     this.handleGetDesignation();
+    this.handleGetLocation();
     this.getEmpStatus();
     const buttonHeight = this.$refs.first_tab?.offsetHeight;
     const buttonWidth = this.$refs.first_tab?.offsetWidth;

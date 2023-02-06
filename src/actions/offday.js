@@ -2,9 +2,9 @@ import { URL_API } from "@/config";
 import { tokenDecrypted } from "@/utils/decryptToken";
 import axios from "axios";
 
-export const AddShiftAPI = async (query, payload) => {
+export const AddOffDayRequest = async (query, payload) => {
   try {
-    const response = await axios.post(`${URL_API}/shift${query}`, payload, {
+    const response = await axios.post(`${URL_API}/off-day${query}`, payload, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -14,10 +14,9 @@ export const AddShiftAPI = async (query, payload) => {
     return error.response;
   }
 };
-
-export const EditShiftAPI = async (id, payload) => {
+export const EditOffdayRequestAPI = async (id, payload) => {
   try {
-    const response = await axios.put(`${URL_API}/shift/${id}`, payload, {
+    const response = await axios.put(`${URL_API}/off-day/${id}`, payload, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -27,9 +26,9 @@ export const EditShiftAPI = async (id, payload) => {
     return error.response;
   }
 };
-export const GetShiftAPI = async (query) => {
+export const GetOffDayRequestAPI = async (query) => {
   try {
-    const response = await axios.get(`${URL_API}/shift${query}`, {
+    const response = await axios.get(`${URL_API}/off-day${query}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -39,9 +38,9 @@ export const GetShiftAPI = async (query) => {
     return error.response;
   }
 };
-export const DeleteShiftAPI = async (id) => {
+export const GetOffdayEmploymentAPI = async (id) => {
   try {
-    const response = await axios.delete(`${URL_API}/shift/${id}`, {
+    const response = await axios.get(`${URL_API}/off-day/${id}`, {
       headers: {
         Authorization: `Bearer ${tokenDecrypted()}`,
       },
@@ -51,12 +50,11 @@ export const DeleteShiftAPI = async (id) => {
     return error.response;
   }
 };
-
-export const ChangeStatusShiftAPI = async (id) => {
+export const EditOvertimeRequestAPI = async (id, payload) => {
   try {
     const response = await axios.put(
-      `${URL_API}/shift/status/${id}`,
-      {},
+      `${URL_API}/outside-request/${id}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${tokenDecrypted()}`,

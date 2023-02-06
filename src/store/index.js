@@ -8,6 +8,13 @@ const store = createStore({
       file: null,
       token: null,
       currentPage: 1,
+      filter: {
+        employment_status: "",
+        designation: "",
+        departement: "",
+        workshifts: "",
+        role: "",
+      },
     };
   },
   mutations: {
@@ -28,6 +35,9 @@ const store = createStore({
     },
     setToken(state, payload) {
       state.token = payload;
+    },
+    setValueFilter(state, payload) {
+      state.filter = { ...payload };
     },
   },
   actions: {},

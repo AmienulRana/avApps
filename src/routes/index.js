@@ -7,8 +7,10 @@ import Login from "../pages/Login.vue";
 import NotFound from "../pages/NotFound.vue";
 import PayrollNominatif from "../pages/Payroll/nominatif.vue";
 import AttadanceDaily from "../pages/Attadance/Daily.vue";
+import AttendanceDetail from "../pages/Attadance/Detail.vue";
 import SettingWorkShift from "../pages/Attadance/SettingWorkshift.vue";
 import SettingCuti from "../pages/Attadance/SettingCuti.vue";
+import AppSetting from "../pages/Setting/AppSetting.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
 import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
 import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
@@ -22,6 +24,7 @@ import Announcement from "../pages/Administration/Announcement.vue";
 import Home from "../pages/Home.vue";
 import Periodic from "../pages/Setting/Periodic.vue";
 import LeaveSetting from "../pages/Setting/LeaveSetting.vue";
+import NeedApproval from "../pages/Pengajuan/NeedApproval.vue";
 import store from "../store";
 
 function requiredAuth(to, from, next) {
@@ -83,6 +86,11 @@ const routes = [
     beforeEnter: requiredAuth,
   },
   {
+    path: "/attedance/detail",
+    component: AttendanceDetail,
+    beforeEnter: requiredAuth,
+  },
+  {
     path: "/leave-request",
     component: LeaveRequest,
     beforeEnter: requiredAuth,
@@ -108,6 +116,11 @@ const routes = [
     beforeEnter: requiredAuth,
   },
   {
+    path: "/need-approval",
+    component: NeedApproval,
+    beforeEnter: requiredAuth,
+  },
+  {
     path: "/organisasi/jabatan",
     component: Jabatan,
     beforeEnter: requiredAuth,
@@ -130,6 +143,11 @@ const routes = [
   {
     path: "/setting/leave",
     component: LeaveSetting,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/app",
+    component: AppSetting,
     beforeEnter: requiredAuth,
   },
   {

@@ -22,7 +22,7 @@
             <font-awesome-icon icon="fa-user" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">{{ data.total_employment }}</p>
+            <p class="text-sm">{{ data?.total_employment }}</p>
             <p class="text-xs text-gray-400">Total employees</p>
           </div>
         </section>
@@ -35,7 +35,7 @@
             <font-awesome-icon icon="fa-home-alt" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">{{ data.total_departement }}</p>
+            <p class="text-sm">{{ data?.total_departement }}</p>
             <p class="text-xs text-gray-400">Total departement</p>
           </div>
         </section>
@@ -48,7 +48,9 @@
             <font-awesome-icon icon="fa-pen-to-square" class="text-lg" />
           </div>
           <div class="ml-3">
-            <p class="text-sm">0</p>
+            <p class="text-sm">
+              {{ data?.total_leave }}
+            </p>
             <p class="text-xs text-gray-400">Total leave request</p>
           </div>
         </section>
@@ -72,6 +74,8 @@
         <section class="col-span-3 mb-10 relative">
           <EmployementStatistic
             :total_employment_status="data.total_employment_status"
+            :departement_statistic="data.departement_statistic"
+            :designation_statistic="data.designation_statistic"
           />
           <Loading v-if="loading.getData" />
         </section>
@@ -110,7 +114,9 @@ export default {
       data: {
         total_employment: 0,
         total_departement: 0,
+        total_leave: 0,
         total_employment_status: [],
+        departement_statistic: [],
       },
     };
   },
@@ -133,21 +139,23 @@ export default {
       this.loading.company = false;
     },
     async handleGetDashboard() {
+      this.loading.getData = true;
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetDahsboardAPI(querySuperAdmin);
-      const { data } = response;
-      if (response.status === 401) {
+      const data = response?.data;
+      if (response?.status === 401) {
         this.$router.push("/login");
         this.toast.error(response?.data?.message);
         this.$store.commit("changeIsLoggedIn", false);
+      } else if (response?.status === 200) {
+        this.data.total_departement = data?.total_departement;
+        this.data.total_employment = data?.total_employment;
+        this.data.total_leave = data?.total_leave;
+        this.data.total_employment_status = data?.employment_status;
+        this.data.departement_statistic = data?.departement_statistic;
+        this.data.designation_statistic = data?.designation_statistic;
+        this.loading.getData = false;
       }
-      if (response.status === 200) {
-        this.data.total_departement = data.total_departement;
-        this.data.total_employment = data.total_employment;
-        this.data.total_employment_status = data.employment_status;
-        console.log(response);
-      }
-      this.loading.getData = false;
     },
   },
   watch: {
@@ -160,7 +168,8 @@ export default {
   },
   mounted() {
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
   },
 };

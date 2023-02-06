@@ -105,7 +105,8 @@ export default {
     this.getAllCompany();
     // this.handleCalender();
     const payload = decryptToken();
-    this.superAdmin = payload?.role === "Super Admin";
+    this.superAdmin =
+      payload?.role === "Super Admin" || payload?.role === "Group Admin";
   },
   watch: {
     dataCompany: {
