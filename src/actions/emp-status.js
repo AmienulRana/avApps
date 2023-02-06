@@ -46,3 +46,15 @@ export const GetEmpStatusAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteEmpStatusAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/employment-status/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
