@@ -14,6 +14,19 @@ export const AddShiftAPI = async (query, payload) => {
     return error.response;
   }
 };
+
+export const EditShiftAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(`${URL_API}/shift/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetShiftAPI = async (query) => {
   try {
     const response = await axios.get(`${URL_API}/shift${query}`, {
