@@ -154,43 +154,11 @@
             </td>
             <td class="p-3 text-right relative">
               <Button
-                class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-                @click.stop="showActions = 0"
+                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                @click="handleDeleteOvertimeRequest(overtime?._id)"
               >
-                <font-awesome-icon icon="fa-ellipsis" />
+                <font-awesome-icon icon="fa-trash-alt" />
               </Button>
-              <div
-                class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-                v-if="showActions === 0"
-              >
-                <ul>
-                  <li
-                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                  >
-                    Calculate/Recalculate
-                  </li>
-                  <li
-                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                  >
-                    Approved 1
-                  </li>
-                  <li
-                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                  >
-                    Approved 2
-                  </li>
-                  <li
-                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                  >
-                    HR Aproved
-                  </li>
-                  <li
-                    class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
-                  >
-                    Edit
-                  </li>
-                </ul>
-              </div>
             </td>
           </tr>
         </tbody>
@@ -414,7 +382,10 @@ import Radio from "./Radio.vue";
 import Button from "./Button.vue";
 import { getDate } from "@/utils/getDate";
 import { getCurrentTime } from "@/utils/getHours";
-import { EditOvertimeRequestAPI } from "@/actions/overtime-request";
+import {
+  EditOvertimeRequestAPI,
+  DeleteOvertimeRequestAPI,
+} from "@/actions/overtime-request";
 import Loading from "./Loading.vue";
 import NoDataShowing from "./NoDataShowing.vue";
 
@@ -518,6 +489,19 @@ export default {
       if (response.status === 200) {
         this.showModal = false;
         this.clearInputValue();
+        this.getOvertime();
+      }
+      this.showMessageStatus(response);
+      this.loading_overtime.edit = false;
+    },
+    async handleDeleteOvertimeRequest(id) {
+      this.loading_overtime.edit = true;
+      const response = await DeleteOvertimeRequestAPI(id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
         this.getOvertime();
       }
       this.showMessageStatus(response);
