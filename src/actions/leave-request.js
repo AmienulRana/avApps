@@ -30,6 +30,18 @@ export const GetLeaveRequestAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteStatusLeaveRequestAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/leave-request/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const EditStatusLeaveRequestAPI = async (id, payload) => {
   try {
     const response = await axios.put(
