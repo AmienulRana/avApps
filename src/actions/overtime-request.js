@@ -30,6 +30,18 @@ export const GetOvertimeRequestAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteOvertimeRequestAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/overtime-request/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const EditOvertimeRequestAPI = async (id, payload) => {
   try {
     const response = await axios.put(
