@@ -250,7 +250,7 @@ export default {
       }
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -296,7 +296,6 @@ export default {
       }
       if (response?.status === 200) {
         this.overtime_requests = response.data;
-        console.log(response);
       }
       this.loading.getOvertimeRequest = false;
     },
