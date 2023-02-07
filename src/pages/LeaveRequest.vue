@@ -60,6 +60,7 @@
         <TableLeaveRequest
           :leave_request="leave_request"
           :showMessageStatus="showMessageStatus"
+          :getLeaveRequest="handleGetLeaveRequest"
           :loadingGet="loading.getLeaveRequest"
         />
       </section>
@@ -524,6 +525,7 @@ export default {
       return currentHour + ":" + currentMinutes + " " + ampm;
     },
     async handleGetLeaveRequest() {
+      this.loading.getLeaveRequest = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await GetLeaveRequestAPI(queryAdminSuper);
       if (response?.status === 401) {
@@ -531,10 +533,9 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
-        this.loading.getLeaveRequest = false;
+        this.leave_request = response?.data;
       }
-      console.log(response?.data);
-      this.leave_request = response?.data;
+      this.loading.getLeaveRequest = false;
     },
     async handleLeaveRequest() {
       this.loading.addLeaveRequest = true;
