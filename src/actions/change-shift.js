@@ -42,6 +42,18 @@ export const GetShiftRequestAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteChangeWorkshiftAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/change-shift/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetOffdayEmploymentAPI = async (id) => {
   try {
     const response = await axios.get(`${URL_API}/off-day/${id}`, {
