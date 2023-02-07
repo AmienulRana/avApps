@@ -87,7 +87,7 @@
             <td class="p-3 text-sm">
               <p class="text-sm">
                 {{
-                  leave?.empleave_type_id.includes("Paid") ? "Paid" : "Unpaid"
+                  leave?.empleave_type_id?.includes("Paid") ? "Paid" : "Unpaid"
                 }}
               </p>
             </td>
@@ -148,26 +148,13 @@
                 <img src="../assets/icons/log.svg" />
               </button>
             </td>
-            <td class="p-3 text-right relative">
+            <td class="text-right relative">
               <Button
-                class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
-                @click.stop="showActions = i"
+                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                @click="handleDeleteLeave(leave?._id)"
               >
-                <font-awesome-icon icon="fa-ellipsis" />
+                <font-awesome-icon icon="fa-trash-alt" />
               </Button>
-              <div
-                class="text-left absolute -top-full right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
-                v-if="showActions === i"
-              >
-                <ul>
-                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                    View details
-                  </li>
-                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                    Rejected
-                  </li>
-                </ul>
-              </div>
             </td>
           </tr>
         </tbody>
@@ -265,9 +252,13 @@
 <script>
 import Modal from "./Modal.vue";
 import Radio from "./Radio.vue";
-import { EditStatusLeaveRequestAPI } from "@/actions/leave-request";
+import {
+  EditStatusLeaveRequestAPI,
+  DeleteStatusLeaveRequestAPI,
+} from "@/actions/leave-request";
 import Loading from "./Loading.vue";
 import NoDataShowing from "./NoDataShowing.vue";
+import Button from "./Button.vue";
 
 export default {
   name: "TableAttadance",
@@ -275,8 +266,9 @@ export default {
     leave_request: Array,
     showMessageStatus: Function,
     loadingGet: Boolean,
+    getLeaveRequest: Function,
   },
-  components: { Modal, Radio, Loading, NoDataShowing },
+  components: { Modal, Radio, Loading, NoDataShowing, Button },
   data() {
     return {
       showActions: null,
@@ -321,6 +313,17 @@ export default {
       }
       this.showMessageStatus(response);
       this.loading = false;
+    },
+    async handleDeleteLeave(id) {
+      const response = await DeleteStatusLeaveRequestAPI(id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.getLeaveRequest();
+      }
+      this.showMessageStatus(response);
     },
   },
 };
