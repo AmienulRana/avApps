@@ -153,7 +153,6 @@ import Dropdown from "../../components/Dropdown.vue";
 import TableChangeWorkShift from "../../components/TableChangeWorkShift.vue";
 import Modal from "../../components/Modal.vue";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
-import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
 import employee from "@/employee.json";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
@@ -176,7 +175,6 @@ export default {
     Dropdown,
     SelectSearch,
     Modal,
-    Radio,
     Input,
     ChoiseCompany,
   },
@@ -243,7 +241,7 @@ export default {
       }
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -266,7 +264,7 @@ export default {
       this.replace_employment = employmentFilter;
       this.getOffdayEmployment(employment?._id);
     },
-    async getOffdayEmployment(id) {
+    async getOffdayEmployment() {
       // const response = await GetOffdayEmploymentAPI(id);
       // console.log(response);
       // if (response.status === 401) {
@@ -288,7 +286,7 @@ export default {
         empchange_replacement: this?.data?.empchange_replacement?._id,
         empchange_to: this?.data?.empchange_to?._id,
       };
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await AddChangeShiftRequest(
         this.superAdmin ? querySuperAdmin : "",
         payload
