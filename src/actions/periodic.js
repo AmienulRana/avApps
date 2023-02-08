@@ -41,7 +41,7 @@ export const GetPeriodicActiveAPI = async (query) => {
 export const ChangeStatusPeriodicAPI = async (id) => {
   try {
     const response = await axios.put(
-      `${URL_API}/periodic/${id}`,
+      `${URL_API}/periodic/status/${id}`,
       {},
       {
         headers: {
@@ -54,32 +54,25 @@ export const ChangeStatusPeriodicAPI = async (id) => {
     return error.response;
   }
 };
-export const EditAllowDeductAPI = async (id, payload) => {
+export const EditPeriodicAPI = async (id, payload) => {
   try {
-    const response = await axios.put(
-      `${URL_API}/allowance-deduction/${id}`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${tokenDecrypted()}`,
-        },
-      }
-    );
+    const response = await axios.put(`${URL_API}/periodic/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
     return response;
   } catch (error) {
     return error.response;
   }
 };
-export const DeleteAllowDeductAPI = async (id) => {
+export const DeletePeriodicAPI = async (id) => {
   try {
-    const response = await axios.delete(
-      `${URL_API}/allowance-deduction/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${tokenDecrypted()}`,
-        },
-      }
-    );
+    const response = await axios.delete(`${URL_API}/periodic/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
     return response;
   } catch (error) {
     return error.response;
