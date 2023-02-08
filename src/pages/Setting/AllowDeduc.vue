@@ -21,12 +21,82 @@
         </div>
       </section>
       <section class="w-full">
-        <TableAllowDeducSetting :ad="allowDeducts" />
+        <section
+          class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+          @click="
+            showActions = null;
+            showReasonNote = null;
+          "
+        >
+          <table class="bg-white min-w-max mt-6 w-full pb-4">
+            <thead class="border-b bg-white border-gray-200 text-gray-400">
+              <tr>
+                <th class="text-left text-sm">Name</th>
+                <th class="text-left text-sm">Description</th>
+                <th class="text-left text-sm">Type</th>
+                <th class="text-left text-sm">Status</th>
+                <th class="text-left text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="border-b h-max"
+                v-for="dataAd in allowDeducts"
+                :key="dataAd?._id"
+              >
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ dataAd?.ad_name }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm">
+                    {{ dataAd?.ad_desc ? dataAd?.ad_desc : "-" }}
+                  </p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p
+                    class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+                    :class="
+                      dataAd?.ad_type === 'Allowance'
+                        ? 'bg-green-500'
+                        : 'bg-orange-500'
+                    "
+                  >
+                    {{ dataAd?.ad_type }}
+                  </p>
+                </td>
+                <td class="p-3 text-sm">
+                  <SwitchButton
+                    class="w-max"
+                    @update:model="(value) => updateStatus(value, dataAd)"
+                    :value="dataAd?.ad_status"
+                  />
+                </td>
+                <td class="p-3 text-right relative">
+                  <button
+                    class="mr-3"
+                    @click="handleDeleteAllowDeduct(dataAd?._id)"
+                  >
+                    <font-awesome-icon
+                      icon="fa-trash-alt"
+                      class="text-red-500"
+                    />
+                  </button>
+                  <button @click="handleDetailAllowDeduct(dataAd)">
+                    <font-awesome-icon
+                      icon="fa-pen-to-square"
+                      class="text-primary"
+                    />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </section>
     </section>
   </LayoutAdmin>
   <Modal
-    title="Add Allowance or Deduction"
+    :title="`${modeEdit ? 'Edit' : 'Add'} Allowance or Deduction`"
     :showModal="modal.showModal"
     @close="modal.showModal = false"
   >
@@ -61,12 +131,14 @@
             label="Allowance"
             @change="data.ad_type = 'Allowance'"
             :modelValue="data.ad_type"
+            :checked="data.ad_type === 'Allowance'"
           />
           <Radio
             label="Deduction"
             class="mx-8"
             @change="data.ad_type = 'Deduction'"
             :modelValue="data.ad_type"
+            :checked="data.ad_type === 'Deduction'"
           />
         </div>
       </section>
@@ -80,8 +152,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddAllowDeduct"
           :disabled="loadingData"
+          v-if="!modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditAllowDeduct"
+          :disabled="loadingData"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -91,7 +172,7 @@
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
-import TableAllowDeducSetting from "../../components/TableAllowDeducSetting.vue";
+import SwitchButton from "../../components/SwitchButton.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "@/components/Input.vue";
 import Radio from "@/components/Radio.vue";
@@ -103,6 +184,7 @@ import {
   GetAllowDeductAPI,
   EditAllowDeductAPI,
   DeleteAllowDeductAPI,
+  ChangeStatusAllowDeductAPI,
 } from "@/actions/allow-deduction";
 import { useToast } from "vue-toastification";
 
@@ -111,11 +193,11 @@ export default {
   components: {
     LayoutAdmin,
     Button,
-    TableAllowDeducSetting,
     Modal,
     Input,
     Radio,
     ChoiseCompany,
+    SwitchButton,
   },
   data() {
     return {
@@ -124,12 +206,14 @@ export default {
       options: [],
       dataCompany: {},
       loadingData: false,
+      modeEdit: false,
       loading: {
         company: true,
       },
       modal: {
         showModal: false,
       },
+      id_ad: "",
       data: {
         ad_name: "",
         ad_desc: "",
@@ -171,6 +255,10 @@ export default {
         }
       }
     },
+    async updateStatus(value, dataAd) {
+      dataAd.ad_status = value;
+      await ChangeStatusAllowDeductAPI(dataAd?._id);
+    },
     async handleAddAllowDeduct() {
       this.loadingData = true;
       const data = {
@@ -200,16 +288,16 @@ export default {
       this.allowDeducts = response?.data;
     },
     handleDetailAllowDeduct(allowDeduct) {
-      this.edit = true;
-      this.data.emp_id = allowDeduct?._id;
-      this.data.empexp_comp_position = allowDeduct?.empexp_comp_position;
-      this.data.empexp_company = allowDeduct?.empexp_company;
-      this.data.empexp_endate = allowDeduct?.empexp_endate;
-      this.data.empexp_startdate = allowDeduct?.empexp_startdate;
+      this.modeEdit = true;
+      this.modal.showModal = true;
+      this.id_ad = allowDeduct?._id;
+      this.data.ad_desc = allowDeduct?.ad_desc;
+      this.data.ad_name = allowDeduct?.ad_name;
+      this.data.ad_type = allowDeduct?.ad_type;
     },
     async handleEditAllowDeduct() {
-      this.loading = true;
-      const id = this.data.emp_id;
+      this.loadingData = true;
+      const id = this.id_ad;
       const data = {
         ...this.data,
       };
@@ -221,10 +309,11 @@ export default {
       if (response.status === 200) {
         this.handleGetAllowDeduct();
         this.clearInputValue();
-        this.showMessageStatus(response);
-        this.edit = false;
+        this.modal.showModal = false;
+        this.modeEdit = false;
       }
-      this.loading = false;
+      this.showMessageStatus(response);
+      this.loadingData = false;
     },
     async handleDeleteAllowDeduct(id) {
       const response = await DeleteAllowDeductAPI(id);
@@ -234,8 +323,8 @@ export default {
       }
       if (response.status === 200) {
         this.handleGetAllowDeduct();
-        this.showMessageStatus(response);
       }
+      this.showMessageStatus(response);
     },
   },
   watch: {
