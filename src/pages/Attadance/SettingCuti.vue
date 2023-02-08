@@ -1,6 +1,11 @@
 <template>
-  <LayoutAdmin @click="activeDropdown = false">
-    <section class="px-8 mt-6 w-full overflow-x-hiden">
+  <LayoutAdmin
+    @click="
+      activeDropdown = false;
+      showActions = '';
+    "
+  >
+    <section class="px-8 mt-6 mb-10 w-full overflow-x-hiden">
       <section class="flex justify-between items-center mb-8">
         <section class="flex items-center">
           <h1 class="text-2xl">
@@ -23,18 +28,122 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingCuti
-          :leaveHoliday="leaveHoliday"
-          :departement="departement"
-          :loading="loading.getLeaveHol"
-        />
+        <section
+          class="w-full overflow-x-auto custom-scrollbar bg-white relative"
+          @click="showActions = null"
+        >
+          <table class="bg-white min-w-max mt-6 w-full pb-4">
+            <thead class="border-b bg-white border-gray-200 text-gray-400">
+              <tr>
+                <th class="text-left text-sm">No.</th>
+                <th class="text-left text-sm">Tanggal Mulai</th>
+                <th class="text-left text-sm">Tanggal Selesai</th>
+                <th class="text-left text-sm">Keterangan Cuti Bersama</th>
+                <th class="text-left text-sm">Tipe</th>
+                <th class="text-left text-sm">Potong Cuti</th>
+                <th class="text-left text-sm">Berlaku</th>
+                <th class="text-left text-sm">Status</th>
+                <th class="text-left text-sm">Action</th>
+              </tr>
+            </thead>
+            <tbody v-if="!loading.getLeaveHol">
+              <tr
+                class="border-b h-max"
+                v-for="(data, i) in leaveHoliday"
+                :key="i"
+              >
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ i + 1 }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ data?.leavehol_startdate }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ data?.leavehol_enddate }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ data?.leavehol_desc }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm">{{ data?.leavehol_type }}</p>
+                </td>
+                <td class="p-3 text-sm">
+                  <SwitchButton
+                    class="w-max"
+                    @update:model="(value) => (data.leavehol_cutleave = value)"
+                    :value="data?.leavehol_cutleave"
+                  />
+                </td>
+                <td class="p-3 text-sm">
+                  <p
+                    class="text-sm"
+                    v-if="departement.length === data?.leavehol_depid.length"
+                  >
+                    Semua
+                  </p>
+                  <template v-else>
+                    <p
+                      v-for="(departement, i) in data?.leavehol_depid"
+                      :key="i"
+                    >
+                      {{ departement?.dep_name }}
+                    </p>
+                  </template>
+                </td>
+                <td class="p-3 text-sm">
+                  <p class="text-sm text-green-500">Aktif</p>
+                </td>
+                <td class="p-3 text-right relative">
+                  <Button
+                    class="p-3 shadow-none rotate-90 hover:bg-blue-100 text-primary rounded-full"
+                    @click.stop="showActions = i"
+                  >
+                    <font-awesome-icon icon="fa-ellipsis" />
+                  </Button>
+                  <div
+                    class="text-left absolute top-0 right-20 rounded-md bg-white shadow-md md:w-max md:h-max"
+                    v-if="showActions === i"
+                  >
+                    <ul>
+                      <li
+                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                        @click="assignCutiDetail(data)"
+                      >
+                        Edit
+                      </li>
+                      <li
+                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                        @click="handleDeleteLeaveHoliday(data?._id)"
+                      >
+                        Delete
+                      </li>
+                      <li
+                        class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400 text-sm"
+                      >
+                        Non-Aktif
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <NoDataShowing
+            v-if="!loading.getLeaveHol && leaveHoliday.length === 0"
+          />
+          <Loading v-if="loading.getLeaveHol" />
+        </section>
       </section>
     </section>
   </LayoutAdmin>
   <Modal
-    title="Add Cuti/Libur"
+    :title="`${modal.modeEdit ? 'Edit' : 'Add'} Cuti/Libur`"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modal.modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -185,8 +294,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddLeaveHoliday"
           :disabled="loading.addLeaveHol"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditLeaveHoliday"
+          :disabled="loading.addLeaveHol"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -196,7 +314,9 @@
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
-import TableSettingCuti from "../../components/TableSettingCuti.vue";
+import SwitchButton from "../../components/SwitchButton.vue";
+import Loading from "../../components/Loading.vue";
+import NoDataShowing from "../../components/NoDataShowing.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "@/components/Input.vue";
 import Select from "@/components/Select/index.vue";
@@ -207,6 +327,8 @@ import { GetAllCompanyAPI } from "@/actions/company";
 import {
   AddLeaveHolidayAPI,
   GetLeaveHolidayAPI,
+  EditLeaveHolidayAPI,
+  DeleteLeaveHolidayAPI,
 } from "@/actions/leave-holiday";
 import { useToast } from "vue-toastification";
 
@@ -215,19 +337,23 @@ export default {
   components: {
     LayoutAdmin,
     Button,
-    TableSettingCuti,
     Modal,
     Input,
     Select,
     ChoiseCompany,
+    SwitchButton,
+    Loading,
+    NoDataShowing,
   },
   data() {
     return {
       modal: {
         showModal: false,
         showDropdown: false,
+        modeEdit: false,
       },
       query: "",
+      showActions: "",
       departement: [],
       searchDepartement: [],
       departementSelected: [],
@@ -240,6 +366,7 @@ export default {
         leavehol_cutleave: false,
         leavehol_depid: [],
       },
+      id_leavehol: "",
       optionsCompany: [],
       superAdmin: false,
       dataCompany: {},
@@ -264,6 +391,15 @@ export default {
         }
       }
     },
+    clearInputValue() {
+      this.data.leavehol_startdate = "";
+      this.data.leavehol_enddate = "";
+      this.data.leavehol_desc = "";
+      this.data.leavehol_type = "";
+      this.data.leavehol_cutleave = false;
+      this.data.leavehol_depid = [];
+      this.departementSelected = [];
+    },
     async handleAddLeaveHoliday() {
       this.loading.addLeaveHol = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
@@ -275,9 +411,50 @@ export default {
       if (response.status === 200) {
         this.modal.showModal = false;
         this.getLeaveHoliday();
+        this.clearInputValue();
       }
       this.showMessageStatus(response);
       this.loading.addLeaveHol = false;
+    },
+    assignCutiDetail(cuti) {
+      this.modal.modeEdit = true;
+      this.modal.showModal = true;
+      this.id_leavehol = cuti?._id;
+      this.data.leavehol_startdate = cuti?.leavehol_startdate;
+      this.data.leavehol_enddate = cuti?.leavehol_enddate;
+      this.data.leavehol_desc = cuti?.leavehol_desc;
+      this.data.leavehol_depid = cuti?.leavehol_depid?.map(
+        (leave) => leave?._id
+      );
+      cuti?.leavehol_depid?.map((dep) => this.handleSelectedDepartement(dep));
+      this.data.leavehol_type = cuti?.leavehol_type;
+    },
+    async handleEditLeaveHoliday() {
+      this.loading.addLeaveHol = true;
+      const response = await EditLeaveHolidayAPI(this?.id_leavehol, this.data);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.modal.modeEdit = false;
+        this.getLeaveHoliday();
+        this.clearInputValue();
+      }
+      this.showMessageStatus(response);
+      this.loading.addLeaveHol = false;
+    },
+    async handleDeleteLeaveHoliday(id) {
+      const response = await DeleteLeaveHolidayAPI(id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.getLeaveHoliday();
+      }
+      this.showMessageStatus(response);
     },
     async getLeaveHoliday() {
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
