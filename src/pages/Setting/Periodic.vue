@@ -21,18 +21,99 @@
         </div>
       </section>
       <section class="w-full">
-        <TableSettingPeriodic
-          :periodics="periodics"
-          :loading="loading.get"
-          :handleGetPeriodic="handleGetPeriodic"
-        />
+        <section class="relative">
+          <section
+            class="w-full overflow-x-auto custom-scrollbar bg-white"
+            :class="loading.get && 'h-96'"
+            @click="
+              showActions = null;
+              showReasonNote = null;
+            "
+          >
+            <table class="bg-white min-w-max mt-6 w-full pb-4">
+              <thead class="border-b bg-white border-gray-200 text-gray-400">
+                <tr>
+                  <th class="text-left text-sm">No.</th>
+                  <th class="text-left text-sm">Company</th>
+                  <th class="text-left text-sm">Years</th>
+                  <th class="text-left text-sm">Month</th>
+                  <th class="text-left text-sm">Start date</th>
+                  <th class="text-left text-sm">End date</th>
+                  <th class="text-left text-sm">Active</th>
+                  <th class="text-left text-sm">Actions</th>
+                </tr>
+              </thead>
+              <tbody v-if="!loading.get">
+                <tr
+                  class="border-b h-max"
+                  v-for="(periodic, i) in periodics"
+                  :key="i"
+                >
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">{{ i + 1 }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">
+                      {{ periodic?.company_id?.company_name }}
+                    </p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">{{ periodic?.periodic_years }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">{{ periodic?.periodic_month }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">{{ periodic?.periodic_start_date }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <p class="text-sm">{{ periodic?.periodic_end_date }}</p>
+                  </td>
+                  <td class="p-3 text-sm">
+                    <SwitchButton
+                      class="w-max"
+                      @update:model="(value) => updateStatus(value, periodic)"
+                      :value="periodic?.periodic_status"
+                    />
+                  </td>
+                  <td class="p-3 text-right relative flex">
+                    <Button
+                      class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                      @click="handleDetailPeriodic(periodic)"
+                    >
+                      <font-awesome-icon
+                        icon="fa-pen-to-square"
+                        class="text-primary"
+                      />
+                    </Button>
+                    <Button
+                      class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                      @click="handleDeletePeriodic(periodic?._id)"
+                    >
+                      <font-awesome-icon
+                        icon="fa-trash-alt"
+                        class="text-red-500"
+                      />
+                    </Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <NoDataShowing v-if="!loading.get && periodics.length === 0" />
+            <Loading v-if="loading.get" />
+          </section>
+        </section>
       </section>
     </section>
   </LayoutAdmin>
   <Modal
-    title="Add Periodic"
+    :title="`${modeEdit ? 'Edit' : 'Add'} Periodic`"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -89,8 +170,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddPeriodic"
           :disabled="loadingData"
+          v-if="!modeEdit"
         >
           Save
+        </Button>
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditPeriodic"
+          :disabled="loadingData"
+          v-else
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -100,7 +190,9 @@
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
-import TableSettingPeriodic from "../../components/TableSettingPeriodic.vue";
+import SwitchButton from "../../components/SwitchButton.vue";
+import Loading from "../../components/Loading.vue";
+import NoDataShowing from "../../components/NoDataShowing.vue";
 import Modal from "../../components/Modal.vue";
 import Input from "@/components/Input.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
@@ -109,23 +201,26 @@ import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import {
   AddPeriodicAPI,
   GetPeriodicAPI,
-  EditAllowDeductAPI,
-  DeleteAllowDeductAPI,
+  EditPeriodicAPI,
+  DeletePeriodicAPI,
 } from "@/actions/periodic";
 import { useToast } from "vue-toastification";
 import Select from "@/components/Select/index.vue";
 import moment from "moment";
+import { ChangeStatusPeriodicAPI } from "@/actions/periodic";
 
 export default {
   name: "PeriodicPage",
   components: {
     LayoutAdmin,
     Button,
-    TableSettingPeriodic,
     Modal,
     Input,
     ChoiseCompany,
     Select,
+    SwitchButton,
+    Loading,
+    NoDataShowing,
   },
   data() {
     return {
@@ -138,6 +233,7 @@ export default {
         company: true,
         get: true,
       },
+      modeEdit: false,
       modal: {
         showModal: false,
       },
@@ -156,6 +252,7 @@ export default {
         "November",
         "December",
       ],
+      id_periodic: "",
       data: {
         periodic_start_date: "",
         periodic_end_date: "",
@@ -182,6 +279,17 @@ export default {
         this.contactEmployee = false;
       } else {
         this.contactEmployee = id;
+      }
+    },
+    async updateStatus(value, periodic) {
+      periodic.periodic_status = value;
+      const response = await ChangeStatusPeriodicAPI(periodic?._id);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.handleGetPeriodic();
       }
     },
     clearInputValue() {
@@ -219,6 +327,7 @@ export default {
       this.loadingData = false;
     },
     async handleGetPeriodic() {
+      this.loading.get = false;
       const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
 
       const response = await GetPeriodicAPI(querySuperAdmin);
@@ -229,41 +338,45 @@ export default {
       this.periodics = response?.data;
       this.loading.get = false;
     },
-    handleDetailAllowDeduct(allowDeduct) {
-      this.edit = true;
-      this.data.emp_id = allowDeduct?._id;
-      this.data.empexp_comp_position = allowDeduct?.empexp_comp_position;
-      this.data.empexp_company = allowDeduct?.empexp_company;
-      this.data.empexp_endate = allowDeduct?.empexp_endate;
-      this.data.empexp_startdate = allowDeduct?.empexp_startdate;
+    handleDetailPeriodic(periodic) {
+      this.modeEdit = true;
+      this.modal.showModal = true;
+      this.id_periodic = periodic?._id;
+      this.data.periodic_start_date = periodic?.periodic_start_date;
+      this.data.periodic_end_date = periodic?.periodic_end_date;
+      this.data.periodic_years = periodic?.periodic_years;
+      this.data.periodic_month = periodic?.periodic_month;
     },
-    async handleEditAllowDeduct() {
-      this.loading = true;
-      const id = this.data.emp_id;
+    async handleEditPeriodic() {
+      this.loadingData = true;
+      const id = this.id_periodic;
       const data = {
         ...this.data,
       };
-      const response = await EditAllowDeductAPI(id, data);
+      const response = await EditPeriodicAPI(id, data);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetPeriodic();
         this.clearInputValue();
-        this.showMessageStatus(response);
-        this.edit = false;
+        this.modeEdit = false;
+        this.modal.showModal = false;
       }
-      this.loading = false;
+      this.showMessageStatus(response);
+      this.loadingData = false;
     },
-    async handleDeleteAllowDeduct(id) {
-      const response = await DeleteAllowDeductAPI(id);
+    async handleDeletePeriodic(id) {
+      const response = await DeletePeriodicAPI(id);
       if (response.status === 401) {
-        return (window.location.href = "/");
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
         this.handleGetPeriodic();
-        this.showMessageStatus(response);
       }
+      this.showMessageStatus(response);
     },
   },
   watch: {
@@ -289,4 +402,19 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+table thead th,
+table tbody tr td {
+  padding: 1rem 2rem;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  height: 5px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: #c6c8cc;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #a1a1a1;
+}
+</style>
