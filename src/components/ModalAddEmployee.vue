@@ -61,7 +61,7 @@
               </div>
             </div>
             <Input
-              label="Nama Depan"
+              label="Nama Depan*"
               input_class="md:w-4/6 w-full mt-1 w-full mt-1"
               class="mb-2.5"
               :value="personal.emp_firstname"
@@ -75,7 +75,7 @@
               @change="personal.emp_lastname = $event"
             />
             <Input
-              label="Email"
+              label="Email*"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
               :value="personal.email"
@@ -97,7 +97,7 @@
             />
             <div class="md:flex justify-between items-center mb-2.5">
               <label class="text-sm text-gray-400 md:w-1/5 w-full"
-                >Jenis Kelamin</label
+                >Jenis Kelamin*</label
               >
               <div class="flex md:w-4/6 w-full mt-1">
                 <Radio
@@ -153,14 +153,14 @@
         >
           <section class="mt-4">
             <Input
-              label="Username"
+              label="Username*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               :value="employment.username"
               @change="employment.username = $event"
             />
             <Input
-              label="Password"
+              label="Password*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               type="password"
@@ -176,7 +176,7 @@
             />
             <SelectSearch
               :options="departement"
-              label="Departement"
+              label="Departement*"
               position="bottom"
               property="dep_name"
               input_class="md:w-4/6 mt-2"
@@ -187,7 +187,7 @@
             />
             <SelectSearch
               :options="designation"
-              label="Jabatan"
+              label="Jabatan*"
               position="bottom"
               property="des_name"
               input_class="md:w-4/6 mt-2"
@@ -197,7 +197,7 @@
               @selected="employment.emp_desid = $event"
             />
             <Select
-              label="Status Karyawan"
+              label="Status Karyawan*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               property="empstatus_name"
@@ -217,7 +217,7 @@
             <SelectSearch
               :options="designation"
               property="des_name"
-              label="Atasan Pertama"
+              label="Atasan Pertama*"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-1'"
@@ -228,7 +228,7 @@
             <SelectSearch
               :options="designation"
               property="des_name"
-              label="Atasan Kedua"
+              label="Atasan Kedua*"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-2'"
@@ -237,7 +237,7 @@
               @selected="employment.emp_ssuperior = $event"
             />
             <Select
-              label="Lokasi Absensi"
+              label="Lokasi Absensi*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               :value="employment.emp_location"
@@ -266,7 +266,7 @@
             :key="day.name"
           >
             <Select
-              :label="day.name"
+              :label="`${day.name}*`"
               input_class="md:w-4/6 mt-2"
               class="w-full mr-6"
               property="shift_desc"
@@ -533,10 +533,10 @@ export default {
       }
     },
     showMessageStatus(response) {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         this.toast.success(response?.data?.message);
       } else {
-        if (response.data.message) {
+        if (response?.data?.message) {
           this.toast.error(response?.data?.message);
         }
       }
