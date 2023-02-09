@@ -222,7 +222,7 @@ export default {
       }
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -279,7 +279,7 @@ export default {
         emp_id: this?.data?.emp_id?._id,
         emp_replacement: this?.data?.emp_replacement?._id,
       };
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await AddOffDayRequest(
         this.superAdmin ? querySuperAdmin : "",
         payload

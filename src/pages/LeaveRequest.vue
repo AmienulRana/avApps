@@ -60,6 +60,7 @@
         <TableLeaveRequest
           :leave_request="leave_request"
           :showMessageStatus="showMessageStatus"
+          :getLeaveRequest="handleGetLeaveRequest"
           :loadingGet="loading.getLeaveRequest"
         />
       </section>
@@ -294,11 +295,6 @@
               :key="image.blobImgUrl"
               @click.stop
             >
-              <!-- <div
-                class="absolute duration-300 top-0 text-white flex justify-center py-4 rounded-lg left-0 w-full h-full"
-              >
-                <p>{{ convertToMB(image?.originalFile?.size) }}mb</p>
-              </div> -->
               <img :src="image?.blobImgUrl" class="w-full h-32 rounded-lg" />
               <p
                 @click="removeImageFromPreview(image)"
@@ -373,7 +369,7 @@ import {
 import { useToast } from "vue-toastification";
 
 export default {
-  name: "EmployeeIndex",
+  name: "LeaveRequest",
   components: {
     LayoutAdmin,
     Button,
@@ -444,7 +440,7 @@ export default {
         }
       }
     },
-    handleFilter(status, designation, departement, role) {
+    handleFilter(status, designation, departement) {
       const filterConditions = [
         { key: "emp_status", value: status },
         { key: "emp_desid", value: designation },
@@ -529,6 +525,7 @@ export default {
       return currentHour + ":" + currentMinutes + " " + ampm;
     },
     async handleGetLeaveRequest() {
+      this.loading.getLeaveRequest = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await GetLeaveRequestAPI(queryAdminSuper);
       if (response?.status === 401) {
@@ -536,10 +533,9 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response.status === 200) {
-        this.loading.getLeaveRequest = false;
+        this.leave_request = response?.data;
       }
-      console.log(response?.data);
-      this.leave_request = response?.data;
+      this.loading.getLeaveRequest = false;
     },
     async handleLeaveRequest() {
       this.loading.addLeaveRequest = true;
@@ -589,7 +585,7 @@ export default {
       this.loading.getCompany = false;
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );

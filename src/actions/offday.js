@@ -38,6 +38,18 @@ export const GetOffDayRequestAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteOffdayRequestAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/off-day/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetOffdayEmploymentAPI = async (id) => {
   try {
     const response = await axios.get(`${URL_API}/off-day/${id}`, {
