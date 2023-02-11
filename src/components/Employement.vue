@@ -104,7 +104,7 @@
       />
       <SelectSearch
         :options="locations"
-        label="Lokasi Abesensi"
+        label="Lokasi Absensi"
         property="loc_name"
         @selected="data.emp_location = $event"
         :selectedOption="data?.emp_location"
@@ -230,6 +230,7 @@ export default {
     async handleGetLocation() {
       const querySuperAdmin = `?company_id=${this.data?.company_id}`;
       const response = await GetLocationAPI(querySuperAdmin);
+      console.log(response);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
