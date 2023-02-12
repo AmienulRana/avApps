@@ -155,6 +155,7 @@
         <Button
           v-else
           class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditOvertimeRequest"
           :disabled="loading?.addOvertimeRequest"
         >
           Edit
@@ -178,6 +179,7 @@ import { GetAllCompanyAPI } from "@/actions/company";
 import {
   AddOvertimeRequestAPI,
   GetOvertimeRequestAPI,
+  EditOvertimeRequestDataAPI,
 } from "@/actions/overtime-request";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
@@ -215,6 +217,7 @@ export default {
           minute: "00",
         },
       },
+      id_overtime: "",
       data: {
         emp_id: "",
         overtime_reason: "",
@@ -296,8 +299,8 @@ export default {
     assignOvertimeDetail(overtime) {
       this.modal.showModal = true;
       this.modal.modeEdit = true;
-      console.log(overtime);
       this.data.emp_id = overtime?.emp_id;
+      this.id_overtime = overtime?._id;
       this.data.overtime_reason = overtime?.overtime_reason;
       this.data.overtime_date = overtime?.overtime_date;
       this.modal.start_time.hour = this.getHourMinute(
@@ -329,6 +332,31 @@ export default {
       }
       if (response.status === 200) {
         this.modal.showModal = false;
+        this.clearInputValue();
+        this.getOvertimeRequest();
+      }
+      this.showMessageStatus(response);
+      this.loading.addOvertimeRequest = false;
+    },
+    async handleEditOvertimeRequest() {
+      this.loading.addOvertimeRequest = true;
+      const payload = {
+        ...this.data,
+        emp_id: this.data?.emp_id?._id,
+        overtime_start_hours: `${this.modal.start_time.hour}:${this.modal.start_time.minute}`,
+        overtime_end_hours: `${this.modal.end_time.hour}:${this.modal.end_time.minute}`,
+      };
+      const response = await EditOvertimeRequestDataAPI(
+        this.id_overtime,
+        payload
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.modal.modeEdit = false;
         this.clearInputValue();
         this.getOvertimeRequest();
       }
