@@ -62,6 +62,7 @@
           :loading="loading.getOvertimeRequest"
           :showMessageStatus="showMessageStatus"
           :getOvertime="getOvertimeRequest"
+          :assignOutsideDetail="assignOutsideDetail"
         />
       </section>
     </section>
@@ -69,7 +70,11 @@
   <Modal
     title="Add Outside Assignment"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modal.modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -86,7 +91,7 @@
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.emp_id = $event"
@@ -129,8 +134,16 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddOvertimeRequest"
           :disabled="loading?.addOvertimeRequest"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          v-else
+          :disabled="loading?.addOvertimeRequest"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -176,10 +189,12 @@ export default {
       layoutData: "card",
       employee: employee,
       modal: {
+        modeEdit: false,
         showModal: false,
         showSelect: false,
         showAbility: "hide",
       },
+      outisde_id: "",
       data: {
         emp_id: "",
         outside_reason: "",
@@ -239,7 +254,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
     },
@@ -262,6 +277,15 @@ export default {
       }
       this.showMessageStatus(response);
       this.loading.addOvertimeRequest = false;
+    },
+    assignOutsideDetail(outside) {
+      this.modal.modeEdit = true;
+      this.modal.showModal = true;
+      this.outisde_id = outside?._id;
+      this.data.emp_id = outside?.emp_id;
+      this.data.outside_reason = outside?.outside_reason;
+      this.data.outside_start_date = outside?.outside_start_date;
+      this.data.outside_end_date = outside?.outside_end_date;
     },
     async getOvertimeRequest() {
       this.loading.getOvertimeRequest = true;
