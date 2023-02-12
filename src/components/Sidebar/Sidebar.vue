@@ -181,9 +181,9 @@ export default {
           title: "Attendance",
           icon: "fa-calendar",
           contents: [
-            { text: "Daily Log Absensi", to: "/attedance/daily" },
+            { text: "Daily Log Attendance", to: "/attedance/daily" },
 
-            { text: "Attendace Detail", to: "/attedance/detail" },
+            { text: "Attendance Detail", to: "/attedance/detail" },
             {
               text: "Setting Cuti Bersama / Off Days",
               to: "/attedance/setting-cuti",
@@ -196,7 +196,7 @@ export default {
           icon: "fa-credit-card",
           contents: [
             {
-              text: "Daftar Nominatif Penerima gaji",
+              text: "Create Payslip",
               to: "/payroll/nominatif",
             },
           ],
