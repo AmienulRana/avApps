@@ -90,9 +90,23 @@
               </p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm">
-                {{ leave?.empleave_attachement.length === 0 ? "-" : "" }}
+              <p
+                class="text-sm"
+                v-if="leave?.empleave_attachement?.length === 0"
+              >
+                -
               </p>
+              <section class="flex" v-else>
+                <a
+                  target="_blank"
+                  class="mr-2"
+                  v-for="(link, i) in leave?.empleave_attachement"
+                  :href="`https://api.mufidahgroup.com/images/${link}`"
+                  :key="i"
+                >
+                  <img src="../assets/icons/arrow-link.svg" />
+                </a>
+              </section>
             </td>
             <td class="p-3 text-sm">
               <p
