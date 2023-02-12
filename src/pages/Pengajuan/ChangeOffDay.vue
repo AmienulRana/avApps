@@ -272,6 +272,7 @@ export default {
     assignChangeOffdayDetail(offday) {
       this.modal.modeEdit = true;
       this.modal.showModal = true;
+      this.deleteFromReplaceEmployment(offday?.emp_id);
       this.offday_id = offday?._id;
       this.data.emp_id = offday?.emp_id;
       this.data.emp_replacement = offday?.emp_replacement;
