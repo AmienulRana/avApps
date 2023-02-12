@@ -68,7 +68,7 @@
     </section>
   </LayoutAdmin>
   <Modal
-    title="Add Outside Assignment"
+    title="Outside Assignment"
     :showModal="modal.showModal"
     @close="
       modal.showModal = false;
@@ -141,6 +141,7 @@
         <Button
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           v-else
+          @click="handleEditOutside"
           :disabled="loading?.addOvertimeRequest"
         >
           Edit
@@ -165,6 +166,7 @@ import { GetAllCompanyAPI } from "@/actions/company";
 import {
   AddOvertimeRequestAPI,
   GetOvertimeRequestAPI,
+  EditDataOvertimeRequestAPI,
 } from "@/actions/outside-request";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import decryptToken from "@/utils/decryptToken";
@@ -286,6 +288,29 @@ export default {
       this.data.outside_reason = outside?.outside_reason;
       this.data.outside_start_date = outside?.outside_start_date;
       this.data.outside_end_date = outside?.outside_end_date;
+    },
+    async handleEditOutside() {
+      this.loading.addOvertimeRequest = true;
+      const payload = {
+        ...this.data,
+        emp_id: this.data?.emp_id?._id,
+      };
+      const response = await EditDataOvertimeRequestAPI(
+        this.outisde_id,
+        payload
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.modal.modeEdit = false;
+        this.clearInputValue();
+        this.getOvertimeRequest();
+      }
+      this.showMessageStatus(response);
+      this.loading.addOvertimeRequest = false;
     },
     async getOvertimeRequest() {
       this.loading.getOvertimeRequest = true;
