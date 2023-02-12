@@ -14,6 +14,18 @@ export const AddOffDayRequest = async (query, payload) => {
     return error.response;
   }
 };
+export const EditDataOffDayRequest = async (id, payload) => {
+  try {
+    const response = await axios.put(`${URL_API}/off-day/data/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const EditOffdayRequestAPI = async (id, payload) => {
   try {
     const response = await axios.put(`${URL_API}/off-day/${id}`, payload, {
