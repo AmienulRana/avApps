@@ -62,6 +62,7 @@
           :showMessageStatus="showMessageStatus"
           :loading="loading.getOvertimeRequest"
           :getOvertime="getOvertimeRequest"
+          :assignOvertimeDetail="assignOvertimeDetail"
         />
       </section>
     </section>
@@ -69,7 +70,11 @@
   <Modal
     title="Overtime Request"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      clearInputValue();
+      modal.modeEdit = false;
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -91,7 +96,7 @@
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.emp_id = $event"
@@ -113,6 +118,8 @@
           @showTime="modal.showTime = 'start'"
           @selected-hour="modal.start_time.hour = $event"
           @selected-minute="modal.start_time.minute = $event"
+          :hourValue="modal.start_time.hour"
+          :minuteValue="modal.start_time.minute"
         />
         <InputTime
           label="End Time"
@@ -120,6 +127,8 @@
           @showTime="modal.showTime = 'end'"
           @selected-hour="modal.end_time.hour = $event"
           @selected-minute="modal.end_time.minute = $event"
+          :hourValue="modal.end_time.hour"
+          :minuteValue="modal.end_time.minute"
         />
       </section>
       <label class="text-sm">Reason Note</label>
@@ -139,8 +148,16 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddOvertimeRequest"
           :disabled="loading?.addOvertimeRequest"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          :disabled="loading?.addOvertimeRequest"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -187,6 +204,7 @@ export default {
       modal: {
         showModal: false,
         showSelect: false,
+        modeEdit: false,
         showTime: "",
         start_time: {
           hour: "",
@@ -232,6 +250,10 @@ export default {
       for (const key in this.data) {
         this.data[key] = "";
       }
+      this.modal.start_time.hour = "";
+      this.modal.start_time.minute = "00";
+      this.modal.end_time.hour = "";
+      this.modal.end_time.minute = "00";
     },
     showContactEmployee(id) {
       if (this.contactEmployee === id) {
@@ -260,9 +282,36 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
+    },
+    getHourMinute(time) {
+      if (time !== "-") {
+        const timeArray = time.split(" ")[0].split(":");
+        return [timeArray[0], timeArray[1]];
+      }
+      return ["", "00"];
+    },
+    assignOvertimeDetail(overtime) {
+      this.modal.showModal = true;
+      this.modal.modeEdit = true;
+      console.log(overtime);
+      this.data.emp_id = overtime?.emp_id;
+      this.data.overtime_reason = overtime?.overtime_reason;
+      this.data.overtime_date = overtime?.overtime_date;
+      this.modal.start_time.hour = this.getHourMinute(
+        overtime?.overtime_start_hours
+      )[0];
+      this.modal.start_time.minute = this.getHourMinute(
+        overtime?.overtime_start_hours
+      )[1];
+      this.modal.end_time.hour = this.getHourMinute(
+        overtime?.overtime_end_hours
+      )[0];
+      this.modal.end_time.minute = this.getHourMinute(
+        overtime?.overtime_end_hours
+      )[1];
     },
     async handleAddOvertimeRequest() {
       this.loading.addOvertimeRequest = true;
