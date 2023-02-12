@@ -343,11 +343,7 @@ export default {
         emp_id: this?.data?.emp_id?._id,
         emp_replacement: this?.data?.emp_replacement?._id,
       };
-      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
-      const response = await EditDataOffDayRequest(
-        this.superAdmin ? querySuperAdmin : "",
-        payload
-      );
+      const response = await EditDataOffDayRequest(this.offday_id, payload);
       if (response?.status === 401) {
         this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
