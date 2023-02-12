@@ -30,6 +30,22 @@ export const EditChangeWorkshiftAPI = async (id, payload) => {
     return error.response;
   }
 };
+export const EditDataChangeShiftRequest = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/change-shift/data/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetShiftRequestAPI = async (query) => {
   try {
     const response = await axios.get(`${URL_API}/change-shift${query}`, {
