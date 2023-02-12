@@ -158,13 +158,21 @@
                 <img src="../assets/icons/log.svg" />
               </button>
             </td>
-            <td class="p-3 text-right relative">
-              <Button
-                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-                @click="handleDeleteOvertimeRequest(overtime?._id)"
-              >
-                <font-awesome-icon icon="fa-trash-alt" />
-              </Button>
+            <td class="p-3 text-right">
+              <section class="flex">
+                <Button
+                  class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                  @click="assignOvertimeDetail(overtime)"
+                >
+                  <font-awesome-icon icon="fa-pen-to-square" />
+                </Button>
+                <Button
+                  class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                  @click="handleDeleteOvertimeRequest(overtime?._id)"
+                >
+                  <font-awesome-icon icon="fa-trash-alt" />
+                </Button>
+              </section>
             </td>
           </tr>
         </tbody>
@@ -409,6 +417,7 @@ export default {
     showMessageStatus: Function,
     overtime_request: Array,
     getOvertime: Function,
+    assignOvertimeDetail: Function,
   },
   data() {
     return {
