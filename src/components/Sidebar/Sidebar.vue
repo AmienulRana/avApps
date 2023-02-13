@@ -222,6 +222,10 @@ export default {
               text: "Periodic Settings",
               to: "/setting/periodic",
             },
+            {
+              text: "Location Settings",
+              to: "/setting/location",
+            },
             { text: "Leave Settings", to: "/setting/leave" },
             { text: "App Settings", to: "/setting/app" },
           ],
