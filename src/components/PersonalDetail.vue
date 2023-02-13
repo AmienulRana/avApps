@@ -97,7 +97,7 @@
         @change="data.emp_birthday = $event"
       />
       <SelectSearch
-        :options="['O+', 'O-', 'A+', 'A-']"
+        :options="['O', 'O+', 'O-', 'A+', 'A-', 'A', 'AB', 'B']"
         label="Golongan Darah"
         input_class="w-full md:w-4/6 mt-1"
         position="top"
