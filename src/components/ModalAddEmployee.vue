@@ -133,7 +133,7 @@
               @change="personal.emp_birthday = $event"
             />
             <SelectSearch
-              :options="['O+', 'O-', 'A+', 'A-']"
+              :options="['O', 'O+', 'O-', 'A+', 'A-', 'A', 'AB', 'B']"
               label="Golongan Darah"
               input_class="w-full md:w-4/6 mt-1"
               position="top"
@@ -236,17 +236,17 @@
               :selectedOption="employment.emp_ssuperior"
               @selected="employment.emp_ssuperior = $event"
             />
-            <Select
+            <SelectSearch
+              :options="locations"
+              property="loc_name"
               label="Lokasi Absensi*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.emp_location"
-              @change="employment.emp_location = $event"
-              :options="[
-                'Mufidah Stationery',
-                'Mufidah Terminal Print',
-                'Jojo House',
-              ]"
+              position="top"
+              :isOpen="show_select === 'location'"
+              @handleShowSelect="show_select = 'location'"
+              :selectedOption="employment.emp_location"
+              @selected="employment.emp_location = $event"
             />
           </section>
         </section>
@@ -405,6 +405,7 @@ import SwitchButton from "./SwitchButton.vue";
 import { AddEmploymentAPI } from "@/actions/employment";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetAllCompanyAPI } from "@/actions/company";
+import { GetLocationAPI } from "@/actions/location";
 import { GetEmpStatusAPI } from "@/actions/emp-status";
 import { GetShiftAPI } from "@/actions/shift";
 import decryptToken from "@/utils/decryptToken";
@@ -482,6 +483,7 @@ export default {
       tabActive: "Personal",
       departement: [],
       designation: [],
+      locations: [],
       empStatus: [],
       options: [],
       superAdmin: false,
@@ -565,11 +567,21 @@ export default {
       }
       this.designation = response?.data;
     },
+    async handleGetLocation() {
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetLocationAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.locations = response.data;
+      // this.designation = response?.data;
+    },
     async handleAddEmployment() {
       this.loadingAdd = true;
       const employment = {
         ...this.employment,
-        emp_location: "63ce2525b46704d7cee86657",
+        emp_location: this.employment.emp_location?._id,
         emp_depid: this.employment.emp_depid?._id,
         emp_desid: this.employment.emp_desid?._id,
         emp_fsuperior: this.employment.emp_fsuperior?._id,
@@ -641,6 +653,7 @@ export default {
         this.handleGetDesignation();
         this.getShift();
         this.getEmpStatus();
+        this.handleGetLocation();
       },
       deep: true,
     },
