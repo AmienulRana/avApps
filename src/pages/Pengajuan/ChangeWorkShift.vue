@@ -65,7 +65,11 @@
   <Modal
     title="Assign Change Workshift"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modal.modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
