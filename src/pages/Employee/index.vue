@@ -11,7 +11,7 @@
           <h1 class="md:text-2xl text-lg">All Employees</h1>
           <ChoiseCompany
             v-if="superAdmin && !loading.employement"
-            @selected:company="dataCompany = $event"
+            @selected:company="handleChangeCompany($event)"
             :options="options"
             :dataCompany="dataCompany"
           />
@@ -432,9 +432,7 @@ export default {
       options: [],
       empStatus: [],
       superAdmin: false,
-      dataCompany: {
-        _id: null,
-      },
+      dataCompany: this.$store.state.company,
       loading: {
         employement: true,
       },
@@ -443,6 +441,10 @@ export default {
   methods: {
     handleShowLayoutData() {
       this.layoutData = this.layoutData === "card" ? "table" : "card";
+    },
+    handleChangeCompany(company) {
+      this.$store.commit("setValueCompany", company);
+      this.dataCompany = company;
     },
     changeDropdownActive(id) {
       if (this.activeDropdown === id) {
@@ -463,7 +465,6 @@ export default {
       }
     },
     handleFilter(status, designation, departement, role) {
-      console.log(role);
       const filterConditions = [
         { key: "emp_status", value: status },
         { key: "emp_desid", value: designation },
@@ -486,12 +487,15 @@ export default {
 
         this.employeeFilter = this.employee.filter(dataFilter);
       }
-      console.log("handle filter dijalankan");
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
       this.options = response?.data;
-      this.dataCompany = response?.data[0];
+      if (this.$store.state.company?._id === "") {
+        this.dataCompany = response?.data[0];
+      } else {
+        this.dataCompany = this.$store.state.company;
+      }
     },
     async getEmpStatus() {
       const queryAdminSuper = `?company_id=${this?.dataCompany?._id || null}`;
@@ -564,6 +568,12 @@ export default {
     this.superAdmin =
       payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
+    if (this.dataCompany?._id) {
+      this.handleGetDepartement();
+      this.handleGetDesignation();
+      this.getEmpStatus();
+      this.handleGetEmployement();
+    }
     // this.handleGetEmployement();
   },
   computed: {},

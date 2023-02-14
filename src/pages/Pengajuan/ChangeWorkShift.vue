@@ -57,6 +57,7 @@
           :loading="loading.get"
           :showMessageStatus="showMessageStatus"
           :getRequestShift="getChangeShiftRequest"
+          :assignChangeWorkshift="assignChangeWorkshift"
         />
       </section>
     </section>
@@ -64,7 +65,11 @@
   <Modal
     title="Assign Change Workshift"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modal.modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -81,7 +86,7 @@
         :isOpen="modal.showSelect === 'Employement'"
         @handleShowSelect="() => (modal.showSelect = 'Employement')"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="deleteFromReplaceEmployment($event)"
@@ -102,7 +107,7 @@
         :isOpen="modal.showSelect === 'Replacement'"
         @handleShowSelect="() => (modal.showSelect = 'Replacement')"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.empchange_replacement = $event"
@@ -138,8 +143,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddChangeShift"
           :disabled="loading.add"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditChangeShift"
+          :disabled="loading.add"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -162,6 +176,7 @@ import { GetAllEmployementAPI } from "@/actions/employment";
 import {
   AddChangeShiftRequest,
   GetShiftRequestAPI,
+  EditDataChangeShiftRequest,
 } from "@/actions/change-shift";
 import { GetShiftAPI } from "@/actions/shift";
 import { useToast } from "vue-toastification";
@@ -184,6 +199,7 @@ export default {
       layoutData: "card",
       employee: employee,
       modal: {
+        modeEdit: false,
         showModal: false,
         showSelect: false,
         showAbility: "hide",
@@ -195,6 +211,7 @@ export default {
       superAdmin: false,
       change_shifts: [],
       dataCompany: {},
+      change_id: "",
       data: {
         emp_id: "",
         empchange_date_request: "",
@@ -251,7 +268,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
       this.replace_emplyoment = getIdNameEmp;
@@ -262,7 +279,7 @@ export default {
         (emp) => employment?._id !== emp._id
       );
       this.replace_employment = employmentFilter;
-      this.getOffdayEmployment(employment?._id);
+      // this.getOffdayEmployment(employment?._id);
     },
     async getOffdayEmployment() {
       // const response = await GetOffdayEmploymentAPI(id);
@@ -277,6 +294,17 @@ export default {
       this.optionsCompany = response.data;
       this.dataCompany = response.data[0];
       this.loading.getCompany = false;
+    },
+    assignChangeWorkshift(workshift) {
+      this.modal.showModal = true;
+      this.modal.modeEdit = true;
+      this.change_id = workshift?._id;
+      this.data.emp_id = workshift?.emp_id;
+      this.deleteFromReplaceEmployment(workshift?.emp_id);
+      this.data.empchange_date_request = workshift?.empchange_date_request;
+      this.data.empchange_reason = workshift?.empchange_reason;
+      this.data.empchange_to = workshift?.empchange_to;
+      this.data.empchange_replacement = workshift?.empchange_replacement;
     },
     async handleAddChangeShift() {
       this.loading.add = true;
@@ -298,7 +326,31 @@ export default {
       if (response.status === 200) {
         this.modal.showModal = false;
         this.clearInputValue();
-        this.getOffDayRequest();
+        this.getChangeShiftRequest();
+      }
+      this.showMessageStatus(response);
+      this.loading.add = false;
+    },
+    async handleEditChangeShift() {
+      this.loading.add = true;
+      const payload = {
+        ...this.data,
+        emp_id: this?.data?.emp_id?._id,
+        empchange_replacement: this?.data?.empchange_replacement?._id,
+        empchange_to: this?.data?.empchange_to?._id,
+      };
+      const response = await EditDataChangeShiftRequest(
+        this.change_id,
+        payload
+      );
+      if (response?.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.clearInputValue();
+        this.getChangeShiftRequest();
       }
       this.showMessageStatus(response);
       this.loading.add = false;

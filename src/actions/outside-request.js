@@ -18,6 +18,22 @@ export const AddOvertimeRequestAPI = async (query, payload) => {
     return error.response;
   }
 };
+export const EditDataOvertimeRequestAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/outside-request/data/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const GetOvertimeRequestAPI = async (query) => {
   try {
     const response = await axios.get(`${URL_API}/outside-request${query}`, {

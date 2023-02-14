@@ -158,13 +158,21 @@
             </button>
           </td>
           <td class="p-3 text-right relative">
-            <Button
-              class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-              @click="handleDeleteChangeOffday(offday?._id)"
-              :disabled="loading_offday?.edit"
-            >
-              <font-awesome-icon icon="fa-trash-alt" />
-            </Button>
+            <section class="flex">
+              <Button
+                class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                @click="assignChangeOffdayDetail(offday)"
+              >
+                <font-awesome-icon icon="fa-pen-to-square" />
+              </Button>
+              <Button
+                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                @click="handleDeleteChangeOffday(offday?._id)"
+                :disabled="loading_offday?.edit"
+              >
+                <font-awesome-icon icon="fa-trash-alt" />
+              </Button>
+            </section>
           </td>
         </tr>
       </tbody>
@@ -404,6 +412,7 @@ export default {
     offday_request: Array,
     getOffday: Function,
     showMessageStatus: Function,
+    assignChangeOffdayDetail: Function,
   },
   components: { Modal, Loading, Radio, Button, NoDataShowing },
   data() {

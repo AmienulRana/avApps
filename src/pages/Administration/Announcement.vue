@@ -106,7 +106,11 @@
   <Modal
     :title="`${!modeEdit ? 'Add' : 'Edit'} Announcement`"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header v-if="!modeEdit">
       <ChoiseCompany
@@ -338,6 +342,14 @@ export default {
         }
       }
     },
+    clearInputValue() {
+      this.data.announcement_startdate = "";
+      this.data.announcement_enddate = "";
+      this.data.announcement_title = "";
+      this.data.announcement_desc = "";
+      this.data.announcement_depid = [];
+      this.departementSelected = [];
+    },
     formatDate(date) {
       const newDate = new Date(date);
       return newDate.toLocaleDateString("en-US", {
@@ -345,12 +357,6 @@ export default {
         month: "short",
         year: "numeric",
       });
-    },
-    clearInputValue() {
-      for (const key in this.data) {
-        this.data[key] = "";
-      }
-      this.departementSelected = [];
     },
     async handleAddAnnouncement() {
       this.loading.addLeaveHol = true;
@@ -414,7 +420,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response.data);
       this.announcements = response.data;
       this.loading.getLeaveHol = false;
       // this.toast.success("tes");

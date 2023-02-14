@@ -58,14 +58,19 @@
           :loading="loading.get"
           :getOffday="getOffDayRequest"
           :showMessageStatus="showMessageStatus"
+          :assignChangeOffdayDetail="assignChangeOffdayDetail"
         />
       </section>
     </section>
   </LayoutAdmin>
   <Modal
-    title="Assign Change Off Day"
+    title="Assign Change Offday"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      modal.modeEdit = false;
+      clearInputValue();
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -82,7 +87,7 @@
         :isOpen="modal.showSelect === 'Employement'"
         @handleShowSelect="() => (modal.showSelect = 'Employement')"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="deleteFromReplaceEmployment($event)"
@@ -112,7 +117,7 @@
         :isOpen="modal.showSelect === 'Replacement'"
         @handleShowSelect="() => (modal.showSelect = 'Replacement')"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.emp_replacement = $event"
@@ -136,8 +141,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleAddOffDay"
           :disabled="loading.add"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditOffDay"
+          :disabled="loading.add"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -161,6 +175,7 @@ import {
   GetOffdayEmploymentAPI,
   AddOffDayRequest,
   GetOffDayRequestAPI,
+  EditDataOffDayRequest,
 } from "@/actions/offday";
 import { useToast } from "vue-toastification";
 
@@ -182,6 +197,7 @@ export default {
       layoutData: "card",
       employee: employee,
       modal: {
+        modeEdit: false,
         showModal: false,
         showSelect: false,
         showAbility: "hide",
@@ -192,6 +208,7 @@ export default {
       superAdmin: false,
       offday_requests: [],
       dataCompany: {},
+      offday_id: "",
       data: {
         emp_id: "",
         offday_reason: "",
@@ -232,7 +249,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
       this.replace_emplyoment = getIdNameEmp;
@@ -251,6 +268,17 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
       }
+    },
+    assignChangeOffdayDetail(offday) {
+      this.modal.modeEdit = true;
+      this.modal.showModal = true;
+      this.deleteFromReplaceEmployment(offday?.emp_id);
+      this.offday_id = offday?._id;
+      this.data.emp_id = offday?.emp_id;
+      this.data.emp_replacement = offday?.emp_replacement;
+      this.data.offday_reason = offday?.offday_reason;
+      this.data.offday_date = offday?.offday_date;
+      this.data.offday_change = offday?.offday_change;
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -271,6 +299,19 @@ export default {
           this.toast.error(response?.data?.message);
         }
       }
+    },
+    async getOffDayRequest() {
+      this.loading.get = true;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetOffDayRequestAPI(queryAdminSuper);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.offday_requests = response.data;
+      }
+      this.loading.get = false;
     },
     async handleAddOffDay() {
       this.loading.add = true;
@@ -296,18 +337,25 @@ export default {
       this.showMessageStatus(response);
       this.loading.add = false;
     },
-    async getOffDayRequest() {
-      this.loading.get = true;
-      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
-      const response = await GetOffDayRequestAPI(queryAdminSuper);
+    async handleEditOffDay() {
+      this.loading.add = true;
+      const payload = {
+        ...this.data,
+        emp_id: this?.data?.emp_id?._id,
+        emp_replacement: this?.data?.emp_replacement?._id,
+      };
+      const response = await EditDataOffDayRequest(this.offday_id, payload);
       if (response?.status === 401) {
-        this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
       }
-      if (response?.status === 200) {
-        this.offday_requests = response.data;
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.clearInputValue();
+        this.getOffDayRequest();
       }
-      this.loading.get = false;
+      this.showMessageStatus(response);
+      this.loading.add = false;
     },
   },
   watch: {

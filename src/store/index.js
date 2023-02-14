@@ -15,6 +15,9 @@ const store = createStore({
         workshifts: "",
         role: "",
       },
+      company: {
+        _id: "",
+      },
     };
   },
   mutations: {
@@ -38,6 +41,9 @@ const store = createStore({
     },
     setValueFilter(state, payload) {
       state.filter = { ...payload };
+    },
+    setValueCompany(state, payload) {
+      state.company = payload;
     },
   },
   actions: {},

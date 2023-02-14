@@ -17,6 +17,7 @@
             <th class="text-left text-sm">Approved 1</th>
             <th class="text-left text-sm">Approved 2</th>
             <th class="text-left text-sm">HR Approved</th>
+            <th class="text-left text-sm">Amount</th>
             <th class="text-left text-sm">Activity</th>
             <th class="text-left text-sm">Actions</th>
           </tr>
@@ -144,6 +145,11 @@
                 {{ overtime?.overtime_hr?.approved_date }}
               </p>
             </td>
+            <td class="p-3 text-sm">
+              <p class="text-sm">
+                {{ formatCurrency(overtime?.overtime_amount) }}
+              </p>
+            </td>
             <td class="p-3 text-sm flex">
               <button
                 class="text-xl ml-3"
@@ -152,13 +158,21 @@
                 <img src="../assets/icons/log.svg" />
               </button>
             </td>
-            <td class="p-3 text-right relative">
-              <Button
-                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-                @click="handleDeleteOvertimeRequest(overtime?._id)"
-              >
-                <font-awesome-icon icon="fa-trash-alt" />
-              </Button>
+            <td class="p-3 text-right">
+              <section class="flex">
+                <Button
+                  class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                  @click="assignOvertimeDetail(overtime)"
+                >
+                  <font-awesome-icon icon="fa-pen-to-square" />
+                </Button>
+                <Button
+                  class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                  @click="handleDeleteOvertimeRequest(overtime?._id)"
+                >
+                  <font-awesome-icon icon="fa-trash-alt" />
+                </Button>
+              </section>
             </td>
           </tr>
         </tbody>
@@ -359,6 +373,12 @@
         />
       </div>
     </section>
+    <section class="flex flex-between mt-2">
+      <p class="text-sm w-1/2">Overtime Amount</p>
+      <p class="text-sm w-1/2 pl-8">
+        {{ formatCurrency(data?.overtime_amount) }}
+      </p>
+    </section>
     <template #footer>
       <section class="flex w-52 justify-between">
         <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
@@ -397,6 +417,7 @@ export default {
     showMessageStatus: Function,
     overtime_request: Array,
     getOvertime: Function,
+    assignOvertimeDetail: Function,
   },
   data() {
     return {
@@ -409,6 +430,7 @@ export default {
       },
       data: {
         overtime_request_id: "",
+        overtime_amount: 0,
         overtime_fsuperior: {
           fsuperior_id: {
             des_name: "",
@@ -442,6 +464,14 @@ export default {
         this.data[key] = "";
       }
     },
+    formatCurrency(number) {
+      const formatter = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(number);
+    },
     formatAMPM(time) {
       let hours = parseInt(time.substr(0, 2));
       let minutes = time.substr(3, 2);
@@ -455,6 +485,7 @@ export default {
       this.data.overtime_fsuperior = { ...overtime?.overtime_fsuperior };
       this.data.overtime_ssuperior = { ...overtime?.overtime_ssuperior };
       this.data.overtime_hr = { ...overtime?.overtime_hr };
+      this.data.overtime_amount = overtime?.overtime_amount;
     },
     async handleEditOvertimeRequest() {
       this.loading_overtime.edit = true;

@@ -58,3 +58,19 @@ export const EditStatusLeaveRequestAPI = async (id, payload) => {
     return error.response;
   }
 };
+export const EditDataLeaveRequestAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/leave-request/data/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};

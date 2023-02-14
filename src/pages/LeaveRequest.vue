@@ -88,8 +88,8 @@
       <SelectSearch
         label="Employee"
         :options="employment"
-        :isOpen="modal.showSelect"
-        @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
+        :isOpen="modal.showSelect === 'emp'"
+        @handleShowSelect="() => (modal.showSelect = 'emp')"
         class="flex-col"
         property="emp_name"
         input_class="w-full mt-2"
@@ -137,21 +137,17 @@
           </div>
         </section>
       </section>
-      <Select
+      <SelectSearch
+        :options="leave_types"
+        :isOpen="modal.showSelect === 'type'"
+        property="type_desc"
+        @handleShowSelect="() => (modal.showSelect = 'type')"
         class="flex-col mt-4"
         input_class="w-full mt-2"
         label_class="w-full"
         label="Leave type"
-        :options="[
-          'Cuti Tahunan (Paid)',
-          'Cuti Menikah (Paid)',
-          'Izin Sakit (Paid)',
-          'Izin Sakit (Unpaid)',
-          'Izin Khusus (Paid)',
-          'Izin Khusus (Unpaid)',
-        ]"
-        :value="data.empleave_type_id"
-        @change="data.empleave_type_id = $event"
+        @selected="data.empleave_type_id = $event"
+        :selectedOption="data.empleave_type_id"
       />
       <section class="flex justify-between items-center mt-4">
         <p class="text-sm">
@@ -262,6 +258,8 @@
             @showTime="modal.showTime = 'start'"
             @selected-hour="modal.start_time.hour = $event"
             @selected-minute="modal.start_time.minute = $event"
+            :hourValue="modal.start_time.hour"
+            :minuteValue="modal.start_time.minute"
           />
           <InputTime
             label="End Time"
@@ -269,6 +267,8 @@
             @showTime="modal.showTime = 'end'"
             @selected-hour="modal.end_time.hour = $event"
             @selected-minute="modal.end_time.minute = $event"
+            :hourValue="modal.end_time.hour"
+            :minuteValue="modal.end_time.minute"
           />
         </section>
       </section>
@@ -366,6 +366,7 @@ import {
   AddLeaveRequestAPI,
   GetLeaveRequestAPI,
 } from "@/actions/leave-request";
+import { GetLeaveSettingAPI } from "@/actions/leave-setting";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -415,6 +416,7 @@ export default {
         empleave_reason: "",
       },
       leave_request: [],
+      leave_types: [],
       employment: [],
       optionsCompany: [],
       superAdmin: false,
@@ -541,6 +543,7 @@ export default {
       this.loading.addLeaveRequest = true;
       const payload = {
         ...this.data,
+        empleave_type_id: this.data.empleave_type_id?._id,
         emp_id: this.data.emp_id._id,
         empleave_leave_duration: this.createLeaveDuration(),
         empleave_apply_date: this.createApplyDate(),
@@ -548,7 +551,7 @@ export default {
         empleave_end_hours: `${this.modal.end_time.hour}:${this.modal.end_time.minute}`,
       };
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
-
+      console.log(payload);
       const response = await AddLeaveRequestAPI(queryAdminSuper, payload);
       if (response?.status === 401) {
         this.$router.push("/login");
@@ -599,12 +602,29 @@ export default {
       }));
       this.employment = getIdNameEmp;
     },
+    async getLeaveType() {
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetLeaveSettingAPI(querySuperAdmin);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        const newTypesProp = response.data.map((type) => ({
+          ...type,
+          type_desc: `${type?.leave_name} (${type?.leave_type})`,
+        }));
+        this.leave_types = newTypesProp;
+        console.log(newTypesProp);
+      }
+    },
   },
   watch: {
     dataCompany: {
       handler: function () {
         this.handleGetEmployement();
         this.handleGetLeaveRequest();
+        this.getLeaveType();
       },
       deep: true,
     },

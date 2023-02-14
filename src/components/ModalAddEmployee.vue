@@ -61,7 +61,7 @@
               </div>
             </div>
             <Input
-              label="Nama Depan"
+              label="Nama Depan*"
               input_class="md:w-4/6 w-full mt-1 w-full mt-1"
               class="mb-2.5"
               :value="personal.emp_firstname"
@@ -75,7 +75,7 @@
               @change="personal.emp_lastname = $event"
             />
             <Input
-              label="Email"
+              label="Email*"
               input_class="md:w-4/6 w-full mt-1"
               class="mb-2.5"
               :value="personal.email"
@@ -97,7 +97,7 @@
             />
             <div class="md:flex justify-between items-center mb-2.5">
               <label class="text-sm text-gray-400 md:w-1/5 w-full"
-                >Jenis Kelamin</label
+                >Jenis Kelamin*</label
               >
               <div class="flex md:w-4/6 w-full mt-1">
                 <Radio
@@ -133,7 +133,7 @@
               @change="personal.emp_birthday = $event"
             />
             <SelectSearch
-              :options="['O+', 'O-', 'A+', 'A-']"
+              :options="['O', 'O+', 'O-', 'A+', 'A-', 'A', 'AB', 'B']"
               label="Golongan Darah"
               input_class="w-full md:w-4/6 mt-1"
               position="top"
@@ -153,14 +153,14 @@
         >
           <section class="mt-4">
             <Input
-              label="Username"
+              label="Username*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               :value="employment.username"
               @change="employment.username = $event"
             />
             <Input
-              label="Password"
+              label="Password*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               type="password"
@@ -176,7 +176,7 @@
             />
             <SelectSearch
               :options="departement"
-              label="Departement"
+              label="Departement*"
               position="bottom"
               property="dep_name"
               input_class="md:w-4/6 mt-2"
@@ -187,7 +187,7 @@
             />
             <SelectSearch
               :options="designation"
-              label="Jabatan"
+              label="Jabatan*"
               position="bottom"
               property="des_name"
               input_class="md:w-4/6 mt-2"
@@ -197,7 +197,7 @@
               @selected="employment.emp_desid = $event"
             />
             <Select
-              label="Status Karyawan"
+              label="Status Karyawan*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
               property="empstatus_name"
@@ -217,7 +217,7 @@
             <SelectSearch
               :options="designation"
               property="des_name"
-              label="Atasan Pertama"
+              label="Atasan Pertama*"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-1'"
@@ -228,7 +228,7 @@
             <SelectSearch
               :options="designation"
               property="des_name"
-              label="Atasan Kedua"
+              label="Atasan Kedua*"
               input_class="md:w-4/6 mt-2"
               position="top"
               :isOpen="show_select === 'atasan-2'"
@@ -236,17 +236,17 @@
               :selectedOption="employment.emp_ssuperior"
               @selected="employment.emp_ssuperior = $event"
             />
-            <Select
-              label="Lokasi Absensi"
+            <SelectSearch
+              :options="locations"
+              property="loc_name"
+              label="Lokasi Absensi*"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.emp_location"
-              @change="employment.emp_location = $event"
-              :options="[
-                'Mufidah Stationery',
-                'Mufidah Terminal Print',
-                'Jojo House',
-              ]"
+              position="top"
+              :isOpen="show_select === 'location'"
+              @handleShowSelect="show_select = 'location'"
+              :selectedOption="employment.emp_location"
+              @selected="employment.emp_location = $event"
             />
           </section>
         </section>
@@ -266,7 +266,7 @@
             :key="day.name"
           >
             <Select
-              :label="day.name"
+              :label="`${day.name}*`"
               input_class="md:w-4/6 mt-2"
               class="w-full mr-6"
               property="shift_desc"
@@ -405,6 +405,7 @@ import SwitchButton from "./SwitchButton.vue";
 import { AddEmploymentAPI } from "@/actions/employment";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetAllCompanyAPI } from "@/actions/company";
+import { GetLocationAPI } from "@/actions/location";
 import { GetEmpStatusAPI } from "@/actions/emp-status";
 import { GetShiftAPI } from "@/actions/shift";
 import decryptToken from "@/utils/decryptToken";
@@ -482,6 +483,7 @@ export default {
       tabActive: "Personal",
       departement: [],
       designation: [],
+      locations: [],
       empStatus: [],
       options: [],
       superAdmin: false,
@@ -533,10 +535,10 @@ export default {
       }
     },
     showMessageStatus(response) {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         this.toast.success(response?.data?.message);
       } else {
-        if (response.data.message) {
+        if (response?.data?.message) {
           this.toast.error(response?.data?.message);
         }
       }
@@ -565,11 +567,21 @@ export default {
       }
       this.designation = response?.data;
     },
+    async handleGetLocation() {
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetLocationAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      this.locations = response.data;
+      // this.designation = response?.data;
+    },
     async handleAddEmployment() {
       this.loadingAdd = true;
       const employment = {
         ...this.employment,
-        emp_location: "63ce2525b46704d7cee86657",
+        emp_location: this.employment.emp_location?._id,
         emp_depid: this.employment.emp_depid?._id,
         emp_desid: this.employment.emp_desid?._id,
         emp_fsuperior: this.employment.emp_fsuperior?._id,
@@ -641,6 +653,7 @@ export default {
         this.handleGetDesignation();
         this.getShift();
         this.getEmpStatus();
+        this.handleGetLocation();
       },
       deep: true,
     },

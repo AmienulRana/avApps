@@ -162,12 +162,20 @@
             </button>
           </td>
           <td class="p-3 text-right relative">
-            <Button
-              class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-              @click="handleDeleteOffdayRequest(change?._id)"
-            >
-              <font-awesome-icon icon="fa-trash-alt" />
-            </Button>
+            <section class="flex">
+              <Button
+                class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                @click="assignChangeWorkshift(change)"
+              >
+                <font-awesome-icon icon="fa-pen-to-square" />
+              </Button>
+              <Button
+                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                @click="handleDeleteOffdayRequest(change?._id)"
+              >
+                <font-awesome-icon icon="fa-trash-alt" />
+              </Button>
+            </section>
           </td>
         </tr>
       </tbody>
@@ -409,6 +417,7 @@ export default {
     change_shifts: Array,
     getRequestShift: Function,
     showMessageStatus: Function,
+    assignChangeWorkshift: Function,
   },
   components: { Modal, Radio, Loading, NoDataShowing },
   data() {

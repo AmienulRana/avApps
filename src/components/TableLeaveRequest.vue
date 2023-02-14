@@ -82,32 +82,44 @@
               <p class="text-sm">{{ leave?.empleave_leave_duration }}</p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm">{{ leave?.empleave_type_id }}</p>
+              <p class="text-sm">{{ leave?.empleave_type_id?.leave_name }}</p>
             </td>
             <td class="p-3 text-sm">
               <p class="text-sm">
-                {{
-                  leave?.empleave_type_id?.includes("Paid") ? "Paid" : "Unpaid"
-                }}
+                {{ leave?.empleave_type_id?.leave_type }}
               </p>
             </td>
             <td class="p-3 text-sm">
-              <p class="text-sm">
-                {{ leave?.empleave_attachement.length === 0 ? "-" : "A" }}
+              <p
+                class="text-sm"
+                v-if="leave?.empleave_attachement?.length === 0"
+              >
+                -
               </p>
+              <section class="flex" v-else>
+                <a
+                  target="_blank"
+                  class="mr-2"
+                  v-for="(link, i) in leave?.empleave_attachement"
+                  :href="`https://api.mufidahgroup.com/images/${link}`"
+                  :key="i"
+                >
+                  <img src="../assets/icons/arrow-link.svg" />
+                </a>
+              </section>
             </td>
             <td class="p-3 text-sm">
               <p
                 class="flex py-1 text-white w-24 items-center justify-center rounded-full"
                 :class="
-                  leave?.empleave_status === 'Pending'
-                    ? 'bg-coral'
+                  leave?.empleave_status === 'Approved'
+                    ? 'bg-green-500'
                     : leave?.empleave_status === 'Rejected'
                     ? 'bg-red-500'
-                    : 'bg-green-500'
+                    : 'bg-coral'
                 "
               >
-                {{ leave?.empleave_status }}
+                {{ leave?.empleave_status || "Pending" }}
               </p>
             </td>
             <td class="p-3 text-sm flex">
@@ -182,7 +194,9 @@
         </div>
         <div class="bg-gray-100 mt-10 px-4 py-2 rounded">
           <h2 class="text-sm flex items-center">
-            {{ detailLeave?.empleave_type_id }}
+            {{ detailLeave?.empleave_type_id?.leave_name }} ({{
+              detailLeave?.empleave_type_id?.leave_type
+            }})
             <span class="w-1.5 block h-1.5 rounded-full bg-gray-300 mx-4" />
             {{ detailLeave?.empleave_leave_duration }}
           </h2>

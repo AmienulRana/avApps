@@ -151,13 +151,21 @@
               </button>
             </td>
             <td class="p-3 text-right relative">
-              <Button
-                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-                @click="handleDeleteOutside(outside?._id)"
-                :disabled="loading_overtime?.edit"
-              >
-                <font-awesome-icon icon="fa-trash-alt" />
-              </Button>
+              <section class="flex">
+                <Button
+                  class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                  @click="assignOutsideDetail(outside)"
+                >
+                  <font-awesome-icon icon="fa-pen-to-square" />
+                </Button>
+                <Button
+                  class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                  @click="handleDeleteOutside(outside?._id)"
+                  :disabled="loading_overtime?.edit"
+                >
+                  <font-awesome-icon icon="fa-trash-alt" />
+                </Button>
+              </section>
             </td>
           </tr>
         </tbody>
@@ -396,6 +404,7 @@ export default {
     showMessageStatus: Function,
     outside_request: Array,
     getOvertime: Function,
+    assignOutsideDetail: Function,
   },
   data() {
     return {
