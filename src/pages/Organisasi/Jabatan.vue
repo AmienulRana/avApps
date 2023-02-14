@@ -251,6 +251,7 @@ export default {
     },
     async handleAddDesignation() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      console.log(querySuperAdmin);
       const data = {
         des_name: this.name,
         des_desc: this.description,
