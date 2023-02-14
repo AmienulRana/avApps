@@ -30,6 +30,18 @@ export const GetDepartementAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteDepartementAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/departement/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 export const DetailDepartementAPI = async (id) => {
   try {
     const response = await axios.get(`${URL_API}/departement/${id}`);

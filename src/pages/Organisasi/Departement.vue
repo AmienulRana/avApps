@@ -98,8 +98,15 @@
                       <li @click="handleDetailDepartement(departement?._id)">
                         Edit
                       </li>
-                      <li>De-activate</li>
-                      <li>Move Employee</li>
+                      <!-- <li>De-activate</li> -->
+                      <li
+                        @click="
+                          modal.delete = true;
+                          id_dep = departement?._id;
+                        "
+                      >
+                        Delete
+                      </li>
                     </ul>
                   </div>
                 </td>
@@ -222,6 +229,35 @@
         </section>
       </template>
     </Modal>
+    <Modal
+      modalClass="md:w-1/2 md:h-80"
+      :showModal="modal.delete"
+      @close="modal.delete = false"
+    >
+      <section class="text-center mb-6">
+        <img
+          src="@/assets/icons/warning.svg"
+          alt="warning-icon"
+          class="block m-auto"
+        />
+        <h1 class="text-xl">Are You Sure to deleted this Departement?</h1>
+        <section class="flex w-full justify-center mt-4">
+          <Button
+            class="bg-gray-400 w-24 py-2 mr-4 text-white rounded-md"
+            @click="modal.delete = ''"
+          >
+            Cancel
+          </Button>
+          <Button
+            class="bg-red-500 w-24 py-2 text-white rounded-md"
+            @click="handleDeleteDepartement"
+            :disabled="loading.delete"
+          >
+            Yes, Sure
+          </Button>
+        </section>
+      </section>
+    </Modal>
   </LayoutAdmin>
 </template>
 
@@ -239,6 +275,7 @@ import {
   GetDepartementAPI,
   DetailDepartementAPI,
   EditDepartementAPI,
+  DeleteDepartementAPI,
 } from "@/actions/departement";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
@@ -280,6 +317,7 @@ export default {
       dataCompany: {},
       loading: {
         departement: true,
+        delete: false,
       },
     };
   },
@@ -354,7 +392,6 @@ export default {
       // this.superAdmin = false;
       this.id_dep = id;
       const response = await DetailDepartementAPI(id);
-      console.log(response.data);
       this.name = response?.data?.dep_name;
       this.description = response?.data?.dep_desc;
       this.work_shift = response?.data?.dep_workshift;
@@ -381,7 +418,21 @@ export default {
         this.modal.showModal = false;
       }
     },
-    handleDeleteDepartement() {},
+    async handleDeleteDepartement() {
+      const id = this.id_dep;
+      this.loading.delete = true;
+      const response = await DeleteDepartementAPI(id);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.toast.error(response?.data?.message);
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.handleGetDepartement();
+        this.modal.delete = false;
+      }
+      this.loading.delete = false;
+    },
     async handleGetEmployement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
