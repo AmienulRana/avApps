@@ -22,7 +22,7 @@
       </section>
       <section class="w-full">
         <section
-          class="w-full overflow-x-auto custom-scrollbar h-96 bg-white"
+          class="w-full overflow-x-auto custom-scrollbar bg-white mb-10"
           @click="showActions = null"
         >
           <table class="bg-white min-w-max mt-6 w-full pb-4">
@@ -285,9 +285,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="EditNewShift"
           :disabled="loading.addShift || !data.shift_name"
-          v-if="modal.edit"
+          v-if="modal.edit && shift_type === 'Regular'"
         >
-          Edit
+          Edit Regular
+        </Button>
+        <Button
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="EditShiftSchedule"
+          :disabled="loading.addShift || !data.shift_name"
+          v-if="modal.edit && shift_type === 'Schedule'"
+        >
+          Edit Shcdule
         </Button>
       </section>
     </template>
@@ -511,6 +519,39 @@ export default {
       if (response?.status === 200) {
         this.modal.showModal = false;
         this.modal.edit = false;
+        this.clearInputValue();
+        this.getShift();
+      }
+      this.showMessageStatus(response);
+      this.loading.addShift = false;
+    },
+    async EditShiftSchedule() {
+      this.loading.addShift = true;
+      let schedule = {};
+
+      for (let i = 1; i <= 53; i++) {
+        schedule = {
+          ...schedule,
+          [`minggu_${i}`]: {
+            shift_clockin: this.formatStringToDate(`minggu_${i}`, "in"),
+            shift_clockout: this.formatStringToDate(`minggu_${i}`, "out"),
+            shift_break_duration: +this.modal[`minggu_${i}`]?.break,
+          },
+        };
+      }
+      const payload = {
+        shift_name: this.data.shift_name,
+        ...schedule,
+        shift_type: this.shift_type,
+      };
+      const response = await EditShiftAPI(this.data._id, payload);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+
+      if (response.status === 200) {
+        this.modal.showModal = false;
         this.clearInputValue();
         this.getShift();
       }
