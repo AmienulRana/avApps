@@ -32,21 +32,124 @@
           title="Departemen"
           :showDropdown="activeDropdown === 'departemen'"
           @update:activeDropdown="(e) => changeDropdownActive('departemen')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.status,
+              filter.replacement,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.status,
+              filter.replacement,
+
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
-        <Dropdown
+        <!-- <Dropdown
           title="Workshift"
           :showDropdown="activeDropdown === 'workshift'"
           @update:activeDropdown="changeDropdownActive('workshift')"
-        />
+          :options="shifts"
+          property="shift_name"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.workshift = $event?._id),
+              filter.replacement,
+
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.workshift = $event),
+              filter.replacement,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.workshift"
+        /> -->
         <Dropdown
-          title="See rejected"
+          title="See Status"
           :showDropdown="activeDropdown === 'rejected'"
           @update:activeDropdown="changeDropdownActive('rejected')"
+          :selectedOption="filter.status"
+          :options="['Pending', 'Approved', 'Rejected']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.replacement,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.replacement,
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Users"
+          title="Replacement"
+          :showDropdown="activeDropdown === 'replacement'"
+          @update:activeDropdown="changeDropdownActive('replacement')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.replacement"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.replacement = $event?._id),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.replacement = $event),
+              filter.employment
+            )
+          "
+        />
+        <Dropdown
+          title="Employment"
           :showDropdown="activeDropdown === 'user'"
           @update:activeDropdown="changeDropdownActive('user')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.replacement,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.replacement,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -178,6 +281,7 @@ import {
   EditDataOffDayRequest,
 } from "@/actions/offday";
 import { useToast } from "vue-toastification";
+import { GetDepartementAPI } from "@/actions/departement";
 
 export default {
   name: "ChangeOffDay",
@@ -209,6 +313,12 @@ export default {
       offday_requests: [],
       dataCompany: {},
       offday_id: "",
+      filter: {
+        departement: "",
+        status: "",
+        replacement: "",
+        employment: "",
+      },
       data: {
         emp_id: "",
         offday_reason: "",
@@ -268,6 +378,39 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
       }
+    },
+    handleFilter(departement, status, replacement, employment) {
+      const newLeaveRequestProp = this.change_shifts.map((shift) => ({
+        ...shift,
+        emp_depid: shift?.emp_id?.emp_depid?._id,
+        replacement: shift?.empchange_replacement?._id,
+        shift_id: shift?._id,
+        status_hr: shift?.empchange_hr?.status,
+        status_at1: shift?.empchange_fsuperior?.status,
+        status_at2: shift?.empchange_ssuperior?.status,
+        employment: shift?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "status_hr", value: status },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+        { key: "replacement", value: replacement },
+      ];
+
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.workshift_filter = newLeaveRequestProp.filter(dataFilter);
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
     },
     assignChangeOffdayDetail(offday) {
       this.modal.modeEdit = true;
@@ -363,6 +506,7 @@ export default {
       handler: function () {
         this.getOffDayRequest();
         this.handleGetEmployement();
+        this.handleGetDepartement();
       },
       deep: true,
     },
