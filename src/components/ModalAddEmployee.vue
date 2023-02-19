@@ -210,8 +210,8 @@
               label="Tanggungan"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.tanggungan"
-              @change="employment.tanggungan = $event"
+              :value="employment.emp_tanggungan"
+              @change="employment.emp_tanggungan = $event"
               :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
             />
             <SelectSearch
@@ -450,7 +450,7 @@ export default {
         emp_status: "",
         emp_fsuperior: "",
         emp_ssuperior: "",
-        tanggungan: "",
+        emp_tanggungan: "",
         emp_location: "",
       },
       attadance_day: {
@@ -613,6 +613,7 @@ export default {
       if (response.status === 200) {
         this.getEmployement();
         this.tabActive = "Personal";
+        this.previewImage = null;
         this.$store.commit("unSetFile");
         this.clearInputValue();
       }
