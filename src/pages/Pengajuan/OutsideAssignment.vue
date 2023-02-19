@@ -3,7 +3,7 @@
     <section class="px-8 mt-6 w-full overflow-x-hiden">
       <section class="flex justify-between">
         <section class="flex items-center">
-          <h1 class="text-2xl">Outsite Assignment</h1>
+          <h1 class="text-2xl">Outside Assignment</h1>
           <ChoiseCompany
             v-if="superAdmin && !loading?.getCompany"
             @selected:company="dataCompany = $event"
@@ -31,26 +31,108 @@
           title="Departemen"
           :showDropdown="activeDropdown === 'departemen'"
           @update:activeDropdown="(e) => changeDropdownActive('departemen')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.status,
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.status,
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
-        <Dropdown
+        <!-- <Dropdown
           title="Workshift"
           :showDropdown="activeDropdown === 'workshift'"
           @update:activeDropdown="changeDropdownActive('workshift')"
-        />
+        /> -->
         <Dropdown
-          title="See rejected"
+          title="See Status"
           :showDropdown="activeDropdown === 'rejected'"
           @update:activeDropdown="changeDropdownActive('rejected')"
+          :selectedOption="filter.status"
+          :options="['Pending', 'Approved', 'Rejected']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.outside_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.outside_duration,
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Overtime duration"
+          title="Outside duration"
           :showDropdown="activeDropdown === 'duration'"
           @update:activeDropdown="changeDropdownActive('duration')"
+          :selectedOption="filter.outside_duration"
+          property="text"
+          :options="[
+            { text: '1 Day', number: 1 },
+            { text: '2 Day', number: 2 },
+            { text: '3 Day', number: 3 },
+            { text: '4 Day', number: 4 },
+            { text: '5 Day', number: 5 },
+            { text: '> 5 Day', number: '>' },
+          ]"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.outside_duration = $event?.number),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.outside_duration = $event),
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Users"
+          title="Employment"
           :showDropdown="activeDropdown === 'user'"
           @update:activeDropdown="changeDropdownActive('user')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.outside_duration,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.outside_duration,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -58,7 +140,7 @@
           Showing 1 to 10 items of 11
         </p>
         <TableOutsideAssignment
-          :outside_request="outside_request"
+          :outside_request="outside_filter"
           :loading="loading.getOvertimeRequest"
           :showMessageStatus="showMessageStatus"
           :getOvertime="getOvertimeRequest"
@@ -171,6 +253,7 @@ import {
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
+import { GetDepartementAPI } from "@/actions/departement";
 
 export default {
   name: "OutsideAssignment",
@@ -205,6 +288,14 @@ export default {
         outside_end_date: "",
       },
       employment: [],
+      departement: [],
+      filter: {
+        departement: "",
+        status: "",
+        outside_duration: "",
+        employment: "",
+      },
+      outside_filter: [],
       optionsCompany: [],
       superAdmin: false,
       outside_request: [],
@@ -245,6 +336,35 @@ export default {
         }
       }
     },
+    handleFilter(departement, status, outside_duration, employment) {
+      // console.log(departement, status, outside_duration);
+      const newLeaveRequestProp = this.outside_request.map((outside) => ({
+        ...outside,
+        emp_depid: outside?.emp_id?.emp_depid?._id,
+        status_hr: outside?.outside_hr?.status,
+        status_at1: outside?.outside_fsuperior?.status,
+        status_at2: outside?.outside_ssuperior?.status,
+        duration:
+          +outside?.outside_duration.split(" ")[0] < 5
+            ? +outside?.outside_duration.split(" ")[0]
+            : ">",
+        employment: outside?.emp_id?._id,
+      }));
+      // console.log(newLeaveRequestProp);
+      const filterConditions = [
+        { key: "status_hr", value: status },
+        { key: "duration", value: outside_duration },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+      ];
+      // console.log(filterConditions);
+
+      const dataFilter = (outside) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || outside[key] == value
+        );
+      this.outside_filter = newLeaveRequestProp.filter(dataFilter);
+    },
     async handleGetEmployement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
@@ -259,6 +379,15 @@ export default {
         emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response?.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
     },
     async handleAddOvertimeRequest() {
       this.loading.addOvertimeRequest = true;
@@ -324,6 +453,12 @@ export default {
         this.outside_request = response.data;
       }
       this.loading.getOvertimeRequest = false;
+      this.handleFilter(
+        this.filter.departement,
+        this.filter.status,
+        this.filter.outside_duration,
+        this.filter.employment
+      );
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -337,6 +472,7 @@ export default {
       handler: function () {
         this.handleGetEmployement();
         this.getOvertimeRequest();
+        this.handleGetDepartement();
       },
       deep: true,
     },
