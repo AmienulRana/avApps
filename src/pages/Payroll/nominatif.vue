@@ -1,6 +1,6 @@
 <template>
   <LayoutAdmin @click="viewActions = null">
-    <section class="px-8 mt-6 w-full" @click="activeDropdown = ''">
+    <section class="px-8 mt-6 w-full mb-8" @click="activeDropdown = ''">
       <section class="flex justify-between">
         <div class="flex items-center">
           <section>
@@ -38,18 +38,68 @@
           title="Departement"
           :showDropdown="activeDropdown === 'departement'"
           @update:activeDropdown="changeDropdownActive('departement')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.status,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.status,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
           ref="dropdown"
           title="Status"
           :showDropdown="activeDropdown === 'status'"
           @update:activeDropdown="(e) => changeDropdownActive('status')"
+          :options="['Approve', 'Cancel', 'Pending']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.employment
+            )
+          "
+          :selectedOption="filter.status"
         />
         <Dropdown
           ref="dropdown"
           title="Employee"
           :showDropdown="activeDropdown === 'employee'"
           @update:activeDropdown="changeDropdownActive('employee')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="relative mb-4">
@@ -77,7 +127,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(payrun, i) in payruns" :key="i">
+              <tr v-for="(payrun, i) in payrun_filter" :key="i">
                 <td class="flex items-center p-3 text-sm">
                   <div
                     class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
@@ -98,6 +148,9 @@
                     </h1>
                     <p class="text-sm text-gray-400">
                       {{ payrun?.emp_id?.emp_desid?.des_name }}
+                    </p>
+                    <p class="text-sm text-gray-400">
+                      {{ payrun?.emp_id?.emp_depid?.dep_name }}
                     </p>
                   </div>
                 </td>
@@ -174,7 +227,7 @@
                       </li>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="showModal = true"
+                        @click="assignDetailPayrun(payrun)"
                       >
                         Edit
                       </li>
@@ -186,7 +239,7 @@
           </table>
         </section>
         <Loading v-if="loading.get" />
-        <NoDataShowing v-if="payruns.length === 0" />
+        <NoDataShowing v-if="payrun_filter.length === 0" />
       </section>
     </section>
     <Modal
@@ -201,34 +254,60 @@
             <div
               class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
             >
-              <h2 class="text-md text-white">AR</h2>
+              <h2 class="text-md text-white">
+                {{
+                  detail_payrun?.emp_id?.emp_fullname.substr(0, 1) +
+                  detail_payrun?.emp_id?.emp_fullname.substr(
+                    detail_payrun?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                    1
+                  )
+                }}
+              </h2>
             </div>
             <div class="ml-3.5">
-              <h1 class="text-base text-blue-400 mb-0">Nama Karyawan</h1>
-              <p class="text-sm text-gray-400">amienulrana@gmail.com</p>
+              <h1 class="text-base text-blue-400 mb-0">
+                {{ detail_payrun?.emp_id?.emp_fullname }}
+              </h1>
+              <p class="text-sm text-gray-400">
+                {{ detail_payrun?.emp_id?.email }}
+              </p>
             </div>
           </div>
           <div>
             <p class="text-sm">
-              Payslip For : <span class="text-blue-500">1 - 30 Nov 2022</span>
+              Payslip For :
+              <span class="text-blue-500">
+                {{
+                  formatDate(detail_payrun?.payrun_period?.periodic_start_date)
+                }}
+                -
+                {{
+                  formatDate(detail_payrun?.payrun_period?.periodic_end_date)
+                }}
+              </span>
             </p>
             <p class="text-sm">Created at : 22 Dec, 2022</p>
           </div>
           <div>
-            <p class="text-sm">Designation : Software Enginner</p>
-            <p class="text-sm">Departement : Accounts</p>
+            <p class="text-sm">
+              Designation : {{ detail_payrun?.emp_id?.emp_desid?.des_name }}
+            </p>
+            <p class="text-sm">
+              Departement : {{ detail_payrun?.emp_id?.emp_depid?.dep_name }}
+            </p>
           </div>
         </section>
         <section>
           <p class="flex justify-between border-b pb-2 text-sm">
-            Basic Sallary <span>$40.000</span>
+            Basic Sallary
+            <span>{{ formatCurrency(detail_payrun?.payrun_salary) }}</span>
           </p>
           <p class="flex justify-between border-b pb-2 mt-6 text-sm">
             Benificiary <span></span>
           </p>
           <div class="flex mt-6 items-center">
             <p class="w-1/3 text-sm">Allowance</p>
-            <section class="w-1/2">
+            <section class="w-full">
               <div class="bg-gray-100 px-5 py-2 rounded-md flex items-center">
                 <p
                   class="text-gray-400 ml-2 bg-white text-sm w-24 px-4 py-1 flex justify-between items-center rounded-full"
@@ -243,9 +322,18 @@
                   :showDropdown="activeDropdown === 'bonus'"
                 />
               </div>
-              <div class="flex justify-between mt-4 items-center">
-                <p class="text-sm">Bonus</p>
-                <input type="number" class="w-32 border h-10 px-4" />
+              <div
+                class="grid grid-cols-4 gap-3 mt-4 items-center"
+                v-for="(allowance, i) in detail_payrun?.payrun_allowance"
+                :key="i"
+              >
+                <p class="text-sm">{{ allowance?.name }}</p>
+                <input
+                  type="number"
+                  class="w-32 border h-10 px-4"
+                  :value="allowance?.total"
+                  @change="allowance.total = $event.target.value"
+                />
                 <div class="flex items-center">
                   <input type="checkbox" class="mr-3" />
                   <label class="text-sm">In Percent (%) </label>
@@ -283,16 +371,30 @@
             </section>
           </div>
           <p class="flex justify-between border-b pb-2 text-sm">
-            Total Allowance <span>$1.000</span>
+            Total Allowance
+            <span>{{
+              formatCurrency(detail_payrun?.payrun_total_allowance)
+            }}</span>
           </p>
           <p class="flex justify-between border-b pb-2 my-2 text-sm">
-            Total Deducation <span>$200</span>
+            Total Deducation
+            <span>{{
+              formatCurrency(detail_payrun?.payrun_total_deduction)
+            }}</span>
           </p>
-          <p class="flex justify-between border-b pb-2 my-2">
+          <p class="flex justify-between border-b pb-2 my-2 text-sm">
+            Total Attendance Deducation
+            <span>{{
+              formatCurrency(detail_payrun?.payrun_total_deduct_attendance)
+            }}</span>
+          </p>
+          <!-- <p class="flex justify-between border-b pb-2 my-2">
             Benificiary Total <span>$800</span>
-          </p>
+          </p> -->
           <p class="flex justify-between border-b pb-2 my-2">
-            Net payable salary<span>$10.800</span>
+            Net payable salary<span>
+              {{ formatCurrency(detail_payrun?.payrun_net_salary) }}
+            </span>
           </p>
         </section>
       </section>
@@ -327,6 +429,9 @@ import {
 } from "@/actions/payrun";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
+import { GetAllowDeductAPI } from "@/actions/allow-deduction";
+import { GetAllEmployementAPI } from "@/actions/employment";
+import { GetDepartementAPI } from "@/actions/departement";
 
 export default {
   name: "PayrollNominatif",
@@ -340,11 +445,22 @@ export default {
       showSelectCompany: false,
       options: [],
       payruns: [],
-      dataCompany: {},
+      payrun_filter: [],
+      departement: [],
+      employment: [],
+      detail_payrun: {},
+      dataCompany: {
+        _id: "",
+      },
       loading: {
         company: true,
         get: false,
         add: false,
+      },
+      filter: {
+        departement: "",
+        status: "",
+        employment: "",
       },
     };
   },
@@ -371,6 +487,32 @@ export default {
         }
       }
     },
+    handleFilter(departement, status, employment) {
+      const newAttendanceProp = this.payruns.map((payrun) => ({
+        ...payrun,
+        emp_depid: payrun?.emp_id?.emp_depid?._id,
+        employment: payrun?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "payrun_status", value: status },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+      ];
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.payrun_filter = newAttendanceProp.filter(dataFilter);
+      // console.log(payrun_filter);
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
+    },
     formatDate(dateString) {
       const date = new Date(dateString);
       const options = { day: "numeric", month: "long" };
@@ -391,6 +533,21 @@ export default {
       this.dataCompany = response?.data[0];
       this.loading.company = false;
     },
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_fullname: employment?.emp_fullname,
+      }));
+      this.employment = getIdNameEmp;
+    },
     changeDropdownActive(id) {
       if (this.activeDropdown === id) {
         this.activeDropdown = false;
@@ -401,7 +558,7 @@ export default {
     async handleGeneratePayslip() {
       this.loading.add = true;
       this.loading.get = true;
-      const querySuperAdmin = `?company_id=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
       const response = await GeneratePayslipAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -417,6 +574,17 @@ export default {
       this.loading.get = false;
       this.showMessageStatus(response);
     },
+    async handleGetAllowDeduct() {
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+
+      const response = await GetAllowDeductAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      console.log(response?.data);
+      // this.allowDeducts = response?.data;
+    },
     async recalculatePayslip(id) {
       this.loading.get = true;
       const response = await RecalculatePayrunAPI(id);
@@ -430,6 +598,10 @@ export default {
       }
       this.loading.get = false;
       this.showMessageStatus(response);
+    },
+    async assignDetailPayrun(payrun) {
+      this.showModal = true;
+      this.detail_payrun = { ...payrun };
     },
     async handleEditPayslip(id, status) {
       this.loading.get = true;
@@ -448,7 +620,7 @@ export default {
     },
     async getPayrun() {
       this.loading.get = true;
-      const querySuperAdmin = `?company_id=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
       const response = await GetPayslipAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -459,6 +631,11 @@ export default {
       if (response?.status === 200) {
         this.payruns = response?.data;
         this.loading.get = false;
+        this.handleFilter(
+          this.filter.departement,
+          this.filter.status,
+          this.filter.employment
+        );
       }
     },
     dynamicStatusClass(status) {
@@ -487,8 +664,9 @@ export default {
     dataCompany: {
       handler: function () {
         this.getPayrun();
-        // this.getShift();
-        // this.getChangeShiftRequest();
+        this.handleGetAllowDeduct();
+        this.handleGetEmployement();
+        this.handleGetDepartement();
       },
       deep: true,
     },
@@ -501,9 +679,9 @@ export default {
     // if (payload?.role === "Super Admin" || payload?.role === "Group Admin") {
     this.getAllCompany();
     // }
-    if (payload?.role !== "Super Admin" || payload?.role !== "Group Admin") {
-      this.getPayrun();
-    }
+    // if (payload?.role !== "Super Admin" || payload?.role !== "Group Admin") {
+    // this.getPayrun();
+    // }
   },
 };
 </script>
@@ -517,7 +695,7 @@ table tbody tr td {
   padding: 1rem 2rem;
 }
 .custom-scrollbar::-webkit-scrollbar {
-  height: 3px !important;
+  height: 8px !important;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 20px;
