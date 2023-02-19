@@ -23,6 +23,7 @@ import Holiday from "../pages/Administration/Holiday.vue";
 import Announcement from "../pages/Administration/Announcement.vue";
 import Home from "../pages/Home.vue";
 import Periodic from "../pages/Setting/Periodic.vue";
+import Location from "../pages/Setting/Location.vue";
 import LeaveSetting from "../pages/Setting/LeaveSetting.vue";
 import NeedApproval from "../pages/Pengajuan/NeedApproval.vue";
 import store from "../store";
@@ -138,6 +139,11 @@ const routes = [
   {
     path: "/setting/periodic",
     component: Periodic,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/location",
+    component: Location,
     beforeEnter: requiredAuth,
   },
   {
