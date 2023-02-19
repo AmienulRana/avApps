@@ -16,7 +16,9 @@
             <th class="text-left text-sm">Name</th>
             <th class="text-left text-sm">Type</th>
             <th class="text-left text-sm">Attachments</th>
-            <th class="text-left text-sm">Status</th>
+            <th class="text-left text-sm">Approved 1</th>
+            <th class="text-left text-sm">Approved 2</th>
+            <th class="text-left text-sm">HR Approved</th>
             <th class="text-left text-sm">Activity</th>
             <th class="text-left text-sm">Actions</th>
           </tr>
@@ -112,14 +114,69 @@
               <p
                 class="flex py-1 text-white w-24 items-center justify-center rounded-full"
                 :class="
-                  leave?.empleave_status === 'Approved'
+                  leave?.leave_fsuperior?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : leave?.leave_fsuperior?.status === 'Approved'
                     ? 'bg-green-500'
-                    : leave?.empleave_status === 'Rejected'
-                    ? 'bg-red-500'
-                    : 'bg-coral'
+                    : 'bg-red-500'
                 "
               >
-                {{ leave?.empleave_status || "Pending" }}
+                {{ leave?.leave_fsuperior?.status }}
+              </p>
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="leave?.leave_fsuperior?.status !== 'Pending'"
+              >
+                {{ leave?.leave_fsuperior?.fsuperior_id?.emp_id?.emp_fullname }}
+                <br />
+                {{ leave?.leave_fsuperior?.approved_hours }},
+                {{ leave?.leave_fsuperior?.approved_date }}
+              </p>
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                class="flex py-1 text-white w-24 px-2 items-center justify-center rounded-full"
+                :class="
+                  leave?.leave_ssuperior?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : leave?.leave_ssuperior?.status === 'Approved'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                "
+              >
+                {{ leave?.leave_ssuperior?.status }}
+              </p>
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="leave?.leave_ssuperior?.status !== 'Pending'"
+              >
+                {{ leave?.leave_ssuperior?.ssuperior_id?.emp_id?.emp_fullname }}
+                <br />
+                {{ leave?.leave_ssuperior?.approved_hours }},
+                {{ leave?.leave_ssuperior?.approved_date }}
+              </p>
+            </td>
+            <td class="p-3 text-sm">
+              <p
+                class="flex py-1 text-white w-24 items-center justify-center rounded-full"
+                :class="
+                  leave?.leave_hr?.status === 'Pending'
+                    ? 'bg-gray-300'
+                    : leave?.leave_hr?.status === 'Approved'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                "
+              >
+                {{ leave?.leave_hr?.status }}
+              </p>
+              <p
+                class="text-sm mt-2 text-gray-400"
+                v-if="leave?.leave_hr?.status !== 'Pending'"
+              >
+                Admin / HR
+                <br />
+                {{ leave?.leave_hr?.approved_hours }},
+                {{ leave?.leave_hr?.approved_date }}
               </p>
             </td>
             <td class="p-3 text-sm flex">
@@ -161,12 +218,20 @@
               </button>
             </td>
             <td class="text-right relative">
-              <Button
-                class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
-                @click="handleDeleteLeave(leave?._id)"
-              >
-                <font-awesome-icon icon="fa-trash-alt" />
-              </Button>
+              <section class="flex">
+                <Button
+                  class="p-3 shadow-none hover:bg-blue-100 text-primary rounded-full"
+                  @click="assignLeaveDetail(leave)"
+                >
+                  <font-awesome-icon icon="fa-pen-to-square" />
+                </Button>
+                <Button
+                  class="p-3 shadow-none hover:bg-red-100 text-red-500 rounded-full"
+                  @click="handleDeleteLeave(leave?._id)"
+                >
+                  <font-awesome-icon icon="fa-trash-alt" />
+                </Button>
+              </section>
             </td>
           </tr>
         </tbody>
@@ -281,6 +346,7 @@ export default {
     showMessageStatus: Function,
     loadingGet: Boolean,
     getLeaveRequest: Function,
+    assignLeaveDetail: Function,
   },
   components: { Modal, Radio, Loading, NoDataShowing, Button },
   data() {
