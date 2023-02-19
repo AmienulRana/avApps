@@ -18,9 +18,9 @@
             >
               <h2 class="text-md text-white">
                 {{
-                  attendance?.emp_id?.emp_fullname.substr(0, 1) +
-                  attendance?.emp_id?.emp_fullname.substr(
-                    attendance?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                  attendance?.emp_id?.emp_fullname?.substr(0, 1) +
+                  attendance?.emp_id?.emp_fullname?.substr(
+                    attendance?.emp_id?.emp_fullname?.indexOf(" ") + 1,
                     1
                   )
                 }}
@@ -77,7 +77,9 @@
             <p class="text-sm mb-2 text-gray-600">
               {{
                 attendance?.attendances.filter(
-                  (att) => att?.attendance_status === "Late"
+                  (att) =>
+                    att?.attendance_status === "Late" ||
+                    att?.attendance_status === "Very Late"
                 ).length
               }}x Late ({{
                 formatTime(
@@ -103,7 +105,9 @@
             <p class="text-sm mb-2 text-gray-600">
               {{
                 attendance?.attendances.filter(
-                  (att) => att?.break_status === "Late"
+                  (att) =>
+                    att?.break_status === "Late" ||
+                    att?.break_status === "Very Late"
                 ).length
               }}x Late ({{
                 formatTime(
