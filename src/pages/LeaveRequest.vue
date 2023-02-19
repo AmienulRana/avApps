@@ -31,26 +31,103 @@
           title="Departemen"
           :showDropdown="activeDropdown === 'departemen'"
           @update:activeDropdown="(e) => changeDropdownActive('departemen')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.workshift,
+              filter.status,
+              filter.leave_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.workshift,
+              filter.status,
+              filter.leave_duration,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
-          title="Workshift"
-          :showDropdown="activeDropdown === 'workshift'"
-          @update:activeDropdown="changeDropdownActive('workshift')"
-        />
-        <Dropdown
-          title="See rejected"
+          title="See Status"
           :showDropdown="activeDropdown === 'rejected'"
           @update:activeDropdown="changeDropdownActive('rejected')"
+          :selectedOption="filter.status"
+          :options="['Pending', 'Approved', 'Rejected']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              (filter.status = $event),
+              filter.leave_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              (filter.status = $event),
+              filter.leave_duration,
+              filter.employment
+            )
+          "
         />
         <Dropdown
           title="Leave duration"
           :showDropdown="activeDropdown === 'duration'"
           @update:activeDropdown="changeDropdownActive('duration')"
+          :selectedOption="filter.leave_duration"
+          :options="['Single Day', 'Multi Day', 'Half Day', 'Hours']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              filter.status,
+              (filter.leave_duration = $event),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              filter.status,
+              (filter.leave_duration = $event),
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Users"
+          title="Employment"
           :showDropdown="activeDropdown === 'user'"
           @update:activeDropdown="changeDropdownActive('user')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              filter.status,
+              filter.leave_duration,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.workshift,
+              filter.status,
+              filter.leave_duration,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -58,10 +135,11 @@
           Showing 1 to 10 items of 11
         </p>
         <TableLeaveRequest
-          :leave_request="leave_request"
+          :leave_request="leave_filter"
           :showMessageStatus="showMessageStatus"
           :getLeaveRequest="handleGetLeaveRequest"
           :loadingGet="loading.getLeaveRequest"
+          :assignLeaveDetail="assignLeaveDetail"
         />
       </section>
     </section>
@@ -69,7 +147,11 @@
   <Modal
     title="Assign Leave"
     :showModal="modal.showModal"
-    @close="modal.showModal = false"
+    @close="
+      modal.showModal = false;
+      clearInputValue();
+      modal.modeEdit = false;
+    "
   >
     <template #header>
       <ChoiseCompany
@@ -91,7 +173,7 @@
         :isOpen="modal.showSelect === 'emp'"
         @handleShowSelect="() => (modal.showSelect = 'emp')"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.emp_id = $event"
@@ -140,7 +222,7 @@
       <SelectSearch
         :options="leave_types"
         :isOpen="modal.showSelect === 'type'"
-        property="type_desc"
+        property="leave_desc"
         @handleShowSelect="() => (modal.showSelect = 'type')"
         class="flex-col mt-4"
         input_class="w-full mt-2"
@@ -158,6 +240,7 @@
             label="Single Day"
             @change="data.empleave_leave_type = 'Single Day'"
             :modelValue="data.empleave_leave_type"
+            :checked="data.empleave_leave_type === 'Single Day'"
             name="leave_duration"
           />
           <Radio
@@ -165,6 +248,7 @@
             class="mx-8"
             @change="data.empleave_leave_type = 'Multi Day'"
             :modelValue="data.empleave_leave_type"
+            :checked="data.empleave_leave_type === 'Multi Day'"
             name="leave_duration"
           />
           <Radio
@@ -172,6 +256,7 @@
             @change="data.empleave_leave_type = 'Half Day'"
             :modelValue="data.empleave_leave_type"
             name="leave_duration"
+            :checked="data.empleave_leave_type === 'Half Day'"
           />
           <Radio
             label="Hours"
@@ -179,6 +264,7 @@
             @change="data.empleave_leave_type = 'Hours'"
             :modelValue="data.empleave_leave_type"
             name="leave_duration"
+            :checked="data.empleave_leave_type === 'Hours'"
           />
         </div>
       </section>
@@ -231,12 +317,14 @@
               class="mx-8 my-0"
               @change="modal.getDurationHalfDay = 'First Half'"
               :modelValue="modal.getDurationHalfDay"
+              :checked="modal.getDurationHalfDay === 'First Half'"
             />
             <Radio
               label="Last half"
               class="my-0"
               @change="modal.getDurationHalfDay = 'Last Half'"
               :modelValue="modal.getDurationHalfDay"
+              :checked="modal.getDurationHalfDay === 'Last Half'"
             />
           </div>
         </div>
@@ -339,8 +427,17 @@
           class="bg-green-500 w-24 py-2 text-white rounded-md"
           @click="handleLeaveRequest"
           :disabled="loading.addLeaveRequest"
+          v-if="!modal.modeEdit"
         >
           Save
+        </Button>
+        <Button
+          v-else
+          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          @click="handleEditLeaveRequest"
+          :disabled="loading.addLeaveRequest"
+        >
+          Edit
         </Button>
       </section>
     </template>
@@ -353,11 +450,11 @@ import Button from "../components/Button.vue";
 import Dropdown from "../components/Dropdown.vue";
 import TableLeaveRequest from "../components/TableLeaveRequest.vue";
 import Modal from "../components/Modal.vue";
-import Select from "@/components/Select";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
 import InputTime from "@/components/InputTime.vue";
+import { GetDepartementAPI } from "@/actions/departement";
 import decryptToken from "@/utils/decryptToken";
 import { GetAllCompanyAPI } from "@/actions/company";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
@@ -365,6 +462,7 @@ import { GetAllEmployementAPI } from "@/actions/employment";
 import {
   AddLeaveRequestAPI,
   GetLeaveRequestAPI,
+  EditDataLeaveRequestAPI,
 } from "@/actions/leave-request";
 import { GetLeaveSettingAPI } from "@/actions/leave-setting";
 import { useToast } from "vue-toastification";
@@ -378,7 +476,6 @@ export default {
     Dropdown,
     SelectSearch,
     Modal,
-    Select,
     Radio,
     ChoiseCompany,
     Input,
@@ -402,10 +499,18 @@ export default {
           minute: "00",
         },
       },
+      filter: {
+        departement: "",
+        workshift: "",
+        status: "",
+        leave_duration: "",
+        employment: "",
+      },
+      leave_id: "",
       data: {
         empleave_attachement: [],
         emp_id: {
-          emp_name: "",
+          emp_fullname: "",
           _id: "",
         },
         empleave_type_id: "",
@@ -416,6 +521,8 @@ export default {
         empleave_reason: "",
       },
       leave_request: [],
+      leave_filter: [],
+      departement: [],
       leave_types: [],
       employment: [],
       optionsCompany: [],
@@ -442,27 +549,34 @@ export default {
         }
       }
     },
-    handleFilter(status, designation, departement) {
+    handleFilter(departement, workshift, status, leave_duration, employment) {
+      const newLeaveRequestProp = this.leave_request.map((leave) => ({
+        ...leave,
+        emp_depid: leave?.emp_id?.emp_depid?._id,
+        status: leave?.empleave_status,
+        leave_duration: leave?.empleave_leave_type,
+        employment: leave?.emp_id?._id,
+      }));
       const filterConditions = [
-        { key: "emp_status", value: status },
-        { key: "emp_desid", value: designation },
+        { key: "status", value: status },
+        { key: "leave_duration", value: leave_duration },
         { key: "emp_depid", value: departement },
-        { key: "_id", value: this.filter.role },
+        { key: "employment", value: employment },
       ];
-      if (this.filter.role) {
-        const dataFilter = (employee) =>
-          filterConditions.every(
-            ({ key, value }) => value === "" || employee[key] === value
-          );
-        this.employeeFilter = this.employee.filter(dataFilter);
-      } else {
-        const dataFilter = (employee) =>
-          filterConditions.every(
-            ({ key, value }) => value === "" || employee[key]?._id === value
-          );
 
-        this.employeeFilter = this.employee.filter(dataFilter);
+      const dataFilter = (leave) =>
+        filterConditions.every(
+          ({ key, value }) => value === "" || leave[key] === value
+        );
+      this.leave_filter = newLeaveRequestProp.filter(dataFilter);
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
       }
+      this.departement = response.data;
     },
     clearInputValue() {
       for (const key in this.data) {
@@ -538,9 +652,27 @@ export default {
         this.leave_request = response?.data;
       }
       this.loading.getLeaveRequest = false;
+      this.handleFilter(
+        this.filter.departement,
+        this.filter.workshift,
+        this.filter.status,
+        this.filter.leave_duration,
+        this.filter.employment
+      );
     },
     async handleLeaveRequest() {
       this.loading.addLeaveRequest = true;
+
+      // const fd = new FormData();
+      // this.data.empleave_attachement.map((image) =>
+      //   fd.append("files", image?.originalFile)
+      // );
+      // fd.append('empleave_type_id', this.data.empleave_type_id?._id);
+      // fd.append('emp_id', this.data.emp_id?.id);
+      // fd.append('empleave_leave_duration', this.createLeaveDuration());
+      // fd.append('empleave_apply_date', this.createApplyDate());
+      // fd.append('empleave_start_hours', `${this.modal.start_time.hour}:${this.modal.start_time.minute}`);
+      // fd.append('empleave_end_hours', `${this.modal.end_time.hour}:${this.modal.end_time.minute}`);
       const payload = {
         ...this.data,
         empleave_type_id: this.data.empleave_type_id?._id,
@@ -550,8 +682,8 @@ export default {
         empleave_start_hours: `${this.modal.start_time.hour}:${this.modal.start_time.minute}`,
         empleave_end_hours: `${this.modal.end_time.hour}:${this.modal.end_time.minute}`,
       };
-      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       console.log(payload);
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await AddLeaveRequestAPI(queryAdminSuper, payload);
       if (response?.status === 401) {
         this.$router.push("/login");
@@ -565,21 +697,79 @@ export default {
       this.showMessageStatus(response);
       this.loading.addLeaveRequest = false;
     },
+    async handleEditLeaveRequest() {
+      this.loading.addLeaveRequest = true;
+      const payload = {
+        ...this.data,
+        empleave_type_id: this.data.empleave_type_id?._id,
+        emp_id: this.data.emp_id._id,
+        empleave_leave_duration: this.createLeaveDuration(),
+        empleave_apply_date: this.createApplyDate(),
+        empleave_start_hours: `${this.modal.start_time.hour}:${this.modal.start_time.minute}`,
+        empleave_end_hours: `${this.modal.end_time.hour}:${this.modal.end_time.minute}`,
+      };
+      const response = await EditDataLeaveRequestAPI(this.leave_id, payload);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response.status === 200) {
+        this.modal.showModal = false;
+        this.modal.modeEdit = false;
+        this.handleGetLeaveRequest();
+        this.clearInputValue();
+      }
+      this.showMessageStatus(response);
+      this.loading.addLeaveRequest = false;
+    },
+    getHourMinute(time) {
+      if (time !== "-") {
+        const timeArray = time.split(" ")[0].split(":");
+        return [timeArray[0], timeArray[1]];
+      }
+      return ["", "00"];
+    },
+    assignLeaveDetail(leave) {
+      this.modal.showModal = true;
+      this.modal.modeEdit = true;
+      this.leave_id = leave?._id;
+      this.data.emp_id = leave?.emp_id;
+      this.data.empleave_type_id = leave?.empleave_type_id;
+      this.data.empleave_leave_type = leave?.empleave_leave_type;
+      this.data.empleave_start_date = leave?.empleave_start_date;
+      this.data.empleave_end_date = leave?.empleave_end_date;
+      this.data.empleave_reason = leave?.empleave_reason;
+      this.modal.getDurationHalfDay = leave?.empleave_leave_duration;
+      if (leave?.empleave_leave_type === "Hours") {
+        this.modal.start_time.hour = this.getHourMinute(
+          leave?.empleave_start_hours
+        )[0];
+        this.modal.start_time.minute = this.getHourMinute(
+          leave?.empleave_start_hours
+        )[1];
+        this.modal.end_time.hour = this.getHourMinute(
+          leave?.empleave_end_hours
+        )[0];
+        this.modal.end_time.minute = this.getHourMinute(
+          leave?.empleave_end_hours
+        )[1];
+      }
+    },
     viewImage(e) {
       const files = e.target.files;
       for (let i = 0; i < files.length; i++) {
         const file = URL.createObjectURL(files[i]);
-        this.data.attachement.push({
+        this.data.empleave_attachement.push({
           blobImgUrl: file,
           originalFile: files[i],
         });
       }
     },
     removeImageFromPreview(image) {
-      const file = this.data.attachement.filter(
+      const file = this.data.empleave_attachement.filter(
         (img) => image.blobImgUrl !== img.blobImgUrl
       );
-      this.data.attachement = file;
+      this.data.empleave_attachement = file;
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -598,7 +788,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
     },
@@ -615,7 +805,6 @@ export default {
           type_desc: `${type?.leave_name} (${type?.leave_type})`,
         }));
         this.leave_types = newTypesProp;
-        console.log(newTypesProp);
       }
     },
   },
@@ -625,6 +814,7 @@ export default {
         this.handleGetEmployement();
         this.handleGetLeaveRequest();
         this.getLeaveType();
+        this.handleGetDepartement();
       },
       deep: true,
     },
