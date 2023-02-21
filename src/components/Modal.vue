@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed bottom-0 inset-x-0 px-4 max-h-screen sm:inset-0 sm:flex sm:items-center sm:justify-center"
+    class="fixed bottom-0 inset-x-0 px-4 max-h-screen sm:inset-0 sm:flex sm:items-center sm:justify-center z-50"
     v-if="showModal"
   >
     <div
