@@ -23,13 +23,21 @@
             :dataCompany="dataCompany"
           />
         </div>
-        <Button
-          class="bg-primary rounded text-white mx-2 px-6 py-2 h-max"
-          @click="handleGeneratePayslip"
-          :disabled="loading.add"
-        >
-          Generate Payslip</Button
-        >
+        <section class="flex">
+          <Button
+            class="bg-primary rounded text-white mx-2 px-6 py-2 h-max"
+            @click="handleGeneratePayslip"
+            :disabled="loading.add"
+          >
+            Generate Payslip</Button
+          >
+          <Button
+            class="rounded text-white mx-2 px-6 py-2 h-max bg-green-400 hover:opacity-70"
+          >
+            Send PDF Payslip
+            <font-awesome-icon icon="fa-paper-plane" class="ml-2" />
+          </Button>
+        </section>
       </section>
 
       <section class="flex mt-6 flex-wrap w-10/12 items-center">
@@ -176,7 +184,7 @@
                 </td>
                 <td class="p-3 text-sm">
                   <p class="text-sm">
-                    {{ formatCurrency(payrun?.payrun_net_salary) }}
+                    {{ formatCurrency(Math.round(payrun?.payrun_net_salary)) }}
                   </p>
                 </td>
                 <td class="p-3 text-sm">
@@ -185,7 +193,24 @@
                   </p>
                 </td>
                 <td class="p-3 text-sm">
-                  <p class="text-sm underline">View</p>
+                  <section class="flex">
+                    <Button
+                      class="text-sm text-white w-20 h-9 rounded bg-gray-400 mr-2 hover:opacity-70"
+                      @click="assignDetailPayrun(payrun, 'Detail')"
+                    >
+                      View
+                      <font-awesome-icon icon="fa-eye" class="ml-2" />
+                    </Button>
+                    <Button
+                      v-if="payrun?.payrun_status === 'Approve'"
+                      class="text-sm text-white w-20 h-9 rounded bg-gray-400 hover:opacity-70"
+                      @click="downloadPDF(payrun)"
+                      :disabled="loadingDownload"
+                    >
+                      Send
+                      <font-awesome-icon icon="fa-paper-plane" class="ml-2" />
+                    </Button>
+                  </section>
                 </td>
                 <td class="p-3 text-right relative z-10">
                   <Button
@@ -227,7 +252,7 @@
                       </li>
                       <li
                         class="px-4 py-2 cursor-pointer hover:text-blue-400"
-                        @click="assignDetailPayrun(payrun)"
+                        @click="assignDetailPayrun(payrun, 'Edit')"
                       >
                         Edit
                       </li>
@@ -244,8 +269,8 @@
     </section>
     <Modal
       title="Edit Payslip"
-      :showModal="showModal"
-      @close="showModal = $event"
+      :showModal="showModal === 'Edit'"
+      @close="showModal = false"
     >
       <section class="">
         <h1 class="text-xl text-center">AvHris</h1>
@@ -308,19 +333,22 @@
           <div class="flex mt-6 items-center">
             <p class="w-1/3 text-sm">Allowance</p>
             <section class="w-full">
-              <div class="bg-gray-100 px-5 py-2 rounded-md flex items-center">
+              <div
+                class="bg-gray-100 px-5 py-2 rounded-md flex items-center flex-wrap"
+                style="min-height: 55px"
+              >
                 <p
-                  class="text-gray-400 ml-2 bg-white text-sm w-24 px-4 py-1 flex justify-between items-center rounded-full"
+                  v-for="(allowance, i) in detail_payrun?.payrun_allowance"
+                  :key="i"
+                  class="text-gray-400 ml-2 mb-2 bg-white text-sm min-w-max px-4 py-1 flex justify-between items-center rounded-full"
                 >
-                  Bonus
-                  <font-awesome-icon icon="fa-xmark" />
+                  {{ allowance?.name }}
+                  <font-awesome-icon
+                    icon="fa-xmark"
+                    class="ml-2"
+                    @click="handleDeleteAllowance(allowance)"
+                  />
                 </p>
-                <Dropdown
-                  @update:activeDropdown="(e) => changeDropdownActive('bonus')"
-                  title="Add"
-                  backgroundTitle="bg-transparent"
-                  :showDropdown="activeDropdown === 'bonus'"
-                />
               </div>
               <div
                 class="grid grid-cols-4 gap-3 mt-4 items-center"
@@ -332,55 +360,93 @@
                   type="number"
                   class="w-32 border h-10 px-4"
                   :value="allowance?.total"
-                  @change="allowance.total = $event.target.value"
+                  @input="allowance.total = +$event.target.value"
                 />
                 <div class="flex items-center">
-                  <input type="checkbox" class="mr-3" />
+                  <input
+                    type="checkbox"
+                    class="mr-3"
+                    :checked="allowance?.percent"
+                    @input="
+                      allowance.percent = allowance?.percent ? false : true
+                    "
+                  />
                   <label class="text-sm">In Percent (%) </label>
                 </div>
-                <font-awesome-icon icon="fa-trash-alt" class="text-red-600" />
+                <font-awesome-icon
+                  icon="fa-trash-alt"
+                  class="text-red-600"
+                  @click="handleDeleteAllowance(allowance)"
+                />
               </div>
             </section>
           </div>
-          <div class="flex my-6 items-center">
+          <div class="flex mt-6 items-center">
             <p class="w-1/3 text-sm">Deduction</p>
-            <section class="w-1/2">
-              <div class="bg-gray-100 px-5 py-2 rounded-md flex items-center">
+            <section class="w-full">
+              <div
+                class="bg-gray-100 px-5 py-2 rounded-md flex items-center flex-wrap"
+                style="min-height: 55px"
+              >
                 <p
-                  class="text-gray-400 ml-2 bg-white text-sm w-24 px-4 py-1 flex justify-between items-center rounded-full"
+                  v-for="(deduction, i) in detail_payrun?.payrun_deduction"
+                  :key="i"
+                  class="text-gray-400 ml-2 bg-white text-sm min-w-max px-4 py-1 flex justify-between items-center rounded-full"
                 >
-                  Bonus
-                  <font-awesome-icon icon="fa-xmark" />
+                  {{ deduction?.name }}
+                  <font-awesome-icon
+                    icon="fa-xmark"
+                    class="ml-2"
+                    @click="handleDeleteDeduction(deduction)"
+                  />
                 </p>
-                <Dropdown
-                  @update:activeDropdown="(e) => changeDropdownActive('tax')"
-                  title="Add"
-                  backgroundTitle="bg-transparent"
-                  :showDropdown="activeDropdown === 'tax'"
-                />
               </div>
-              <div class="flex justify-between mt-4 items-center">
-                <p class="text-sm">Bonus</p>
-                <input type="number" class="w-32 border h-10 px-4" />
+              <div
+                class="grid grid-cols-4 gap-3 mt-4 items-center"
+                v-for="(deduction, i) in detail_payrun?.payrun_deduction"
+                :key="i"
+              >
+                <p class="text-sm">{{ deduction?.name }}</p>
+                <input
+                  type="number"
+                  class="w-32 border h-10 px-4"
+                  :value="deduction?.total"
+                  @input="deduction.total = +$event.target.value"
+                />
                 <div class="flex items-center">
-                  <input type="checkbox" class="mr-3" />
+                  <input
+                    type="checkbox"
+                    class="mr-3"
+                    :checked="deduction?.percent"
+                    @input="
+                      deduction.percent = deduction?.percent ? false : true
+                    "
+                  />
                   <label class="text-sm">In Percent (%) </label>
                 </div>
-                <font-awesome-icon icon="fa-trash-alt" class="text-red-600" />
+                <font-awesome-icon
+                  icon="fa-trash-alt"
+                  class="text-red-600"
+                  @click="handleDeleteDeduction(deduction)"
+                />
               </div>
             </section>
           </div>
-          <p class="flex justify-between border-b pb-2 text-sm">
+          <p class="flex justify-between border-b pb-2 text-sm mt-8">
             Total Allowance
             <span>{{
-              formatCurrency(detail_payrun?.payrun_total_allowance)
+              formatCurrency(getTotalAllowance(detail_payrun?.payrun_allowance))
             }}</span>
           </p>
           <p class="flex justify-between border-b pb-2 my-2 text-sm">
             Total Deducation
-            <span>{{
-              formatCurrency(detail_payrun?.payrun_total_deduction)
-            }}</span>
+            <span>
+              {{
+                formatCurrency(
+                  getTotalDeduction(detail_payrun?.payrun_deduction)
+                )
+              }}
+            </span>
           </p>
           <p class="flex justify-between border-b pb-2 my-2 text-sm">
             Total Attendance Deducation
@@ -393,7 +459,14 @@
           </p> -->
           <p class="flex justify-between border-b pb-2 my-2">
             Net payable salary<span>
-              {{ formatCurrency(detail_payrun?.payrun_net_salary) }}
+              {{
+                formatCurrency(
+                  detail_payrun?.payrun_salary -
+                    detail_payrun?.payrun_total_deduct_attendance +
+                    getTotalAllowance(detail_payrun?.payrun_allowance) -
+                    getTotalDeduction(detail_payrun?.payrun_deduction)
+                )
+              }}
             </span>
           </p>
         </section>
@@ -403,8 +476,215 @@
           <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
             Cancel
           </Button>
-          <Button class="bg-blue-500 w-24 py-2 text-white rounded-md">
+          <Button
+            class="bg-blue-500 w-24 py-2 text-white rounded-md"
+            @click="handleEditDataPayslip"
+            :disabled="loading.edit"
+          >
             Save
+          </Button>
+        </section>
+      </template>
+    </Modal>
+    <Modal
+      title="Detail Payslip"
+      :showModal="true"
+      :class="showModal === 'Detail' ? 'opacity-100 z-50' : 'opacity-0 -z-10'"
+      @close="showModal = false"
+    >
+      <section id="modal-content">
+        <h1 class="text-xl text-center">AvHris</h1>
+        <p class="text-sm text-center">
+          Periode
+          <span class="text-blue-500">
+            {{ detail_payrun?.payrun_period?.periodic_month }}
+
+            {{ detail_payrun?.payrun_period?.periodic_years }}
+          </span>
+        </p>
+
+        <section class="flex justify-between my-10">
+          <div class="flex">
+            <div
+              class="w-12 h-12 flex justify-center items-center rounded-full bg-zinc-400"
+            >
+              <h2 class="text-md text-white">
+                {{
+                  detail_payrun?.emp_id?.emp_fullname.substr(0, 1) +
+                  detail_payrun?.emp_id?.emp_fullname.substr(
+                    detail_payrun?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                    1
+                  )
+                }}
+              </h2>
+            </div>
+            <div class="ml-3.5">
+              <h1 class="text-base text-blue-400 mb-0">
+                {{ detail_payrun?.emp_id?.emp_fullname }}
+              </h1>
+              <p class="text-sm text-gray-400">
+                {{ detail_payrun?.emp_id?.email }}
+              </p>
+            </div>
+          </div>
+          <div>
+            <p class="text-sm">
+              Payslip For :
+              <span class="text-blue-500">
+                {{
+                  formatDate(
+                    detail_payrun?.payrun_period?.periodic_start_date ||
+                      "12-02-2023"
+                  )
+                }}
+                -
+                {{
+                  formatDate(
+                    detail_payrun?.payrun_period?.periodic_end_date ||
+                      "10-02-2023"
+                  )
+                }}
+              </span>
+            </p>
+            <p class="text-sm">Created at : 22 Dec, 2022</p>
+          </div>
+          <div>
+            <p class="text-sm">
+              Designation : {{ detail_payrun?.emp_id?.emp_desid?.des_name }}
+            </p>
+            <p class="text-sm">
+              Departement : {{ detail_payrun?.emp_id?.emp_depid?.dep_name }}
+            </p>
+          </div>
+        </section>
+        <section>
+          <p class="flex justify-between border-b pb-2 text-sm">
+            Gaji Pokok
+            <span>{{ formatCurrency(detail_payrun?.payrun_salary || 0) }}</span>
+          </p>
+          <p class="text-center mt-6 text-sm">Rincian Penghasilan</p>
+          <div class="grid grid-cols-2 gap-6 mt-6">
+            <section class="w-full">
+              <p class="text-sm text-center mb-3">Tunjangan</p>
+              <p
+                class="text-gray-400 mb-2 bg-white text-sm px-4 py-1 flex justify-between items-center"
+              >
+                <span> Tunjangan Jabatan </span>
+                <span>
+                  {{
+                    formatCurrency(detail_payrun?.payrun_total_designation || 0)
+                  }}
+                </span>
+              </p>
+              <p
+                class="text-gray-400 mb-2 bg-white text-sm px-4 py-1 flex justify-between items-center"
+              >
+                <span> Lembur / Overtime </span>
+                <span>
+                  {{
+                    formatCurrency(detail_payrun?.payrun_total_overtime || 0)
+                  }}
+                </span>
+              </p>
+              <p
+                v-for="(allowance, i) in detail_payrun?.payrun_allowance"
+                :key="i"
+                class="text-gray-400 mb-2 bg-white text-sm px-4 py-1 flex justify-between items-center"
+              >
+                <span>
+                  {{ allowance?.name }}
+                  {{ allowance?.percent ? `${allowance?.total}%` : "" }}
+                </span>
+                <span>
+                  {{
+                    formatCurrency(
+                      allowance?.percent
+                        ? (allowance?.total / 100) *
+                            detail_payrun?.payrun_salary
+                        : allowance?.total || 0
+                    )
+                  }}
+                </span>
+              </p>
+            </section>
+            <section class="w-full">
+              <p class="text-center text-sm mb-3">Potongan</p>
+              <p
+                class="text-gray-400 mb-2 bg-white text-sm px-4 py-1 flex justify-between items-center"
+              >
+                <span> Potongan Absensi </span>
+                <span>
+                  {{
+                    formatCurrency(
+                      detail_payrun?.payrun_total_deduct_attendance || 0
+                    )
+                  }}
+                </span>
+              </p>
+              <p
+                v-for="(deduction, i) in detail_payrun?.payrun_deduction"
+                :key="i"
+                class="text-gray-400 mb-2 bg-white text-sm px-4 py-1 flex justify-between items-center"
+              >
+                <span>
+                  {{ deduction?.name }}
+                  {{ deduction?.percent ? `${deduction?.total}%` : "" }}
+                </span>
+                <span>
+                  {{
+                    formatCurrency(
+                      deduction?.percent
+                        ? (deduction?.total / 100) *
+                            detail_payrun?.payrun_salary
+                        : deduction?.total || 0
+                    )
+                  }}
+                </span>
+              </p>
+              <!-- <p
+                  v-for="(deduction, i) in detail_payrun?.payrun_deduction"
+                  :key="i"
+                  class="text-gray-400 ml-2 bg-white text-sm min-w-max px-4 py-1 flex justify-between items-center rounded-full"
+                >
+                  {{ deduction?.name }}
+                </p> -->
+            </section>
+          </div>
+          <p class="flex justify-between border-b pb-2 text-sm mt-8">
+            Total Tunjangan
+            <span>{{
+              formatCurrency(detail_payrun?.payrun_total_allowance || 0)
+            }}</span>
+          </p>
+          <p class="flex justify-between border-b pb-2 my-2 text-sm">
+            Total Potongan
+            <span>
+              {{ formatCurrency(detail_payrun?.payrun_total_deduction || 0) }}
+            </span>
+          </p>
+          <p class="flex justify-between border-b pb-2 my-2 text-sm">
+            Total Potongan Kehadiran
+            <span>{{
+              formatCurrency(detail_payrun?.payrun_total_deduct_attendance || 0)
+            }}</span>
+          </p>
+          <!-- <p class="flex justify-between border-b pb-2 my-2">
+            Benificiary Total <span>$800</span>
+          </p> -->
+          <p class="flex justify-between border-b pb-2 my-2">
+            Net payable salary<span>
+              {{ formatCurrency(detail_payrun?.payrun_net_salary || 0) }}
+            </span>
+          </p>
+        </section>
+      </section>
+      <template v-slot:footer>
+        <section class="flex w-52 justify-end">
+          <Button
+            class="bg-gray-400 w-24 py-2 text-white rounded-md"
+            @click="showModal = null"
+          >
+            Close
           </Button>
         </section>
       </template>
@@ -426,12 +706,15 @@ import {
   GetPayslipAPI,
   EditPayrunStatusAPI,
   RecalculatePayrunAPI,
+  EditPayrunDataAPI,
 } from "@/actions/payrun";
 import decryptToken from "@/utils/decryptToken";
 import { useToast } from "vue-toastification";
 import { GetAllowDeductAPI } from "@/actions/allow-deduction";
 import { GetAllEmployementAPI } from "@/actions/employment";
 import { GetDepartementAPI } from "@/actions/departement";
+import html2canvas from "html2canvas";
+import jspdf from "jspdf";
 
 export default {
   name: "PayrollNominatif",
@@ -442,6 +725,7 @@ export default {
       activeDropdown: "",
       showModal: false,
       superAdmin: false,
+      loadingDownload: false,
       showSelectCompany: false,
       options: [],
       payruns: [],
@@ -456,6 +740,7 @@ export default {
         company: true,
         get: false,
         add: false,
+        edit: false,
       },
       filter: {
         departement: "",
@@ -478,6 +763,25 @@ export default {
     return { toast };
   },
   methods: {
+    downloadPDF(payrun) {
+      this.detail_payrun = payrun;
+      this.loadingDownload = true;
+      window.html2canvas = html2canvas;
+      let doc = new jspdf("p", "pt", "a4");
+      const modalContent = document.querySelector("#modal-content");
+      setTimeout(() => {
+        doc.html(modalContent, {
+          callback: function (pdf) {
+            pdf.save(
+              `${payrun?.emp_id?.emp_fullname}_${
+                payrun?.payrun_period?.periodic_month
+              }_${payrun?.payrun_period?.periodic_years}_${Date.now()}.pdf`
+            );
+          },
+        });
+        this.loadingDownload = false;
+      }, 500);
+    },
     showMessageStatus(response) {
       if (response.status === 200) {
         this.toast.success(response?.data?.message);
@@ -486,6 +790,20 @@ export default {
           this.toast.error(response?.data?.message);
         }
       }
+    },
+    handleDeleteAllowance(allowance) {
+      const payrun_allowance = this.detail_payrun?.payrun_allowance;
+      const delete_allowance = payrun_allowance?.filter(
+        (all) => all?._id !== allowance?._id
+      );
+      this.detail_payrun.payrun_allowance = delete_allowance;
+    },
+    handleDeleteDeduction(deduction) {
+      const payrun_deduction = this.detail_payrun?.payrun_deduction;
+      const delete_deduction = payrun_deduction?.filter(
+        (all) => all?._id !== deduction?._id
+      );
+      this.detail_payrun.payrun_deduction = delete_deduction;
     },
     handleFilter(departement, status, employment) {
       const newAttendanceProp = this.payruns.map((payrun) => ({
@@ -503,7 +821,30 @@ export default {
           ({ key, value }) => value == "" || overtime[key] == value
         );
       this.payrun_filter = newAttendanceProp.filter(dataFilter);
-      // console.log(payrun_filter);
+    },
+    getTotalAllowance(allowance) {
+      let totalAllowance = 0;
+      for (let i = 0; i < allowance.length; i++) {
+        if (allowance[i].percent) {
+          totalAllowance +=
+            (allowance[i].total / 100) * this.detail_payrun?.payrun_salary;
+        } else {
+          totalAllowance = allowance[i].total + totalAllowance;
+        }
+      }
+      return totalAllowance;
+    },
+    getTotalDeduction(deduction) {
+      let totalDeduction = 0;
+      for (let i = 0; i < deduction.length; i++) {
+        if (deduction[i].percent) {
+          totalDeduction +=
+            (deduction[i].total / 100) * this.detail_payrun?.payrun_salary;
+        } else {
+          totalDeduction = deduction[i].total + totalDeduction;
+        }
+      }
+      return totalDeduction;
     },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
@@ -568,7 +909,6 @@ export default {
       }
       if (response?.status === 200) {
         this.getPayrun();
-        // this.getPayrun();
       }
       this.loading.add = false;
       this.loading.get = false;
@@ -582,8 +922,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response?.data);
-      // this.allowDeducts = response?.data;
     },
     async recalculatePayslip(id) {
       this.loading.get = true;
@@ -594,14 +932,29 @@ export default {
       }
       if (response?.status === 200) {
         this.getPayrun();
-        // this.getPayrun();
       }
       this.loading.get = false;
       this.showMessageStatus(response);
     },
-    async assignDetailPayrun(payrun) {
-      this.showModal = true;
-      this.detail_payrun = { ...payrun };
+    async assignDetailPayrun(payrun, modal) {
+      this.showModal = modal;
+      if (modal === "Edit") {
+        this.detail_payrun = {
+          ...payrun,
+          payrun_allowance: [
+            ...payrun?.payrun_allowance,
+            {
+              total: 0,
+              name: "Komisi / Bonus",
+              percent: false,
+            },
+          ],
+        };
+      } else {
+        this.detail_payrun = {
+          ...payrun,
+        };
+      }
     },
     async handleEditPayslip(id, status) {
       this.loading.get = true;
@@ -613,9 +966,39 @@ export default {
       }
       if (response?.status === 200) {
         this.getPayrun();
-        // this.getPayrun();
       }
       this.loading.get = false;
+      this.showMessageStatus(response);
+    },
+    async handleEditDataPayslip() {
+      const id = this.detail_payrun?._id;
+      const detail_payrun = this.detail_payrun;
+      const payload = {
+        ...this.detail_payrun,
+        payrun_total_allowance: this.getTotalAllowance(
+          detail_payrun?.payrun_allowance
+        ),
+        payrun_total_deduction: this.getTotalDeduction(
+          detail_payrun?.payrun_deduction
+        ),
+        payrun_net_salary:
+          detail_payrun?.payrun_salary -
+          detail_payrun?.payrun_total_deduct_attendance +
+          this.getTotalAllowance(detail_payrun?.payrun_allowance) -
+          this.getTotalDeduction(detail_payrun?.payrun_deduction),
+      };
+      this.loading.edit = true;
+      const response = await EditPayrunDataAPI(id, payload);
+      if (response?.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      if (response?.status === 200) {
+        this.getPayrun();
+        this.showModal = false;
+        this.detail_payrun = {};
+      }
+      this.loading.edit = false;
       this.showMessageStatus(response);
     },
     async getPayrun() {
