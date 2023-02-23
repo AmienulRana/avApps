@@ -23,18 +23,57 @@
         </div>
       </section>
       <section class="flex mt-6 flex-wrap w-10/12 items-center">
-        <Button
-          class="bg-white w-10 h-10 text-primary rounded-full shadow-md"
-          @click="handleShowLayoutData"
-        >
-          <font-awesome-icon icon="fa-table" />
-        </Button>
-        <Dropdown
-          ref="dropdown"
-          title="Today"
-          :showDropdown="activeDropdown === 'today'"
-          @update:activeDropdown="(e) => changeDropdownActive('today')"
-        />
+        <section class="relative">
+          <Button
+            class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm"
+            :class="[
+              'bg-white hover:bg-gray-50 hover:text-blue-800',
+              filter.date && filter.date !== dateToday()
+                ? 'text-primary bg-gray-50'
+                : '',
+            ]"
+            @click.stop="changeDropdownActive('date')"
+            style="min-width: 80px; min-height: 30px"
+          >
+            {{ filter.date === dateToday() ? "Today" : filter.date }}
+            <font-awesome-icon
+              icon="fa-xmark"
+              class="ml-3 text-primary"
+              v-if="filter.date && filter.date !== dateToday()"
+              @click.stop="
+                handleFilter(
+                  (filter.date = dateToday()),
+                  filter.departement,
+                  filter.workshift,
+                  filter.behavior,
+                  filter.status,
+                  filter.employment
+                );
+                activeDropdown = '';
+              "
+            />
+          </Button>
+          <Transition
+            enter-active-class="animated fadeInDown"
+            leave-active-class="animated fadeOutUp"
+          >
+            <Calender
+              class="absolute top-10 left-0 z-20 mt-2.5"
+              v-if="activeDropdown === 'date'"
+              @selected="
+                handleFilter(
+                  (filter.date = $event),
+                  filter.departement,
+                  filter.workshift,
+                  filter.behavior,
+                  filter.status,
+                  filter.employment
+                )
+              "
+            />
+          </Transition>
+        </section>
+
         <Dropdown
           title="Departement"
           :showDropdown="activeDropdown === 'departement'"
@@ -489,6 +528,7 @@ import Loading from "@/components/Loading.vue";
 import NoDataShowing from "@/components/NoDataShowing.vue";
 import { GetDepartementAPI } from "@/actions/departement";
 import { GetShiftAPI } from "@/actions/shift";
+import Calender from "@/components/Calendar";
 
 export default {
   name: "DailyAttedance",
@@ -503,6 +543,7 @@ export default {
     Loading,
     NoDataShowing,
     Input,
+    Calender,
   },
   data() {
     return {
@@ -542,6 +583,7 @@ export default {
       departement: [],
       optionsCompany: [],
       employment: [],
+      all_attendance: [],
       attendance_filter: [],
       superAdmin: false,
       dataCompany: {},
@@ -591,13 +633,14 @@ export default {
       this.departement = response.data;
     },
     handleFilter(date, departement, workshift, behavior, status, employment) {
-      const newAttendanceProp = this.attendances.map((attendance) => ({
+      const newAttendanceProp = this.all_attendance.map((attendance) => ({
         ...attendance,
         emp_depid: attendance?.emp_id?.emp_depid?._id,
         employment: attendance?.emp_id?._id,
         shift: attendance?.shift_id?._id,
       }));
       const filterConditions = [
+        { key: "attendance_date", value: date },
         { key: "behavior_at", value: behavior },
         { key: "shift", value: workshift },
         { key: "attendance_status", value: status },
@@ -609,6 +652,7 @@ export default {
           ({ key, value }) => value == "" || overtime[key] == value
         );
       this.attendance_filter = newAttendanceProp.filter(dataFilter);
+      console.log(this.attendance_filter);
     },
     clearInputValue() {
       for (const key in this.data) {
@@ -684,6 +728,13 @@ export default {
       return "-";
       // return newDate;
     },
+    dateToday() {
+      const dateObject = new Date();
+      const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+      const day = dateObject.getDate().toString().padStart(2, "0");
+      const year = dateObject.getFullYear();
+      return `${year}-${month}-${day}`;
+    },
     async handleGetAttendance() {
       this.loading.getAttendance = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
@@ -693,13 +744,9 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
-        const dateObject = new Date();
-        const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
-        const day = dateObject.getDate().toString().padStart(2, "0");
-        const year = dateObject.getFullYear();
-        const formatDate = `${month}/${day}/${year}`;
+        // console.log(response.data);
         const filterAttedanceToday = response.data.filter(
-          (attedance) => attedance?.attendance_date === formatDate
+          (attedance) => attedance?.attendance_date === this.dateToday()
         );
         this.attendances = filterAttedanceToday.map((attendance) => ({
           ...attendance,
@@ -710,8 +757,19 @@ export default {
             attendance?.attendance_date_out
           ),
         }));
+        this.all_attendance = response.data.map((attendance) => ({
+          ...attendance,
+          attendance_date: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date
+          ),
+          attendance_date_out: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date_out
+          ),
+        }));
         this.handleFilter(
-          this.filter.date,
+          (this.filter.date = this.filter.date
+            ? this.filter.date
+            : this.dateToday()),
           this.filter.departement,
           this.filter.workshift,
           this.filter.behavior,
@@ -823,4 +881,31 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.fadeInDown {
+  animation: fadeInDown 0.3s;
+}
+.fadeOutUp {
+  animation: fadeOutUp 0.3s;
+}
+@keyframes fadeInDown {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes fadeOutUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+}
+</style>
