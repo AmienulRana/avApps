@@ -20,6 +20,93 @@
           >
         </div>
       </section>
+      <section class="flex mt-6 flex-wrap w-10/12 items-center mb-5">
+        <section class="relative">
+          <Button
+            class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm"
+            :class="[
+              'bg-white hover:bg-gray-50 hover:text-blue-800',
+              filter.date ? 'text-primary bg-gray-50' : '',
+            ]"
+            @click.stop="changeDropdownActive('date')"
+            style="min-width: 80px; min-height: 30px"
+          >
+            {{ !filter.date ? "Entry Date" : filter.date }}
+            <font-awesome-icon
+              icon="fa-xmark"
+              class="ml-3 text-primary"
+              v-if="filter.date"
+              @click.stop="
+                handleFilter(
+                  (filter.date = ''),
+                  filter.employment,
+                  filter.status
+                );
+                activeDropdown = '';
+              "
+            />
+          </Button>
+          <Transition
+            enter-active-class="animated fadeInDown"
+            leave-active-class="animated fadeOutUp"
+          >
+            <Calender
+              class="absolute top-10 left-0 z-20 mt-2.5"
+              v-if="activeDropdown === 'date'"
+              @selected="
+                handleFilter(
+                  (filter.date = $event),
+                  filter.employment,
+                  filter.status
+                )
+              "
+            />
+          </Transition>
+        </section>
+        <Dropdown
+          title="Status"
+          :showDropdown="activeDropdown === 'type'"
+          @update:activeDropdown="changeDropdownActive('type')"
+          :options="['Solved', 'Unsolved']"
+          @selected="
+            handleFilter(
+              filter.date,
+              filter.employment,
+              (filter.status = $event)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              filter.employment,
+              (filter.status = $event)
+            )
+          "
+          :selectedOption="filter.status"
+        />
+        <Dropdown
+          title="Employment"
+          :showDropdown="activeDropdown === 'employee'"
+          @update:activeDropdown="changeDropdownActive('employee')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.date,
+              (filter.employment = $event?._id),
+              filter.status
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              (filter.employment = $event),
+              filter.status
+            )
+          "
+        />
+      </section>
       <section class="w-full">
         <section
           class="w-full overflow-x-auto relative custom-scrollbar bg-white"
@@ -39,7 +126,7 @@
             <tbody v-if="!loading.getStatus && empWarning.length !== 0">
               <tr
                 class="border-b h-max"
-                v-for="(warning, i) in empWarning"
+                v-for="(warning, i) in warning_filter"
                 :key="i"
               >
                 <td class="p-3 text-sm">
@@ -84,7 +171,9 @@
               </tr>
             </tbody>
           </table>
-          <NoDataShowing v-if="!loading.getStatus && empWarning.length === 0" />
+          <NoDataShowing
+            v-if="!loading.getStatus && warning_filter.length === 0"
+          />
 
           <Loading v-if="loading.getStatus" />
         </section>
@@ -117,7 +206,7 @@
         :isOpen="modal.showSelect"
         @handleShowSelect="() => (modal.showSelect = !modal.showSelect)"
         class="flex-col"
-        property="emp_name"
+        property="emp_fullname"
         input_class="w-full mt-2"
         label_class="w-full text-black"
         @selected="data.emp_id = $event"
@@ -201,6 +290,7 @@ import LayoutAdmin from "../../components/Layout/Admin.vue";
 import Button from "../../components/Button.vue";
 import Loading from "../../components/Loading.vue";
 import Modal from "../../components/Modal.vue";
+import Dropdown from "../../components/Dropdown.vue";
 import Input from "@/components/Input.vue";
 import Select from "@/components/Select/index.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
@@ -215,8 +305,9 @@ import {
   DeleteEmpWarningAPI,
 } from "@/actions/emp-warning";
 import { useToast } from "vue-toastification";
-import { GetAllEmployementAPI } from "@/actions/employment";
 
+import { GetAllEmployementAPI } from "@/actions/employment";
+import Calender from "@/components/Calendar";
 export default {
   name: "EmploymentWarningPage",
   components: {
@@ -228,7 +319,9 @@ export default {
     Select,
     ChoiseCompany,
     SelectSearch,
+    Dropdown,
     NoDataShowing,
+    Calender,
   },
   data() {
     return {
@@ -238,7 +331,10 @@ export default {
       },
       modeEdit: false,
       empWarning: [],
+      warning_filter: [],
       selectedStatus: "",
+      activeDropdown: "",
+
       data: {
         emp_id: "",
         empwarning_subject: "",
@@ -256,6 +352,11 @@ export default {
         addStatus: false,
         getStatus: true,
       },
+      filter: {
+        date: "",
+        status: "",
+        employment: "",
+      },
     };
   },
   setup() {
@@ -268,6 +369,29 @@ export default {
         this.data[key] = "";
       }
       this.selectedStatus = "";
+    },
+    changeDropdownActive(id) {
+      if (this.activeDropdown === id) {
+        this.activeDropdown = false;
+      } else {
+        this.activeDropdown = id;
+      }
+    },
+    handleFilter(date, employment, status) {
+      const newWarning = this.empWarning.map((warning) => ({
+        ...warning,
+        employment: warning?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "empwarning_date", value: date },
+        { key: "employment", value: employment },
+        { key: "empwarning_status", value: status },
+      ];
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.warning_filter = newWarning.filter(dataFilter);
     },
     showMessageStatus(response) {
       if (response.status === 200) {
@@ -306,7 +430,12 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      this.empWarning = response.data;
+      this.empWarning = response?.data;
+      this.handleFilter(
+        this.filter.date,
+        this.filter.employment,
+        this.filter.status
+      );
       this.loading.getStatus = false;
     },
     detailEmpWarning(warning) {
@@ -370,7 +499,7 @@ export default {
       }
       const getIdNameEmp = response?.data?.map((employment) => ({
         _id: employment?._id,
-        emp_name: employment?.emp_fullname,
+        emp_fullname: employment?.emp_fullname,
       }));
       this.employment = getIdNameEmp;
     },
@@ -389,24 +518,6 @@ export default {
     this.superAdmin =
       payload?.role === "Super Admin" || payload?.role === "Group Admin";
     this.getAllCompany();
-  },
-  computed: {
-    changeBackgroundStatus() {
-      switch (this.selectedStatus) {
-        case "Primary":
-          return "#1976d3";
-        case "Info":
-          return "#1976d3";
-        case "Success":
-          return "rgb(34 197 94)";
-        case "Danger":
-          return "rgb(239 68 68)";
-        case "Warning":
-          return "rgb(249 115 22)";
-        default:
-          return "#1976d3";
-      }
-    },
   },
 };
 </script>

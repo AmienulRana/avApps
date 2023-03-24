@@ -14,6 +14,7 @@ import AppSetting from "../pages/Setting/AppSetting.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
 import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
 import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
+import LeaveStatus from "../pages/Pengajuan/LeaveStatus.vue";
 import ChangeWorkShift from "../pages/Pengajuan/ChangeWorkShift.vue";
 import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
@@ -94,6 +95,11 @@ const routes = [
   {
     path: "/leave-request",
     component: LeaveRequest,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/leave-status",
+    component: LeaveStatus,
     beforeEnter: requiredAuth,
   },
   {

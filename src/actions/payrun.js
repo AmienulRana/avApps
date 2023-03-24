@@ -90,3 +90,35 @@ export const RecalculatePayrunAPI = async (id) => {
     return error.response;
   }
 };
+export const EditPayrunDataAPI = async (id, data) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/payrun/data/${id}`,
+      { ...data },
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+export const UploadPDFFileAPI = async (data, id) => {
+  try {
+    const response = await axios.post(
+      `${URL_API}/payrun/upload-pdf/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};

@@ -13,56 +13,67 @@
         </section>
       </section>
       <section class="flex mt-6 flex-wrap w-10/12 items-center">
-        <Button
-          class="bg-white w-10 h-10 text-primary rounded-full shadow-md"
-          @click="handleShowLayoutData"
-        >
-          <font-awesome-icon icon="fa-table" />
-        </Button>
         <Dropdown
-          ref="dropdown"
-          title="Today"
-          :showDropdown="activeDropdown === 'today'"
-          @update:activeDropdown="(e) => changeDropdownActive('today')"
-        />
-        <Dropdown
-          ref="dropdown"
           title="Departement"
           :showDropdown="activeDropdown === 'departement'"
           @update:activeDropdown="changeDropdownActive('departement')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter((filter.departement = $event?._id), filter.employment)
+          "
+          @clearSelected="
+            handleFilter((filter.departement = $event), filter.employment)
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
-          ref="dropdown"
-          title="Shift"
-          :showDropdown="activeDropdown === 'shift'"
-          @update:activeDropdown="changeDropdownActive('shift')"
-        />
-        <Dropdown
-          ref="dropdown"
-          title="Behavior"
-          :showDropdown="activeDropdown === 'behavior'"
-          @update:activeDropdown="changeDropdownActive('behavior')"
-        />
-        <Dropdown
-          ref="dropdown"
-          title="Type"
-          :showDropdown="activeDropdown === 'type'"
-          @update:activeDropdown="changeDropdownActive('type')"
-        />
-        <Dropdown
-          ref="dropdown"
-          title="Employee"
+          title="Employment"
           :showDropdown="activeDropdown === 'employee'"
           @update:activeDropdown="changeDropdownActive('employee')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(filter.departement, (filter.employment = $event?._id))
+          "
+          @clearSelected="
+            handleFilter(filter.departement, (filter.employment = $event))
+          "
         />
       </section>
       <section class="w-full">
         <p class="text-sm text-gray-300 mt-5 mb-3">
           Showing 1 to 10 items of 11
         </p>
+        <section class="bg-white p-4 mt-6">
+          <div class="flex items-center px-4">
+            <button
+              type="button"
+              class="flex flex-none items-center justify-center text-gray-400 hover:text-gray-500"
+              @click.stop="previousMonth"
+            >
+              <span class="sr-only">Previous month</span>
+              <ChevronLeftIcon class="h-8 w-8" aria-hidden="true" />
+            </button>
+            <div class="mx-4">
+              <p class="text-primary cursor-pointer">
+                {{ monthSelected.text }}, {{ yearSelected }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="flex flex-none items-center justify-center text-gray-400 hover:text-gray-500"
+              @click.stop="nextMonth"
+            >
+              <span class="sr-only">Next month</span>
+              <ChevronRightIcon class="h-8 w-8" aria-hidden="true" />
+            </button>
+          </div>
+        </section>
         <TableDetailAttendance
           :dates_periodic="dates_periodic"
-          :attendances="attendances"
+          :attendances="attendance_filter"
         />
       </section>
       <section class="flex justify-between my-6"></section>
@@ -72,7 +83,6 @@
 
 <script>
 import LayoutAdmin from "../../components/Layout/Admin.vue";
-import Button from "../../components/Button.vue";
 import Dropdown from "../../components/Dropdown.vue";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
@@ -81,16 +91,20 @@ import { useToast } from "vue-toastification";
 import { GetAttendanceAPI } from "@/actions/attendance";
 import TableDetailAttendance from "@/components/TableDetailAttendance.vue";
 import moment from "moment";
-import { GetPeriodicActiveAPI } from "@/actions/periodic";
+import { GetPeriodicAPI } from "@/actions/periodic";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/solid";
+import { GetDepartementAPI } from "@/actions/departement";
+import { GetAllEmployementAPI } from "@/actions/employment";
 
 export default {
   name: "DailyAttedance",
   components: {
     LayoutAdmin,
-    Button,
-    Dropdown,
+    ChevronLeftIcon,
+    ChevronRightIcon,
     ChoiseCompany,
     TableDetailAttendance,
+    Dropdown,
   },
   data() {
     return {
@@ -117,18 +131,45 @@ export default {
           minute: null,
         },
       },
+      months: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "Mei",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+
+      monthSelected: {
+        number: 1,
+        text: "February",
+      },
+      yearSelected: 2023,
       data: {
         emp_id: "",
       },
       attendances: [],
+      attendance_filter: [],
       dates_periodic: [],
       options: [],
       employment: [],
+      departement: [],
       superAdmin: false,
       dataCompany: {},
+      periodic: [],
       loading: {
         getCompany: true,
         addAttendance: false,
+      },
+      filter: {
+        departement: "",
+        employment: "",
       },
     };
   },
@@ -137,8 +178,88 @@ export default {
     return { toast };
   },
   methods: {
-    handleShowLayoutData() {
-      this.layoutData = this.layoutData === "card" ? "table" : "card";
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
+    },
+    handleFilter(departement, employment) {
+      console.log(this.attendances);
+      const newAttendanceProp = this.attendances.map((attendance) => ({
+        ...attendance,
+        emp_depid: attendance?.emp_id?.emp_depid?._id,
+        employment: attendance?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+      ];
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.attendance_filter = newAttendanceProp.filter(dataFilter);
+    },
+    async handleGetEmployement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetAllEmployementAPI(
+        this.superAdmin ? querySuperAdmin : ""
+      );
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      const getIdNameEmp = response?.data?.map((employment) => ({
+        _id: employment?._id,
+        emp_fullname: employment?.emp_fullname,
+      }));
+      this.employment = getIdNameEmp;
+    },
+    previousMonth() {
+      this.monthSelected.number--;
+      if (this.monthSelected.number < 0) {
+        this.monthSelected.number = 11;
+        this.yearSelected--;
+      }
+      this.monthSelected.text = this.months[this.monthSelected.number];
+
+      const periodicFilter = this.periodic.filter(
+        (period) =>
+          period?.periodic_month === this.monthSelected.text &&
+          +period?.periodic_years === this.yearSelected
+      )[0];
+      if (periodicFilter) {
+        this.handleCalender(
+          periodicFilter?.periodic_start_date,
+          periodicFilter?.periodic_end_date
+        );
+      } else {
+        this.toast.error(
+          `Can't find periodic ${this.monthSelected.text} ${this.yearSelected}`
+        );
+      }
+    },
+    nextMonth() {
+      this.monthSelected.number++;
+      if (this.monthSelected.number > 11) {
+        this.monthSelected.number = 0;
+        this.yearSelected++;
+      }
+      this.monthSelected.text = this.months[this.monthSelected.number];
+      const periodicFilter = this.periodic.filter(
+        (period) =>
+          period?.periodic_month === this.monthSelected.text &&
+          +period?.periodic_years === this.yearSelected
+      )[0];
+      if (periodicFilter) {
+        this.handleCalender(
+          periodicFilter?.periodic_start_date,
+          periodicFilter?.periodic_end_date
+        );
+      }
     },
     changeDropdownActive(id) {
       if (this.activeDropdown === id) {
@@ -165,8 +286,8 @@ export default {
         const attendanceData = response.data;
         const groupedAttendance = {};
         attendanceData.forEach((attendance) => {
-          if (!groupedAttendance[attendance.emp_id._id]) {
-            groupedAttendance[attendance.emp_id._id] = {
+          if (!groupedAttendance[attendance?.emp_id?._id]) {
+            groupedAttendance[attendance?.emp_id?._id] = {
               emp_id: {
                 _id: attendance?.emp_id?._id,
                 emp_fullname: attendance?.emp_id?.emp_fullname,
@@ -175,7 +296,7 @@ export default {
               attendances: [],
             };
           }
-          groupedAttendance[attendance.emp_id._id].attendances.push({
+          groupedAttendance[attendance?.emp_id?._id].attendances.push({
             clock_in: attendance?.clock_in,
             clock_out: attendance?.clock_out,
             break_in: attendance?.break_in,
@@ -204,6 +325,7 @@ export default {
           return data;
         });
         this.attendances = filterAttendanceWithPeriodic;
+        this.handleFilter(this.filter.departement, this.filter.employment);
       }
       this.loading.addAttendance = false;
     },
@@ -223,15 +345,24 @@ export default {
     },
     async getPeriodic() {
       const querySuperAdmin = `?company_id=${this?.dataCompany?._id}`;
-      const response = await GetPeriodicActiveAPI(querySuperAdmin);
+      const response = await GetPeriodicAPI(querySuperAdmin);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
+
+      const filterActivePeriodic = response?.data.filter(
+        (period) => period?.periodic_status === true
+      )[0];
       this.handleCalender(
-        response?.data?.periodic_start_date,
-        response?.data?.periodic_end_date
+        filterActivePeriodic?.periodic_start_date,
+        filterActivePeriodic?.periodic_end_date
       );
+      const indexMonthActive = this.months.indexOf(
+        filterActivePeriodic?.periodic_month
+      );
+      this.monthSelected.number = indexMonthActive;
+      this.monthSelected.text = this.months[indexMonthActive];
       this.periodic = response?.data;
     },
   },
@@ -239,7 +370,9 @@ export default {
     dataCompany: {
       handler: function () {
         // this.handleGetAttendance();
+        this.handleGetEmployement();
         this.getPeriodic();
+        this.handleGetDepartement();
       },
       deep: true,
     },

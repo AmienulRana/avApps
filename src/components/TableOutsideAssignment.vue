@@ -43,7 +43,9 @@
               </div>
               <div class="ml-5">
                 <h1 class="text-blue-400 text-base">
-                  {{ outside?.emp_id?.emp_fullname }}
+                  <router-link :to="`/employee/${outside?.emp_id?._id}`">{{
+                    outside?.emp_id?.emp_fullname
+                  }}</router-link>
                 </h1>
                 <p class="text-sm mb-1 text-gray-400">
                   {{ outside?.emp_id?.emp_depid?.dep_name }}

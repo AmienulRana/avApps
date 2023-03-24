@@ -83,7 +83,7 @@ export default {
     return {
       months: [
         "January",
-        "Febuary",
+        "February",
         "March",
         "April",
         "Mei",
@@ -96,8 +96,8 @@ export default {
         "December",
       ],
       monthSelected: {
-        number: 1,
-        text: "Febuary",
+        number: 2,
+        text: "March",
       },
       days: [],
       yearSelected: 2023,

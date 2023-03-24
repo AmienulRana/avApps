@@ -3,7 +3,7 @@
     <section class="px-8 mt-6 w-full overflow-x-hiden">
       <section class="flex justify-between">
         <section class="flex items-center">
-          <h1 class="text-2xl">Leave Request</h1>
+          <h1 class="text-2xl">Leave Status</h1>
           <ChoiseCompany
             v-if="superAdmin && !loading?.getCompany"
             @selected:company="dataCompany = $event"
@@ -159,7 +159,39 @@
             </button>
           </div>
         </section>
-        <TableLeaveRequest
+        <section
+          class="grid md:grid-cols-4 sm:grid-cols-2 gap-4 md:px-6 bg-white"
+        >
+          <section
+            class="flex flex-col items-center justify-center bg-gray-100 rounded-sm h-24 mb-3.5"
+          >
+            <p class="text-xl mb-2">{{ total_leave.employment }}</p>
+            <p class="text-sm text-gray-500">Employment on leave</p>
+          </section>
+          <section
+            class="flex flex-col items-center justify-center bg-gray-100 rounded-sm mb-3.5"
+          >
+            <p class="text-xl mb-2">{{ leave_filter?.length }}</p>
+            <p class="text-sm text-gray-500">Total leave request</p>
+          </section>
+          <section
+            class="flex flex-col items-center justify-center bg-gray-100 rounded-sm mb-3.5"
+          >
+            <p class="text-xl mb-2">{{ total_leave.single }}</p>
+            <p class="text-sm text-gray-500">
+              On leave <span class="text-black">(single day)</span>
+            </p>
+          </section>
+          <section
+            class="flex flex-col items-center justify-center bg-gray-100 rounded-sm mb-3.5"
+          >
+            <p class="text-xl mb-2">{{ total_leave.multi }}</p>
+            <p class="text-sm text-gray-500">
+              On leave <span class="text-black">(multi day)</span>
+            </p>
+          </section>
+        </section>
+        <TableLeaveStatus
           :leave_request="leave_filter"
           :showMessageStatus="showMessageStatus"
           :getLeaveRequest="handleGetLeaveRequest"
@@ -470,11 +502,11 @@
 </template>
 
 <script>
-import LayoutAdmin from "../components/Layout/Admin.vue";
-import Button from "../components/Button.vue";
-import Dropdown from "../components/Dropdown.vue";
-import TableLeaveRequest from "../components/TableLeaveRequest.vue";
-import Modal from "../components/Modal.vue";
+import LayoutAdmin from "../../components/Layout/Admin.vue";
+import Button from "../../components/Button.vue";
+import Dropdown from "../../components/Dropdown.vue";
+import TableLeaveStatus from "../../components/TableLeaveStatus.vue";
+import Modal from "../../components/Modal.vue";
 import SelectSearch from "@/components/Select/SelectSearch.vue";
 import Radio from "@/components/Radio.vue";
 import Input from "@/components/Input.vue";
@@ -500,7 +532,7 @@ export default {
   components: {
     LayoutAdmin,
     Button,
-    TableLeaveRequest,
+    TableLeaveStatus,
     Dropdown,
     SelectSearch,
     Modal,
@@ -535,6 +567,11 @@ export default {
         status: "",
         leave_duration: "",
         employment: "",
+      },
+      total_leave: {
+        employment: 0,
+        single: 0,
+        multi: 0,
       },
       leave_id: "",
       data: {
@@ -734,6 +771,21 @@ export default {
       let ampm = currentHour >= 12 ? "PM" : "AM";
       return `${today} ` + currentHour + ":" + currentMinutes + " " + ampm;
     },
+    handleTotalLeave(leave) {
+      const leave_single = leave.filter(
+        (l) => l?.empleave_leave_type === "Single Day"
+      ).length;
+      const multi_single = leave.filter(
+        (l) => l?.empleave_leave_type === "Multi Day"
+      ).length;
+      const employment = Array.from(new Set(leave.map(JSON.stringify))).map(
+        JSON.parse
+      );
+
+      this.total_leave.single = leave_single;
+      this.total_leave.multi = multi_single;
+      this.total_leave.employment = employment.length;
+    },
     async handleGetLeaveRequest() {
       this.loading.getLeaveRequest = true;
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
@@ -749,9 +801,13 @@ export default {
               leave?.empleave_apply_date,
               "YYYY-MM-DD hh:mm A"
             ).format("YYYY-MM-DD");
-            return leaveDate === periodic?.date;
+            return (
+              leaveDate === periodic?.date &&
+              leave?.empleave_hr?.status === "Approved"
+            );
           });
         });
+        this.handleTotalLeave(leaves);
         this.leave_request = leaves;
       }
       this.loading.getLeaveRequest = false;

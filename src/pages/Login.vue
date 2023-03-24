@@ -57,14 +57,35 @@
           v-model="email"
         />
       </div>
-      <div class="mb-5">
+      <div class="mb-5 relative">
         <label class="text-sm text-gray-400">Password</label>
-        <input
-          type="password"
-          placeholder="Enter Your Password"
-          class="w-full border mt-2 outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
-          v-model="password"
-        />
+        <div class="relative">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Enter Your Password"
+            class="w-full border mt-2 outline-gray-600 focus:outline focus:outline-primary px-2 py-1.5 bg-white rounded"
+            v-model="password"
+            @keyup="detectCapsLock"
+          />
+          <font-awesome-icon
+            v-if="showPassword"
+            @click="showPassword = false"
+            icon="fa-eye"
+            class="text-gray-400 absolute right-4 top-[50%] -translate-y-[25%]"
+          />
+          <font-awesome-icon
+            v-else
+            @click="showPassword = true"
+            icon="fa-eye-slash"
+            class="text-gray-400 absolute right-4 top-[50%] -translate-y-[25%]"
+          />
+        </div>
+        <div
+          class="tooltip absolute inset-x-0 top-full duration-300 z-10 mt-2 px-2 py-1 bg-gray-400 text-gray-100 text-sm rounded md:w-1/2"
+          :class="capslockOn ? 'opacity-100' : 'opacity-0'"
+        >
+          Caps Lock is On!
+        </div>
       </div>
       <Button
         class="bg-dodgerblue mb-2.5 text-white py-2 h-9 text-sm rounded-sm relative"
@@ -116,6 +137,8 @@ export default {
       email: "",
       password: "",
       loading: false,
+      capslockOn: false,
+      showPassword: false,
     };
   },
   setup() {
@@ -123,27 +146,9 @@ export default {
     return { toast };
   },
   methods: {
-    changeAccount(role) {
-      this.login_as = role;
-      if (role === "Mufidah Group") {
-        this.email = "superadmin@demo.com";
-        this.password = "superAdmin123";
-      } else if (role === "Mufidah Stationery") {
-        this.email = "admin@stationery.com";
-        this.password = "12345";
-      } else if (role === "Mufidah Studio") {
-        this.email = "admin@studio.com";
-        this.password = "12345";
-      } else if (role === "Mufidah Terminal Print") {
-        this.email = "admin@mtp.com";
-        this.password = "12345";
-      } else if (role === "Mufidah Babyshop") {
-        this.email = "admin@babyshop.com";
-        this.password = "12345";
-      } else if (role === "UD Wahyu") {
-        this.email = "admin@wahyu.com";
-        this.password = "12345";
-      }
+    detectCapsLock(event) {
+      this.capslockOn =
+        event.getModifierState && event.getModifierState("CapsLock");
     },
     encrypt(token) {
       const secret_key = SECRET_KEY;
@@ -151,7 +156,7 @@ export default {
       return ciphertext.toString();
     },
     validationResponse(response) {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         const { token } = response?.data;
         const encryptedToken = this.encrypt(token);
         this.$store.state.isLoggedIn = true;
@@ -161,7 +166,7 @@ export default {
         localStorage.setItem("token", encryptedToken);
         this.$router.push("/");
       } else {
-        if (response.data.message) {
+        if (response?.data?.message) {
           this.toast.error(response?.data?.message);
         }
         this.loading = false;
@@ -187,4 +192,16 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.tooltip::before {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #979797 transparent;
+}
+</style>

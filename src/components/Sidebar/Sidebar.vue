@@ -169,6 +169,7 @@ export default {
           title: "Request",
           icon: "fa-clock",
           contents: [
+            { text: "Leave Status", to: "/leave-status" },
             { text: "Leave Request", to: "/leave-request" },
             { text: "Overtime Request", to: "/overtime-request" },
             { text: "Outside Assignment", to: "/outside-assignment" },

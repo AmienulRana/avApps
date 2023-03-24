@@ -37,3 +37,14 @@ table thead th {
 .not-approved {
   height: 150px;
 }
+
+.modal-width {
+  width: 810px !important;
+}
+
+@media print {
+  .modal-content,
+  .modal-width {
+    background-color: red !important;
+  }
+}

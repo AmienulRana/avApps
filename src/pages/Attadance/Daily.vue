@@ -263,7 +263,10 @@
                     </div>
                     <div class="ml-5">
                       <h1 class="text-blue-400 text-base">
-                        {{ attedance?.emp_id?.emp_fullname }}
+                        <router-link
+                          :to="`/employee/${attedance?.emp_id?._id}`"
+                          >{{ attedance?.emp_id?.emp_fullname }}</router-link
+                        >
                       </h1>
                       <p class="text-sm mb-1 text-gray-600">
                         {{ attedance?.emp_id?.emp_depid?.dep_name }}
@@ -323,10 +326,10 @@
                   </td>
                   <td class="p-3 text-sm">
                     <p class="text-sm text-gray-400">
-                      Break in : {{ attedance?.break_in }}
+                      Break out : {{ attedance?.break_out }}
                     </p>
                     <p class="text-sm text-gray-400">
-                      Break out : {{ attedance?.break_out }}
+                      Break In : {{ attedance?.break_in }}
                     </p>
                   </td>
                   <td class="p-3 text-sm">
@@ -652,7 +655,6 @@ export default {
           ({ key, value }) => value == "" || overtime[key] == value
         );
       this.attendance_filter = newAttendanceProp.filter(dataFilter);
-      console.log(this.attendance_filter);
     },
     clearInputValue() {
       for (const key in this.data) {

@@ -28,7 +28,9 @@
             </div>
             <div class="ml-5">
               <h1 class="text-blue-400 text-base">
-                {{ attendance?.emp_id?.emp_fullname }}
+                <router-link :to="`/employee/${attendance?.emp_id?._id}`">{{
+                  attendance?.emp_id?.emp_fullname
+                }}</router-link>
               </h1>
               <p class="text-sm mb-1 text-gray-600">
                 {{ attendance?.emp_id?.emp_depid?.dep_name }}

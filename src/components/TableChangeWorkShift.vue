@@ -45,7 +45,9 @@
             </div>
             <div class="ml-5">
               <h1 class="text-blue-400 text-base">
-                {{ change?.emp_id?.emp_fullname }}
+                <router-link :to="`/employee/${change?.emp_id?._id}`">{{
+                  change?.emp_id?.emp_fullname
+                }}</router-link>
               </h1>
               <p class="text-sm mb-1 text-gray-400">
                 {{ change?.emp_id?.emp_depid?.dep_name }}

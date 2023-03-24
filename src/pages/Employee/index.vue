@@ -361,7 +361,6 @@
           </section>
         </section>
         <Pagination
-          v-if="employee.length > pagination.perPage"
           v-bind:items="employee"
           v-bind:per-page="pagination.perPage"
           v-bind:current-page="pagination.currentPage"
@@ -598,7 +597,6 @@ export default {
         return this.$router.push("/login");
       }
       this.employee = response?.data;
-      this.paginatedItems(response?.data);
       this.loading.employement = false;
       this.handleFilter(
         this.filter.employment_status,
@@ -606,6 +604,7 @@ export default {
         this.filter.departement,
         this.filter.role
       );
+      // this.paginatedItems(response?.data);
     },
     async handleDeleteEmployment() {
       this.loading.delete = true;
@@ -622,13 +621,6 @@ export default {
       }
       this.showMessageStatus(response);
       this.loading.delete = false;
-    },
-    paginatedItems(employment) {
-      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
-      this.employeeFilter = employment.slice(
-        start,
-        start + this.pagination.perPage
-      );
     },
   },
   watch: {
@@ -657,7 +649,12 @@ export default {
     }
     // this.handleGetEmployement();
   },
-  computed: {},
+  computed: {
+    paginatedItems() {
+      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
+      return this.employeeFilter.slice(start, start + this.pagination.perPage);
+    },
+  },
 };
 </script>
 

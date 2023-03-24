@@ -60,6 +60,12 @@
                 />
               </div>
             </div>
+            <p
+              class="text-center text-sm mb-5"
+              :class="limitFileSize ? 'text-red-500' : 'text-gray-400'"
+            >
+              Max Size File 4.8 MB
+            </p>
             <Input
               label="Nama Depan*"
               input_class="md:w-4/6 w-full mt-1 w-full mt-1"
@@ -386,7 +392,7 @@
         <Button
           class="bg-green-500 min-w-max px-2 py-2 text-white rounded-md"
           @click="handleAddEmployment"
-          :disabled="loadingAdd"
+          :disabled="loadingAdd || limitFileSize"
         >
           Tambah Karyawan
         </Button>
@@ -487,6 +493,7 @@ export default {
       empStatus: [],
       options: [],
       superAdmin: false,
+      limitFileSize: false,
       dataCompany: {
         _id: "",
       },
@@ -512,11 +519,27 @@ export default {
       this.$refs.file.click();
     },
     viewImage(e) {
+      this.limitFileSize = false;
       const files = e.target?.files[0];
       this.$store.commit("setFile", files);
+      const fileSize = +(files.size / 1024 ** 2).toFixed(2);
+      if (fileSize > 4.8) {
+        this.limitFileSize = true;
+      }
       if (files) {
         const file = URL.createObjectURL(files);
         this.previewImage = file;
+        //     const img = new Image();
+        // img.onload = () => {
+        //   const width = img.width;
+        //   const height = img.height;
+        //   console.log(`Ukuran gambar: ${width} x ${height}`);
+
+        //   // tampilkan ukuran file dalam satuan KB
+        //   const fileSize = (files.size / 1024).toFixed(2);
+        //   console.log(`Ukuran file: ${fileSize} KB`);
+        // }
+        // img.src = file;
       }
     },
     clearInputValue() {
