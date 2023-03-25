@@ -161,7 +161,17 @@
           title="Status"
           :showDropdown="activeDropdown === 'type'"
           @update:activeDropdown="changeDropdownActive('type')"
-          :options="['Attendance', 'Absent', 'Off Day', 'Cuti Bersama']"
+          :options="[
+            'Attendance',
+            'Absent',
+            'Off Day',
+            'Cuti Tahunan (Paid)',
+            'Cuti Menikah (Paid)',
+            'Izin Sakit (Paid)',
+            'Izin Khusus (Paid)',
+            'Izin Khusus (Unpaid)',
+            'Cuti Bersama',
+          ]"
           @selected="
             handleFilter(
               filter.date,
@@ -421,6 +431,41 @@
           @change="data.attendance_date = $event"
           :value="data?.attendance_date"
         />
+        <SelectSearch
+          label="Status"
+          :options="[
+            'Attendance',
+            'Absent',
+            'Off Day',
+            'Cuti Tahunan (Paid)',
+            'Cuti Menikah (Paid)',
+            'Izin Sakit (Paid)',
+            'Izin Khusus (Paid)',
+            'Izin Khusus (Unpaid)',
+            'Cuti Bersama',
+          ]"
+          :isOpen="modal.showSelect === 'status'"
+          @handleShowSelect="() => (modal.showSelect = 'status')"
+          class="flex-col"
+          input_class="w-full mt-2"
+          label_class="w-full text-black"
+          @selected="data.attendance_status = $event"
+          :selectedOption="data?.attendance_status"
+          v-if="modal.modeEdit"
+        />
+        <SelectSearch
+          label="Attendance Shift"
+          :options="shifts"
+          property="shift_desc"
+          :isOpen="modal.showSelect === 'shift'"
+          @handleShowSelect="() => (modal.showSelect = 'shift')"
+          class="flex-col"
+          input_class="w-full mt-2"
+          label_class="w-full text-black"
+          @selected="data.attendance_shift = $event"
+          :selectedOption="data?.attendance_shift"
+          v-if="modal.modeEdit"
+        />
         <section class="my-4 flex justify-between items-center">
           <InputTime
             label="Clock In"
@@ -470,6 +515,14 @@
             @selected-minute="modal.time_breakout.minute = $event"
           />
         </section>
+        <label class="text-sm">Reason Note</label>
+        <textarea
+          rows="4"
+          class="w-full mt-2 border outline-primary py-4"
+          v-model="data.attendance_reason"
+          v-if="modal.modeEdit"
+        >
+        </textarea>
       </section>
       <template #footer>
         <section class="flex w-52 justify-between">
@@ -579,6 +632,9 @@ export default {
         id_attendance: "",
         attendance_date: "",
         attendance_date_out: "",
+        attendance_status: "",
+        attendance_shift: "",
+        attendance_reason: "",
       },
       showActions: null,
       attendances: [],
@@ -794,6 +850,9 @@ export default {
       this.data.id_attendance = attendance?._id;
       this.data.attendance_date = attendance?.attendance_date;
       this.data.attendance_date_out = attendance?.attendance_date_out;
+      this.data.attendance_reason = attendance?.attendance_reason;
+      this.data.attendance_status = attendance?.attendance_status;
+      this.data.attendance_shift = attendance?.shift_id;
       this.data.emp_id = attendance?.emp_id;
       this.modal.time_clockin.hour = this.getHourMinute(
         attendance?.clock_in
@@ -829,6 +888,9 @@ export default {
         clock_out: `${this.modal.time_clockout?.hour}:${this.modal.time_clockout?.minute}`,
         break_in: `${this.modal.time_breakin?.hour}:${this.modal.time_breakin?.minute}`,
         break_out: `${this.modal.time_breakout?.hour}:${this.modal.time_breakout?.minute}`,
+        attendance_status: this?.data?.attendance_status,
+        shift_id: this?.data?.attendance_shift?._id,
+        attendance_reason: this.data?.attendance_reason,
       };
       // const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await EditAttendanceAPI(
