@@ -31,21 +31,133 @@
           title="Departemen"
           :showDropdown="activeDropdown === 'departemen'"
           @update:activeDropdown="(e) => changeDropdownActive('departemen')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.status,
+              filter.workshift,
+              filter.replacement,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.status,
+              filter.workshift,
+              filter.replacement,
+
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
           title="Workshift"
           :showDropdown="activeDropdown === 'workshift'"
           @update:activeDropdown="changeDropdownActive('workshift')"
+          :options="shifts"
+          property="shift_name"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.workshift = $event?._id),
+              filter.replacement,
+
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              (filter.workshift = $event),
+              filter.replacement,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.workshift"
         />
         <Dropdown
-          title="See rejected"
+          title="See Status"
           :showDropdown="activeDropdown === 'rejected'"
           @update:activeDropdown="changeDropdownActive('rejected')"
+          :selectedOption="filter.status"
+          :options="['Pending', 'Approved', 'Rejected']"
+          @selected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.workshift,
+              filter.replacement,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              (filter.status = $event),
+              filter.workshift,
+              filter.replacement,
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Users"
+          title="Replacement"
+          :showDropdown="activeDropdown === 'replacement'"
+          @update:activeDropdown="changeDropdownActive('replacement')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.replacement"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.workshift,
+              (filter.replacement = $event?._id),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.workshift,
+              (filter.replacement = $event),
+              filter.employment
+            )
+          "
+        />
+        <Dropdown
+          title="Employment"
           :showDropdown="activeDropdown === 'user'"
           @update:activeDropdown="changeDropdownActive('user')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.workshift,
+              filter.replacement,
+
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+              filter.status,
+              filter.workshift,
+              filter.replacement,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -53,7 +165,7 @@
           Showing 1 to 10 items of 11
         </p>
         <TableChangeWorkShift
-          :change_shifts="change_shifts"
+          :change_shifts="workshift_filter"
           :loading="loading.get"
           :showMessageStatus="showMessageStatus"
           :getRequestShift="getChangeShiftRequest"
@@ -180,6 +292,7 @@ import {
 } from "@/actions/change-shift";
 import { GetShiftAPI } from "@/actions/shift";
 import { useToast } from "vue-toastification";
+import { GetDepartementAPI } from "@/actions/departement";
 
 export default {
   name: "ChangeWorkShift",
@@ -204,9 +317,19 @@ export default {
         showSelect: false,
         showAbility: "hide",
       },
+      filter: {
+        departement: "",
+        status: "",
+        workshift: "",
+        change_to: "",
+        replacement: "",
+        employment: "",
+      },
       replace_employment: [],
+      workshift_filter: [],
       employment: [],
       shifts: [],
+      departement: [],
       optionsCompany: [],
       superAdmin: false,
       change_shifts: [],
@@ -257,6 +380,40 @@ export default {
         }
       }
     },
+    handleFilter(departement, status, workshift, replacement, employment) {
+      const newLeaveRequestProp = this.change_shifts.map((shift) => ({
+        ...shift,
+        emp_depid: shift?.emp_id?.emp_depid?._id,
+        replacement: shift?.empchange_replacement?._id,
+        shift_id: shift?._id,
+        status_hr: shift?.empchange_hr?.status,
+        status_at1: shift?.empchange_fsuperior?.status,
+        status_at2: shift?.empchange_ssuperior?.status,
+        employment: shift?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "status_hr", value: status },
+        { key: "shift_id", value: workshift },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+        { key: "replacement", value: replacement },
+      ];
+
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.workshift_filter = newLeaveRequestProp.filter(dataFilter);
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
+    },
     async handleGetEmployement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
@@ -291,8 +448,8 @@ export default {
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
-      this.optionsCompany = response.data;
-      this.dataCompany = response.data[0];
+      this.optionsCompany = response?.data;
+      this.dataCompany = response?.data[0];
       this.loading.getCompany = false;
     },
     assignChangeWorkshift(workshift) {
@@ -323,7 +480,7 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
       }
-      if (response.status === 200) {
+      if (response?.status === 200) {
         this.modal.showModal = false;
         this.clearInputValue();
         this.getChangeShiftRequest();
@@ -347,7 +504,7 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
         return this.$router.push("/login");
       }
-      if (response.status === 200) {
+      if (response?.status === 200) {
         this.modal.showModal = false;
         this.clearInputValue();
         this.getChangeShiftRequest();
@@ -367,6 +524,13 @@ export default {
         this.change_shifts = response.data;
       }
       this.loading.get = false;
+      this.handleFilter(
+        this.filter.departement,
+        this.filter.status,
+        this.filter.workshift,
+        this.filter.replacement,
+        this.filter.employment
+      );
     },
     async getShift() {
       const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
@@ -375,7 +539,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response);
       if (response?.status === 200) {
         this.shifts = response?.data;
       }
@@ -387,6 +550,7 @@ export default {
         this.handleGetEmployement();
         this.getShift();
         this.getChangeShiftRequest();
+        this.handleGetDepartement();
       },
       deep: true,
     },

@@ -30,6 +30,18 @@ export const GetAllEmployementAPI = async (query) => {
     return error.response;
   }
 };
+export const DeleteEmployementAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/employment/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
 export const DetailEmployementAPI = async (id) => {
   try {
@@ -47,6 +59,38 @@ export const EditPersonalEmployementAPI = async (id, payload) => {
   try {
     const response = await axios.put(
       `${URL_API}/employment/personal-detail/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+export const EditStatusEmployementAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/employment/status/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenDecrypted()}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
+export const ResetPasswordAPI = async (id, payload) => {
+  try {
+    const response = await axios.put(
+      `${URL_API}/employment/reset/${id}`,
       payload,
       {
         headers: {

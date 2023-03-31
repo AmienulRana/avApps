@@ -14,6 +14,7 @@ import AppSetting from "../pages/Setting/AppSetting.vue";
 import LeaveRequest from "../pages/LeaveRequest.vue";
 import OvertimeRequest from "../pages/Pengajuan/OvertimeRequest.vue";
 import OutsideAssignment from "../pages/Pengajuan/OutsideAssignment.vue";
+import LeaveStatus from "../pages/Pengajuan/LeaveStatus.vue";
 import ChangeWorkShift from "../pages/Pengajuan/ChangeWorkShift.vue";
 import ChangeOffDay from "../pages/Pengajuan/ChangeOffDay.vue";
 import Jabatan from "../pages/Organisasi/Jabatan.vue";
@@ -23,6 +24,7 @@ import Holiday from "../pages/Administration/Holiday.vue";
 import Announcement from "../pages/Administration/Announcement.vue";
 import Home from "../pages/Home.vue";
 import Periodic from "../pages/Setting/Periodic.vue";
+import Location from "../pages/Setting/Location.vue";
 import LeaveSetting from "../pages/Setting/LeaveSetting.vue";
 import NeedApproval from "../pages/Pengajuan/NeedApproval.vue";
 import store from "../store";
@@ -96,6 +98,11 @@ const routes = [
     beforeEnter: requiredAuth,
   },
   {
+    path: "/leave-status",
+    component: LeaveStatus,
+    beforeEnter: requiredAuth,
+  },
+  {
     path: "/overtime-request",
     component: OvertimeRequest,
     beforeEnter: requiredAuth,
@@ -138,6 +145,11 @@ const routes = [
   {
     path: "/setting/periodic",
     component: Periodic,
+    beforeEnter: requiredAuth,
+  },
+  {
+    path: "/setting/location",
+    component: Location,
     beforeEnter: requiredAuth,
   },
   {

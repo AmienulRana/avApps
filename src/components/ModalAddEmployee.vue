@@ -60,6 +60,12 @@
                 />
               </div>
             </div>
+            <p
+              class="text-center text-sm mb-5"
+              :class="limitFileSize ? 'text-red-500' : 'text-gray-400'"
+            >
+              Max Size File 4.8 MB
+            </p>
             <Input
               label="Nama Depan*"
               input_class="md:w-4/6 w-full mt-1 w-full mt-1"
@@ -210,9 +216,20 @@
               label="Tanggungan"
               input_class="md:w-4/6 mt-2"
               class="mb-2.5"
-              :value="employment.tanggungan"
-              @change="employment.tanggungan = $event"
+              :value="employment.emp_tanggungan"
+              @change="employment.emp_tanggungan = $event"
               :options="['TK/0', 'TK/1', 'TK/2', 'TK/4']"
+            />
+            <SelectSearch
+              :options="designation"
+              property="des_name"
+              label="HR Employment*"
+              input_class="md:w-4/6 mt-2"
+              position="top"
+              :isOpen="show_select === 'hr'"
+              @handleShowSelect="show_select = 'hr'"
+              :selectedOption="employment.emp_hr"
+              @selected="employment.emp_hr = $event"
             />
             <SelectSearch
               :options="designation"
@@ -386,7 +403,7 @@
         <Button
           class="bg-green-500 min-w-max px-2 py-2 text-white rounded-md"
           @click="handleAddEmployment"
-          :disabled="loadingAdd"
+          :disabled="loadingAdd || limitFileSize"
         >
           Tambah Karyawan
         </Button>
@@ -450,7 +467,8 @@ export default {
         emp_status: "",
         emp_fsuperior: "",
         emp_ssuperior: "",
-        tanggungan: "",
+        emp_hr: "",
+        emp_tanggungan: "",
         emp_location: "",
       },
       attadance_day: {
@@ -487,6 +505,7 @@ export default {
       empStatus: [],
       options: [],
       superAdmin: false,
+      limitFileSize: false,
       dataCompany: {
         _id: "",
       },
@@ -512,11 +531,27 @@ export default {
       this.$refs.file.click();
     },
     viewImage(e) {
+      this.limitFileSize = false;
       const files = e.target?.files[0];
       this.$store.commit("setFile", files);
+      const fileSize = +(files.size / 1024 ** 2).toFixed(2);
+      if (fileSize > 4.8) {
+        this.limitFileSize = true;
+      }
       if (files) {
         const file = URL.createObjectURL(files);
         this.previewImage = file;
+        //     const img = new Image();
+        // img.onload = () => {
+        //   const width = img.width;
+        //   const height = img.height;
+        //   console.log(`Ukuran gambar: ${width} x ${height}`);
+
+        //   // tampilkan ukuran file dalam satuan KB
+        //   const fileSize = (files.size / 1024).toFixed(2);
+        //   console.log(`Ukuran file: ${fileSize} KB`);
+        // }
+        // img.src = file;
       }
     },
     clearInputValue() {
@@ -586,6 +621,7 @@ export default {
         emp_desid: this.employment.emp_desid?._id,
         emp_fsuperior: this.employment.emp_fsuperior?._id,
         emp_ssuperior: this.employment.emp_ssuperior?._id,
+        emp_hr: this.employment.emp_hr?._id,
       };
       const salary = {
         emp_salary: Number(this.basic_salary.salary),
@@ -613,6 +649,7 @@ export default {
       if (response.status === 200) {
         this.getEmployement();
         this.tabActive = "Personal";
+        this.previewImage = null;
         this.$store.commit("unSetFile");
         this.clearInputValue();
       }

@@ -283,7 +283,12 @@ export default {
     },
     async updateStatus(value, periodic) {
       periodic.periodic_status = value;
-      const response = await ChangeStatusPeriodicAPI(periodic?._id);
+      const querySuperAdmin = `?company_id=${this.dataCompany?._id}`;
+
+      const response = await ChangeStatusPeriodicAPI(
+        periodic?._id,
+        querySuperAdmin
+      );
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);

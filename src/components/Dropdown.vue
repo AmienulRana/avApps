@@ -96,10 +96,19 @@ export default {
     handleSearchData(value) {
       this.query = value;
       if (this.query.length >= 1) {
-        const result = this.options.filter((option) =>
-          option[this.property].toLowerCase().includes(this.query.toLowerCase())
-        );
-        this.searchResult = result;
+        if (this.property) {
+          const result = this.options.filter((option) =>
+            option[this.property]
+              .toLowerCase()
+              .includes(this.query.toLowerCase())
+          );
+          this.searchResult = result;
+        } else {
+          const result = this.options.filter((option) =>
+            option.toLowerCase().includes(this.query.toLowerCase())
+          );
+          this.searchResult = result;
+        }
       } else {
         this.searchResult = this.options;
       }

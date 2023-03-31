@@ -96,7 +96,9 @@
                         assignDetailRequest(request, showModeListIdx)
                       "
                     >
-                      {{ request?.emp_id?.emp_fullname }}
+                      <router-link :to="`/employee/${request?.emp_id?._id}`">{{
+                        request?.emp_id?.emp_fullname
+                      }}</router-link>
                     </h1>
                     <p class="text-sm mb-1 text-gray-400">
                       {{ request?.emp_id?.email }}

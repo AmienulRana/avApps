@@ -18,9 +18,9 @@
             >
               <h2 class="text-md text-white">
                 {{
-                  attendance?.emp_id?.emp_fullname.substr(0, 1) +
-                  attendance?.emp_id?.emp_fullname.substr(
-                    attendance?.emp_id?.emp_fullname.indexOf(" ") + 1,
+                  attendance?.emp_id?.emp_fullname?.substr(0, 1) +
+                  attendance?.emp_id?.emp_fullname?.substr(
+                    attendance?.emp_id?.emp_fullname?.indexOf(" ") + 1,
                     1
                   )
                 }}
@@ -28,7 +28,9 @@
             </div>
             <div class="ml-5">
               <h1 class="text-blue-400 text-base">
-                {{ attendance?.emp_id?.emp_fullname }}
+                <router-link :to="`/employee/${attendance?.emp_id?._id}`">{{
+                  attendance?.emp_id?.emp_fullname
+                }}</router-link>
               </h1>
               <p class="text-sm mb-1 text-gray-600">
                 {{ attendance?.emp_id?.emp_depid?.dep_name }}
@@ -77,7 +79,9 @@
             <p class="text-sm mb-2 text-gray-600">
               {{
                 attendance?.attendances.filter(
-                  (att) => att?.attendance_status === "Late"
+                  (att) =>
+                    att?.attendance_status === "Late" ||
+                    att?.attendance_status === "Very Late"
                 ).length
               }}x Late ({{
                 formatTime(
@@ -103,7 +107,9 @@
             <p class="text-sm mb-2 text-gray-600">
               {{
                 attendance?.attendances.filter(
-                  (att) => att?.break_status === "Late"
+                  (att) =>
+                    att?.break_status === "Late" ||
+                    att?.break_status === "Very Late"
                 ).length
               }}x Late ({{
                 formatTime(

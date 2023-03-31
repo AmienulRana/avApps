@@ -30,6 +30,18 @@ export const EditAttendanceAPI = async (id, payload) => {
     return error.response;
   }
 };
+export const DeleteAttendanceAPI = async (id) => {
+  try {
+    const response = await axios.delete(`${URL_API}/attendance/${id}`, {
+      headers: {
+        Authorization: `Bearer ${tokenDecrypted()}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
 export const GetAttendanceAPI = async (query) => {
   try {

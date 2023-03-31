@@ -16,9 +16,9 @@
             <th class="text-left text-sm">Name</th>
             <th class="text-left text-sm">Type</th>
             <th class="text-left text-sm">Attachments</th>
-            <th class="text-left text-sm">Approved 1</th>
+            <!-- <th class="text-left text-sm">Approved 1</th>
             <th class="text-left text-sm">Approved 2</th>
-            <th class="text-left text-sm">HR Approved</th>
+            <th class="text-left text-sm">HR Approved</th> -->
             <th class="text-left text-sm">Activity</th>
             <th class="text-left text-sm">Actions</th>
           </tr>
@@ -112,7 +112,7 @@
                 </a>
               </section>
             </td>
-            <td class="p-3 text-sm">
+            <!-- <td class="p-3 text-sm">
               <p
                 class="flex py-1 text-white w-24 items-center justify-center rounded-full"
                 :class="
@@ -184,7 +184,7 @@
                 {{ leave?.empleave_hr?.approved_hours }},
                 {{ leave?.empleave_hr?.approved_date }}
               </p>
-            </td>
+            </td> -->
             <td class="p-3 text-sm flex">
               <div class="relative">
                 <button

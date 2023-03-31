@@ -3,6 +3,7 @@
     @click="
       activeDropdown = false;
       pagination.changePerPage = false;
+      contactEmployee = null;
     "
   >
     <section class="md:px-8 px-4 mt-6 w-full">
@@ -18,7 +19,7 @@
         </section>
         <Button
           class="bg-primary text-white px-6 py-2 text-sm rounded-md mt-2 md:mt-0"
-          @click="showModal = true"
+          @click="showModal = 'Add'"
           >Add Employee</Button
         >
       </section>
@@ -210,7 +211,7 @@
                 {{ employe?.emp_desid?.des_name }}
               </p>
               <p class="text-sm md:text-base text-gray-400">
-                {{ employe?._id?.split("").splice(11, 7).join("") }}
+                {{ employe?._id?.split("").splice(4, 7).join("") }}
               </p>
               <Button
                 class="px-4 text-sm py-1 my-2 text-white rounded-full"
@@ -231,7 +232,7 @@
               </p>
               <Button
                 class="absolute top-4 right-4 px-3 bg-blue-100 text-primary rounded-full"
-                @click="showContactEmployee(index + 1)"
+                @click.stop="showContactEmployee(index + 1)"
               >
                 <font-awesome-icon icon="fa-ellipsis" />
               </Button>
@@ -288,13 +289,15 @@
                       Terminate
                     </router-link>
                   </li>
-                  <li class="px-4 py-2 hover:bg-gray-100 hover:text-blue-400">
-                    <router-link
-                      to="/detail-employee"
-                      class="cursor-pointer text-sm"
-                    >
-                      Remove from employee list
-                    </router-link>
+                  <li
+                    class="px-4 py-2 hover:bg-red-100 text-red-500 cursor-pointer text-sm"
+                    @click="
+                      showModal = 'Delete';
+                      data.employment_name = employe?.emp_fullname;
+                      data.employment_id = employe?._id;
+                    "
+                  >
+                    Remove Employment
                   </li>
                 </ul>
               </div>
@@ -358,7 +361,6 @@
           </section>
         </section>
         <Pagination
-          v-if="employee.length > pagination.perPage"
           v-bind:items="employee"
           v-bind:per-page="pagination.perPage"
           v-bind:current-page="pagination.currentPage"
@@ -368,9 +370,47 @@
     </section>
     <AddModalEmployee
       :getEmployement="handleGetEmployement"
-      :showModal="showModal"
+      :showModal="showModal === 'Add'"
       :closeModal="() => (showModal = false)"
     />
+    <Modal
+      modalClass="md:w-1/2 md:h-96"
+      :showModal="showModal === 'Delete'"
+      @close="showModal = false"
+    >
+      <section class="text-center mb-6">
+        <img
+          src="@/assets/icons/warning.svg"
+          alt="warning-icon"
+          class="block m-auto"
+        />
+        <h1 class="text-xl">
+          Are You Sure to deleted Employment
+          <span class="text-red-500 font-bold"
+            >"{{ data?.employment_name }}"</span
+          >???
+        </h1>
+        <p class="text-gray-400 mt-3">
+          If you delete this company all data related to this Employment will
+          also be deleted
+        </p>
+        <section class="flex w-full justify-center mt-4">
+          <Button
+            class="bg-gray-400 w-24 py-2 mr-4 text-white rounded-md"
+            @click="showModal = ''"
+          >
+            Cancel
+          </Button>
+          <Button
+            class="bg-red-500 w-24 py-2 text-white rounded-md"
+            @click="handleDeleteEmployment"
+            :disabled="loading.delete"
+          >
+            Yes, Sure
+          </Button>
+        </section>
+      </section>
+    </Modal>
   </LayoutAdmin>
 </template>
 
@@ -383,14 +423,19 @@ import AddModalEmployee from "../../components/ModalAddEmployee.vue";
 import { GetAllCompanyAPI } from "@/actions/company";
 import { GetDesignationAPI } from "@/actions/designation";
 import { GetDepartementAPI } from "@/actions/departement";
-import { GetAllEmployementAPI } from "@/actions/employment";
+import {
+  GetAllEmployementAPI,
+  DeleteEmployementAPI,
+} from "@/actions/employment";
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Paggination.vue";
 import { URL_IMAGES } from "@/config";
 import NoDataShowing from "@/components/NoDataShowing.vue";
+import Modal from "@/components/Modal.vue";
 import { GetEmpStatusAPI } from "@/actions/emp-status";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "EmployeeIndex",
@@ -404,11 +449,16 @@ export default {
     Loading,
     Pagination,
     NoDataShowing,
+    Modal,
   },
   data() {
     return {
       activeDropdown: "",
       urlImages: URL_IMAGES,
+      data: {
+        employment_name: "",
+        employment_id: "",
+      },
       designation: [],
       departement: [],
       currentPage: 1,
@@ -435,10 +485,24 @@ export default {
       dataCompany: this.$store.state.company,
       loading: {
         employement: true,
+        delete: false,
       },
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
+    showMessageStatus(response) {
+      if (response?.status === 200) {
+        this.toast.success(response?.data?.message);
+      } else {
+        if (response?.data?.message) {
+          this.toast.error(response?.data?.message);
+        }
+      }
+    },
     handleShowLayoutData() {
       this.layoutData = this.layoutData === "card" ? "table" : "card";
     },
@@ -533,7 +597,6 @@ export default {
         return this.$router.push("/login");
       }
       this.employee = response?.data;
-      this.paginatedItems(response?.data);
       this.loading.employement = false;
       this.handleFilter(
         this.filter.employment_status,
@@ -541,13 +604,23 @@ export default {
         this.filter.departement,
         this.filter.role
       );
+      // this.paginatedItems(response?.data);
     },
-    paginatedItems(employment) {
-      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
-      this.employeeFilter = employment.slice(
-        start,
-        start + this.pagination.perPage
-      );
+    async handleDeleteEmployment() {
+      this.loading.delete = true;
+      const response = await DeleteEmployementAPI(this.data.employment_id);
+      if (response.status === 401) {
+        this.$store.commit("changeIsLoggedIn", false);
+
+        return this.$router.push("/login");
+      }
+      if (response?.status === 200) {
+        this.handleGetEmployement();
+        this.showModal = false;
+        this.contactEmployee = null;
+      }
+      this.showMessageStatus(response);
+      this.loading.delete = false;
     },
   },
   watch: {
@@ -576,7 +649,12 @@ export default {
     }
     // this.handleGetEmployement();
   },
-  computed: {},
+  computed: {
+    paginatedItems() {
+      const start = (this.pagination.currentPage - 1) * this.pagination.perPage;
+      return this.employeeFilter.slice(start, start + this.pagination.perPage);
+    },
+  },
 };
 </script>
 

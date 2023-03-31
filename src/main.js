@@ -43,6 +43,10 @@ import {
   faCameraAlt,
   faUserXmark,
   faRightFromBracket,
+  faEye,
+  faPaperPlane,
+  faEyeSlash,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -76,7 +80,11 @@ library.add(
   faPenToSquare,
   faCameraAlt,
   faUserXmark,
-  faRightFromBracket
+  faRightFromBracket,
+  faEye,
+  faPaperPlane,
+  faEyeSlash,
+  faPlus
 );
 
 createApp(App)

@@ -82,6 +82,17 @@
       />
       <SelectSearch
         :options="designation"
+        label="HR Employment"
+        property="des_name"
+        @selected="data.emp_hr = $event"
+        :selectedOption="data?.emp_hr"
+        input_class="md:w-4/6 mt-2"
+        position="top"
+        :isOpen="show_select === 'hr'"
+        @handleShowSelect="show_select = 'hr'"
+      />
+      <SelectSearch
+        :options="designation"
         label="Atasan Pertama"
         property="des_name"
         @selected="data.emp_fsuperior = $event"
@@ -174,6 +185,7 @@ export default {
         },
         emp_fsuperior: this.employment?.emp_fsuperior,
         emp_ssuperior: this.employment?.emp_ssuperior,
+        emp_hr: this.employment?.emp_hr,
         emp_location: this.employment?.emp_location,
         company_id: this.employment?.company_id,
         emp_tanggungan: this.employment?.emp_tanggungan,
@@ -230,7 +242,6 @@ export default {
     async handleGetLocation() {
       const querySuperAdmin = `?company_id=${this.data?.company_id}`;
       const response = await GetLocationAPI(querySuperAdmin);
-      console.log(response);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
@@ -255,6 +266,7 @@ export default {
         emp_desid: this.data?.emp_desid?._id,
         emp_fsuperior: this.data?.emp_fsuperior?._id,
         emp_ssuperior: this.data?.emp_ssuperior?._id,
+        emp_hr: this.data?.emp_hr?._id,
         emp_location: this.data?.emp_location?._id,
       };
       const { id } = this.$route.params;

@@ -23,47 +23,188 @@
         </div>
       </section>
       <section class="flex mt-6 flex-wrap w-10/12 items-center">
-        <Button
-          class="bg-white w-10 h-10 text-primary rounded-full shadow-md"
-          @click="handleShowLayoutData"
-        >
-          <font-awesome-icon icon="fa-table" />
-        </Button>
+        <section class="relative">
+          <Button
+            class="rounded-full px-6 text-gray-400 py-2 duration-300 text-sm"
+            :class="[
+              'bg-white hover:bg-gray-50 hover:text-blue-800',
+              filter.date && filter.date !== dateToday()
+                ? 'text-primary bg-gray-50'
+                : '',
+            ]"
+            @click.stop="changeDropdownActive('date')"
+            style="min-width: 80px; min-height: 30px"
+          >
+            {{ filter.date === dateToday() ? "Today" : filter.date }}
+            <font-awesome-icon
+              icon="fa-xmark"
+              class="ml-3 text-primary"
+              v-if="filter.date && filter.date !== dateToday()"
+              @click.stop="
+                handleFilterDate((filter.date = dateToday()));
+                activeDropdown = '';
+              "
+            />
+          </Button>
+          <Transition
+            enter-active-class="animated fadeInDown"
+            leave-active-class="animated fadeOutUp"
+          >
+            <Calender
+              class="absolute top-10 left-0 z-20 mt-2.5"
+              v-if="activeDropdown === 'date'"
+              @selected="handleFilterDate((filter.date = $event))"
+            />
+          </Transition>
+        </section>
+
         <Dropdown
-          ref="dropdown"
-          title="Today"
-          :showDropdown="activeDropdown === 'today'"
-          @update:activeDropdown="(e) => changeDropdownActive('today')"
-        />
-        <Dropdown
-          ref="dropdown"
           title="Departement"
           :showDropdown="activeDropdown === 'departement'"
           @update:activeDropdown="changeDropdownActive('departement')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              filter.date,
+              (filter.departement = $event?._id),
+              filter.workshift,
+              filter.behavior,
+              filter.status,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              (filter.departement = $event),
+              filter.workshift,
+              filter.behavior,
+              filter.status,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
-          ref="dropdown"
-          title="Shift"
-          :showDropdown="activeDropdown === 'shift'"
-          @update:activeDropdown="changeDropdownActive('shift')"
+          title="Workshift"
+          :showDropdown="activeDropdown === 'workshift'"
+          @update:activeDropdown="changeDropdownActive('workshift')"
+          :options="shifts"
+          property="shift_name"
+          @selected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              (filter.workshift = $event?._id),
+              filter.behavior,
+              filter.status,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              (filter.workshift = $event),
+              filter.behavior,
+              filter.status,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.workshift"
         />
         <Dropdown
-          ref="dropdown"
           title="Behavior"
           :showDropdown="activeDropdown === 'behavior'"
           @update:activeDropdown="changeDropdownActive('behavior')"
+          :options="['Early', 'Regular', 'Late', 'Very Late']"
+          @selected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              (filter.behavior = $event),
+              filter.status,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              (filter.behavior = $event),
+              filter.status,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.behavior"
         />
         <Dropdown
-          ref="dropdown"
-          title="Type"
+          title="Status"
           :showDropdown="activeDropdown === 'type'"
           @update:activeDropdown="changeDropdownActive('type')"
+          :options="[
+            'Attendance',
+            'Absent',
+            'Off Day',
+            'Cuti Tahunan (Paid)',
+            'Cuti Menikah (Paid)',
+            'Izin Sakit (Paid)',
+            'Izin Khusus (Paid)',
+            'Izin Khusus (Unpaid)',
+            'Cuti Bersama',
+          ]"
+          @selected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              filter.behavior,
+              (filter.status = $event),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              filter.behavior,
+              (filter.status = $event),
+              filter.employment
+            )
+          "
+          :selectedOption="filter.status"
         />
         <Dropdown
-          ref="dropdown"
-          title="Employee"
+          title="Employment"
           :showDropdown="activeDropdown === 'employee'"
           @update:activeDropdown="changeDropdownActive('employee')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              filter.behavior,
+              filter.status,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.date,
+              filter.departement,
+              filter.workshift,
+              filter.behavior,
+              filter.status,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -97,7 +238,7 @@
               <tbody v-if="!loading.addAttendance">
                 <tr
                   class="border-b"
-                  v-for="(attedance, i) in attendances"
+                  v-for="(attedance, i) in attendance_filter"
                   :key="i"
                 >
                   <td class="flex items-center p-3 text-sm">
@@ -116,7 +257,10 @@
                     </div>
                     <div class="ml-5">
                       <h1 class="text-blue-400 text-base">
-                        {{ attedance?.emp_id?.emp_fullname }}
+                        <router-link
+                          :to="`/employee/${attedance?.emp_id?._id}`"
+                          >{{ attedance?.emp_id?.emp_fullname }}</router-link
+                        >
                       </h1>
                       <p class="text-sm mb-1 text-gray-600">
                         {{ attedance?.emp_id?.emp_depid?.dep_name }}
@@ -176,10 +320,10 @@
                   </td>
                   <td class="p-3 text-sm">
                     <p class="text-sm text-gray-400">
-                      Break in : {{ attedance?.break_in }}
+                      Break out : {{ attedance?.break_out }}
                     </p>
                     <p class="text-sm text-gray-400">
-                      Break out : {{ attedance?.break_out }}
+                      Break In : {{ attedance?.break_in }}
                     </p>
                   </td>
                   <td class="p-3 text-sm">
@@ -212,6 +356,12 @@
                         >
                           Edit
                         </li>
+                        <li
+                          class="px-4 py-2 text-red-500 hover:bg-gray-100 hover:text-red-400"
+                          @click="handleDeleteAttendance(attedance?._id)"
+                        >
+                          Delete
+                        </li>
                       </ul>
                     </div>
                   </td>
@@ -221,7 +371,7 @@
           </section>
           <Loading v-if="loading.getAttendance" />
           <NoDataShowing
-            v-if="!loading.getAttendance && attendances.length === 0"
+            v-if="!loading.getAttendance && attendance_filter.length === 0"
           />
         </section>
       </section>
@@ -230,7 +380,11 @@
     <Modal
       :title="`${modal.modeEdit ? 'Edit' : 'Add'} Attendance`"
       :showModal="modal.showModal"
-      @close="modal.showModal = false"
+      @close="
+        modal.showModal = false;
+        clearInputValue();
+        modal.modeEdit = false;
+      "
     >
       <template #header>
         <ChoiseCompany
@@ -266,6 +420,41 @@
           input_class="mt-2"
           @change="data.attendance_date = $event"
           :value="data?.attendance_date"
+        />
+        <SelectSearch
+          label="Status"
+          :options="[
+            'Attendance',
+            'Absent',
+            'Off Day',
+            'Cuti Tahunan (Paid)',
+            'Cuti Menikah (Paid)',
+            'Izin Sakit (Paid)',
+            'Izin Khusus (Paid)',
+            'Izin Khusus (Unpaid)',
+            'Cuti Bersama',
+          ]"
+          :isOpen="modal.showSelect === 'status'"
+          @handleShowSelect="() => (modal.showSelect = 'status')"
+          class="flex-col"
+          input_class="w-full mt-2"
+          label_class="w-full text-black"
+          @selected="data.attendance_status = $event"
+          :selectedOption="data?.attendance_status"
+          v-if="modal.modeEdit"
+        />
+        <SelectSearch
+          label="Attendance Shift"
+          :options="shifts"
+          property="shift_desc"
+          :isOpen="modal.showSelect === 'shift'"
+          @handleShowSelect="() => (modal.showSelect = 'shift')"
+          class="flex-col"
+          input_class="w-full mt-2"
+          label_class="w-full text-black"
+          @selected="data.attendance_shift = $event"
+          :selectedOption="data?.attendance_shift"
+          v-if="modal.modeEdit"
         />
         <section class="my-4 flex justify-between items-center">
           <InputTime
@@ -316,6 +505,14 @@
             @selected-minute="modal.time_breakout.minute = $event"
           />
         </section>
+        <label class="text-sm">Reason Note</label>
+        <textarea
+          rows="4"
+          class="w-full mt-2 border outline-primary py-4"
+          v-model="data.attendance_reason"
+          v-if="modal.modeEdit"
+        >
+        </textarea>
       </section>
       <template #footer>
         <section class="flex w-52 justify-between">
@@ -324,7 +521,13 @@
           </Button>
           <Button
             class="bg-green-500 w-24 py-2 text-white rounded-md"
-            :disabled="!data.emp_id || loading.addAttendance"
+            :disabled="
+              data.emp_id === '' ||
+              data.attendance_date === '' ||
+              data.attendance_date_out === '' ||
+              modal.time_clockin.hour === '' ||
+              loading.addAttendance
+            "
             @click="handleAddAttendance"
             v-if="!modal.modeEdit"
           >
@@ -333,7 +536,14 @@
           <Button
             v-else
             class="bg-green-500 w-24 py-2 text-white rounded-md"
-            :disabled="!data.emp_id || loading.addAttendance"
+            :disabled="
+              data.emp_id === '' ||
+              data.attendance_date === '' ||
+              data.attendance_date_out === '' ||
+              (modal.time_clockin.hour === '' &&
+                data.attendance_status === 'Attendance') ||
+              loading.addAttendance
+            "
             @click="handleEditAttendance"
           >
             Edit
@@ -361,9 +571,13 @@ import {
   AddAttendanceAPI,
   GetAttendanceAPI,
   EditAttendanceAPI,
+  DeleteAttendanceAPI
 } from "@/actions/attendance";
 import Loading from "@/components/Loading.vue";
 import NoDataShowing from "@/components/NoDataShowing.vue";
+import { GetDepartementAPI } from "@/actions/departement";
+import { GetShiftAPI } from "@/actions/shift";
+import Calender from "@/components/Calendar";
 
 export default {
   name: "DailyAttedance",
@@ -378,6 +592,7 @@ export default {
     Loading,
     NoDataShowing,
     Input,
+    Calender,
   },
   data() {
     return {
@@ -410,17 +625,32 @@ export default {
         id_attendance: "",
         attendance_date: "",
         attendance_date_out: "",
+        attendance_status: "",
+        attendance_shift: "",
+        attendance_reason: "",
       },
       showActions: null,
       attendances: [],
+      shifts: [],
+      departement: [],
       optionsCompany: [],
       employment: [],
+      all_attendance: [],
+      attendance_filter: [],
       superAdmin: false,
       dataCompany: {},
       loading: {
         getAttendance: true,
         getCompany: true,
         addAttendance: false,
+      },
+      filter: {
+        date: "",
+        departement: "",
+        behavior: "",
+        status: "",
+        workshift: "",
+        employment: "",
       },
     };
   },
@@ -446,12 +676,50 @@ export default {
         this.activeDropdown = id;
       }
     },
-    showContactEmployee(id) {
-      if (this.contactEmployee === id) {
-        this.contactEmployee = false;
-      } else {
-        this.contactEmployee = id;
+    async handleDeleteAttendance(id){
+      const response = await DeleteAttendanceAPI(
+      id
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
       }
+      if (response?.status === 200) {
+        const date = this.filter.date ? this.filter.date : this.dateToday();
+        this.handleGetAttendance(date);
+      }
+      this.showMessageStatus(response);
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
+    },
+    handleFilterDate(date) {
+      this.handleGetAttendance(date);
+    },
+    handleFilter(date, departement, workshift, behavior, status, employment) {
+      const newAttendanceProp = this.all_attendance.map((attendance) => ({
+        ...attendance,
+        emp_depid: attendance?.emp_id?.emp_depid?._id,
+        employment: attendance?.emp_id?._id,
+        shift: attendance?.shift_id?._id,
+      }));
+      const filterConditions = [
+        { key: "behavior_at", value: behavior },
+        { key: "shift", value: workshift },
+        { key: "attendance_status", value: status },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+      ];
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.attendance_filter = newAttendanceProp.filter(dataFilter);
     },
     clearInputValue() {
       for (const key in this.data) {
@@ -462,7 +730,7 @@ export default {
           this.modal[key].hour = "";
         }
         if (Object.prototype.hasOwnProperty.call(this.modal[key], "minute")) {
-          this.modal[key].minute = "";
+          this.modal[key].minute = "00";
         }
       }
     },
@@ -471,6 +739,17 @@ export default {
       this.optionsCompany = response?.data;
       this.dataCompany = response?.data[0];
       this.loading.getCompany = false;
+    },
+    async getShift() {
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const response = await GetShiftAPI(queryAdminSuper);
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        this.shifts = response?.data;
+      }
     },
     showMessageStatus(response) {
       if (response.status === 200) {
@@ -500,30 +779,69 @@ export default {
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
-        this.clearInputValue();
+        // this.clearInputValue();
         this.handleGetAttendance();
         this.modal.showModal = false;
       }
       this.showMessageStatus(response);
       this.loading.addAttendance = false;
     },
-    async handleGetAttendance() {
-      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+    changeFormatDateToInputFormat(date) {
+      if (date) {
+        const oldDate = date.split("/");
+        const newDate = `${oldDate[2]}-${oldDate[0]}-${oldDate[1]}`;
+        return newDate;
+      }
+      return "-";
+      // return newDate;
+    },
+    dateToday() {
+      const dateObject = new Date();
+      const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+      const day = dateObject.getDate().toString().padStart(2, "0");
+      const year = dateObject.getFullYear();
+      return `${year}-${month}-${day}`;
+    },
+    async handleGetAttendance(date) {
+      this.loading.getAttendance = true;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}&request_date=${date}`;
       const response = await GetAttendanceAPI(queryAdminSuper);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
-        const dateObject = new Date();
-        const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
-        const day = dateObject.getDate().toString().padStart(2, "0");
-        const year = dateObject.getFullYear();
-        const formatDate = `${month}/${day}/${year}`;
         const filterAttedanceToday = response.data.filter(
-          (attedance) => attedance?.attendance_date === formatDate
+          (attedance) => attedance?.attendance_date === this.dateToday()
         );
-        this.attendances = filterAttedanceToday;
+        this.attendances = filterAttedanceToday.map((attendance) => ({
+          ...attendance,
+          attendance_date: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date
+          ),
+          attendance_date_out: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date_out
+          ),
+        }));
+        this.all_attendance = response.data.map((attendance) => ({
+          ...attendance,
+          attendance_date: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date
+          ),
+          attendance_date_out: this.changeFormatDateToInputFormat(
+            attendance?.attendance_date_out
+          ),
+        }));
+        this.handleFilter(
+          (this.filter.date = this.filter.date
+            ? this.filter.date
+            : this.dateToday()),
+          this.filter.departement,
+          this.filter.workshift,
+          this.filter.behavior,
+          this.filter.status,
+          this.filter.employment
+        );
       }
       this.loading.getAttendance = false;
     },
@@ -540,6 +858,9 @@ export default {
       this.data.id_attendance = attendance?._id;
       this.data.attendance_date = attendance?.attendance_date;
       this.data.attendance_date_out = attendance?.attendance_date_out;
+      this.data.attendance_reason = attendance?.attendance_reason;
+      this.data.attendance_status = attendance?.attendance_status;
+      this.data.attendance_shift = attendance?.shift_id;
       this.data.emp_id = attendance?.emp_id;
       this.modal.time_clockin.hour = this.getHourMinute(
         attendance?.clock_in
@@ -575,6 +896,9 @@ export default {
         clock_out: `${this.modal.time_clockout?.hour}:${this.modal.time_clockout?.minute}`,
         break_in: `${this.modal.time_breakin?.hour}:${this.modal.time_breakin?.minute}`,
         break_out: `${this.modal.time_breakout?.hour}:${this.modal.time_breakout?.minute}`,
+        attendance_status: this?.data?.attendance_status,
+        shift_id: this?.data?.attendance_shift?._id,
+        attendance_reason: this.data?.attendance_reason,
       };
       // const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
       const response = await EditAttendanceAPI(
@@ -587,14 +911,15 @@ export default {
       }
       if (response?.status === 200) {
         this.clearInputValue();
-        this.handleGetAttendance();
+        const date = this.filter.date ? this.filter.date : this.dateToday();
+        this.handleGetAttendance(date);
         this.modal.showModal = false;
       }
       this.showMessageStatus(response);
       this.loading.addAttendance = false;
     },
     async handleGetEmployement() {
-      const querySuperAdmin = `?company=${this.dataCompany._id}`;
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetAllEmployementAPI(
         this.superAdmin ? querySuperAdmin : ""
       );
@@ -612,8 +937,12 @@ export default {
   watch: {
     dataCompany: {
       handler: function () {
-        this.handleGetAttendance();
+        this.handleGetAttendance(
+          this.filter.date ? this.filter.date : this.dateToday()
+        );
+        this.getShift();
         this.handleGetEmployement();
+        this.handleGetDepartement();
       },
       deep: true,
     },
@@ -627,4 +956,31 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.fadeInDown {
+  animation: fadeInDown 0.3s;
+}
+.fadeOutUp {
+  animation: fadeOutUp 0.3s;
+}
+@keyframes fadeInDown {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes fadeOutUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+}
+</style>

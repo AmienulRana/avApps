@@ -251,7 +251,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response);
     },
   },
   mounted() {

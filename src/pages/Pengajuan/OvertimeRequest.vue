@@ -31,26 +31,108 @@
           title="Departemen"
           :showDropdown="activeDropdown === 'departemen'"
           @update:activeDropdown="(e) => changeDropdownActive('departemen')"
+          :options="departement"
+          property="dep_name"
+          @selected="
+            handleFilter(
+              (filter.departement = $event?._id),
+              filter.status,
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              (filter.departement = $event),
+              filter.status,
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
+          :selectedOption="filter.departement"
         />
         <Dropdown
-          title="Workshift"
-          :showDropdown="activeDropdown === 'workshift'"
-          @update:activeDropdown="changeDropdownActive('workshift')"
-        />
-        <Dropdown
-          title="See rejected"
+          title="See Status"
           :showDropdown="activeDropdown === 'rejected'"
           @update:activeDropdown="changeDropdownActive('rejected')"
+          :selectedOption="filter.status"
+          :options="['Pending', 'Approved', 'Rejected']"
+          @selected="
+            handleFilter(
+              filter.departement,
+
+              (filter.status = $event),
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+
+              (filter.status = $event),
+              filter.overtime_duration,
+              filter.employment
+            )
+          "
         />
         <Dropdown
           title="Overtime duration"
           :showDropdown="activeDropdown === 'duration'"
           @update:activeDropdown="changeDropdownActive('duration')"
+          :selectedOption="filter.overtime_duration"
+          property="text"
+          :options="[
+            { text: '1 Hours', number: 1 },
+            { text: '2 Hours', number: 2 },
+            { text: '3 Hours', number: 3 },
+            { text: '4 Hours', number: 4 },
+            { text: '5 Hours', number: 5 },
+          ]"
+          @selected="
+            handleFilter(
+              filter.departement,
+
+              filter.status,
+              (filter.overtime_duration = $event?.number),
+              filter.employment
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+
+              filter.status,
+              (filter.overtime_duration = $event),
+              filter.employment
+            )
+          "
         />
         <Dropdown
-          title="Users"
+          title="Employment"
           :showDropdown="activeDropdown === 'user'"
           @update:activeDropdown="changeDropdownActive('user')"
+          :options="employment"
+          property="emp_fullname"
+          :selectedOption="filter.employment"
+          @selected="
+            handleFilter(
+              filter.departement,
+
+              filter.status,
+              filter.overtime_duration,
+              (filter.employment = $event?._id)
+            )
+          "
+          @clearSelected="
+            handleFilter(
+              filter.departement,
+
+              filter.status,
+              filter.overtime_duration,
+              (filter.employment = $event)
+            )
+          "
         />
       </section>
       <section class="w-full">
@@ -58,7 +140,7 @@
           Showing 1 to 10 items of 11
         </p>
         <TableRequestOvertime
-          :overtime_request="overtime_requests"
+          :overtime_request="overtime_filter"
           :showMessageStatus="showMessageStatus"
           :loading="loading.getOvertimeRequest"
           :getOvertime="getOvertimeRequest"
@@ -184,6 +266,7 @@ import {
 import decryptToken from "@/utils/decryptToken";
 import ChoiseCompany from "@/components/ChoiseCompany.vue";
 import { useToast } from "vue-toastification";
+import { GetDepartementAPI } from "@/actions/departement";
 
 export default {
   name: "OvertimeRequest",
@@ -225,7 +308,15 @@ export default {
         overtime_start_hours: "",
         overtime_end_hours: "",
       },
+      filter: {
+        departement: "",
+        status: "",
+        overtime_duration: "",
+        employment: "",
+      },
       employment: [],
+      departement: [],
+
       optionsCompany: [],
       superAdmin: false,
       overtime_requests: [],
@@ -264,6 +355,40 @@ export default {
       } else {
         this.contactEmployee = id;
       }
+    },
+    async handleGetDepartement() {
+      const querySuperAdmin = `?company=${this.dataCompany?._id}`;
+      const response = await GetDepartementAPI(querySuperAdmin);
+      if (response.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.departement = response.data;
+    },
+    changeHoursToNumber(hours) {
+      return +hours.split(":")[0];
+    },
+    handleFilter(departement, status, overtime_duration, employment) {
+      const newLeaveRequestProp = this.overtime_requests.map((overtime) => ({
+        ...overtime,
+        emp_depid: overtime?.emp_id?.emp_depid?._id,
+        status_hr: overtime?.overtime_hr?.status,
+        status_at1: overtime?.overtime_fsuperior?.status,
+        status_at2: overtime?.overtime_ssuperior?.status,
+        duration: this.changeHoursToNumber(overtime?.overtime_duration),
+        employment: overtime?.emp_id?._id,
+      }));
+      const filterConditions = [
+        { key: "status_hr", value: status },
+        { key: "duration", value: overtime_duration },
+        { key: "emp_depid", value: departement },
+        { key: "employment", value: employment },
+      ];
+
+      const dataFilter = (overtime) =>
+        filterConditions.every(
+          ({ key, value }) => value == "" || overtime[key] == value
+        );
+      this.overtime_filter = newLeaveRequestProp.filter(dataFilter);
     },
     showMessageStatus(response) {
       if (response.status === 200) {
@@ -375,6 +500,12 @@ export default {
         this.overtime_requests = response.data;
       }
       this.loading.getOvertimeRequest = false;
+      this.handleFilter(
+        this.filter.departement,
+        this.filter.status,
+        this.filter.overtime_duration,
+        this.filter.employment
+      );
     },
     async getAllCompany() {
       const response = await GetAllCompanyAPI();
@@ -393,6 +524,7 @@ export default {
       handler: function () {
         this.handleGetEmployement();
         this.getOvertimeRequest();
+        this.handleGetDepartement();
       },
       deep: true,
     },

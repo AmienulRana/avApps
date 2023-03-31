@@ -38,10 +38,10 @@ export const GetPeriodicActiveAPI = async (query) => {
     return error.response;
   }
 };
-export const ChangeStatusPeriodicAPI = async (id) => {
+export const ChangeStatusPeriodicAPI = async (id, query) => {
   try {
     const response = await axios.put(
-      `${URL_API}/periodic/status/${id}`,
+      `${URL_API}/periodic/status/${id}${query}`,
       {},
       {
         headers: {

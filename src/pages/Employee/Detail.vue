@@ -18,7 +18,7 @@
           class="bg-white w-full grid shadow-md md:h-64 md:grid-cols-2 lg:grid-cols-3 gap-3 py-3 my-6"
         >
           <section
-            class="flex px-6 py-4 flex-col md:flex-row items-center md:items-start"
+            class="flex px-6 flex-col md:flex-row items-center md:items-start"
           >
             <div
               @click="openFilePicker"
@@ -59,27 +59,37 @@
               />
             </div>
             <div class="md:ml-9 ml-0 text-center md:text-start">
-              <h1 class="md:text-xl mt-2 text-base">
-                {{ personal_detail?.emp_fullname }}
-              </h1>
-              <Button
-                class="px-4 text-sm py-1 my-2 text-white rounded-full"
-                :style="`background:${employment?.emp_status?.empstatus_color}`"
-              >
-                {{ employment?.emp_status?.empstatus_name }}
-              </Button>
-              <p class="text-sm text-gray-400">
-                {{ employment.emp_desid?.des_name }}
-              </p>
-              <p class="text-sm text-gray-400"></p>
-              <p class="text-sm text-gray-400">
-                {{ employment.emp_depid?.dep_name }}
-              </p>
+              <section class="h-[160px]">
+                <h1 class="md:text-xl text-base">
+                  {{ personal_detail?.emp_fullname }}
+                </h1>
+                <Button
+                  class="px-4 text-sm py-1 my-2 text-white rounded-full"
+                  :style="`background:${employment?.emp_status?.empstatus_color}`"
+                >
+                  {{ employment?.emp_status?.empstatus_name }}
+                </Button>
+                <p class="text-sm text-gray-400">
+                  {{ employment.emp_desid?.des_name }}
+                </p>
+                <p class="text-sm text-gray-400"></p>
+                <p class="text-sm text-gray-400">
+                  {{ employment.emp_depid?.dep_name }}
+                </p>
+              </section>
+              <p class="text-sm text-primary my-1">Employment Status</p>
+              <SwitchButton
+                :value="employment?.emp_employment_status"
+                class="w-max"
+                @update:model="
+                  (value) => handleUpdateStatus(value, 'emp_employment_status')
+                "
+              />
             </div>
           </section>
-          <section class="md:border-x h-max mb-6">
-            <section class="px-6 py-4">
-              <div class="flex items-center mb-5">
+          <section class="h-max mb-6">
+            <section class="md:border-x h-[160px] px-6 py-4">
+              <div class="flex items-center mb-4">
                 <font-awesome-icon
                   icon="fa-briefcase"
                   class="text-2xl w-10 text-primary"
@@ -104,8 +114,57 @@
                 </div>
               </div>
             </section>
+            <section class="px-8">
+              <p class="text-sm text-primary my-1">Attendance Status</p>
+              <SwitchButton
+                :value="employment?.emp_attendance_status"
+                class="w-max"
+                @update:model="
+                  (value) => handleUpdateStatus(value, 'emp_attendance_status')
+                "
+              />
+            </section>
             <section class="px-6 md:py-4 md:hidden">
-              <div class="flex items-center mb-5">
+              <section class="h-[160px]">
+                <div class="flex items-center mb-5">
+                  <font-awesome-icon
+                    icon="fa-dollar"
+                    class="text-2xl w-10 text-primary"
+                  />
+                  <div class="ml-3">
+                    <p class="text-sm text-gray-400">Salary</p>
+                    <p class="text-sm opacity-80">
+                      $ 10,000
+                      <span class="text-primary text-xs">(current)</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <font-awesome-icon
+                    icon="fa-calendar"
+                    class="text-2xl w-10 text-primary"
+                  />
+                  <div class="ml-3">
+                    <p class="text-sm text-gray-400">Joining date</p>
+                    <p class="text-sm opacity-80">Not added yet</p>
+                  </div>
+                </div>
+              </section>
+              <section class="px-8">
+                <p class="text-sm text-primary my-1">Payroll Status</p>
+                <SwitchButton
+                  :value="employment?.emp_payroll_status"
+                  class="w-max"
+                  @update:model="
+                    (value) => handleUpdateStatus(value, 'emp_payroll_status')
+                  "
+                />
+              </section>
+            </section>
+          </section>
+          <section class="px-6 hidden md:block">
+            <section class="h-[160px] py-4">
+              <div class="flex items-center mb-4">
                 <font-awesome-icon
                   icon="fa-dollar"
                   class="text-2xl w-10 text-primary"
@@ -129,31 +188,16 @@
                 </div>
               </div>
             </section>
-          </section>
-          <section class="px-6 md:py-4 hidden md:block">
-            <div class="flex items-center mb-5">
-              <font-awesome-icon
-                icon="fa-dollar"
-                class="text-2xl w-10 text-primary"
+            <section class="px-8">
+              <p class="text-sm text-primary my-1">Payroll Status</p>
+              <SwitchButton
+                :value="employment?.emp_payroll_status"
+                class="w-max"
+                @update:model="
+                  (value) => handleUpdateStatus(value, 'emp_payroll_status')
+                "
               />
-              <div class="ml-3">
-                <p class="text-sm text-gray-400">Salary</p>
-                <p class="text-sm opacity-80">
-                  $ 10,000
-                  <span class="text-primary text-xs">(current)</span>
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center">
-              <font-awesome-icon
-                icon="fa-calendar"
-                class="text-2xl w-10 text-primary"
-              />
-              <div class="ml-3">
-                <p class="text-sm text-gray-400">Joining date</p>
-                <p class="text-sm opacity-80">Not added yet</p>
-              </div>
-            </div>
+            </section>
           </section>
         </section>
       </section>
@@ -196,6 +240,10 @@
           <Rekening v-if="sideTabActive === 'Rekening'" />
           <Payroll v-if="sideTabActive === 'Payroll'" />
           <Cuti v-if="sideTabActive === 'Cuti'" />
+          <ResetPassword
+            v-if="sideTabActive === 'Reset Password'"
+            :employment="personal_detail?.emp_fullname"
+          />
         </section>
       </section>
     </section>
@@ -209,9 +257,15 @@ import Loading from "../../components/Loading.vue";
 import Employement from "../../components/Employement.vue";
 import Experience from "../../components/Education.vue";
 import Rekening from "../../components/Rekening.vue";
+import ResetPassword from "../../components/ResetPassword.vue";
 import Payroll from "../../components/Payroll.vue";
+import SwitchButton from "../../components/SwitchButton.vue";
 import Cuti from "../../components/Cuti.vue";
-import { DetailEmployementAPI, UpdateProfileAPI } from "@/actions/employment";
+import {
+  DetailEmployementAPI,
+  UpdateProfileAPI,
+  EditStatusEmployementAPI,
+} from "@/actions/employment";
 import { URL_IMAGES } from "@/config";
 
 import Button from "@/components/Button.vue";
@@ -227,6 +281,8 @@ export default {
     Payroll,
     Cuti,
     Loading,
+    SwitchButton,
+    ResetPassword,
   },
   data() {
     return {
@@ -246,6 +302,7 @@ export default {
         { name: "Rekening", icon: "fa-credit-card" },
         { name: "Payroll", icon: "fa-dollar" },
         { name: "Cuti", icon: "fa-calendar" },
+        { name: "Reset Password", icon: "fa-lock" },
       ],
       isOpenAccordion: false,
       loading: true,
@@ -273,16 +330,29 @@ export default {
         emp_desid: {},
         emp_fsuperior: "",
         emp_ssuperior: "",
+        emp_hr: "",
         emp_location: "",
         emp_tanggungan: "",
         emp_attadance: {},
         company_id: "",
+        emp_attendance_status: true,
+        emp_employment_status: true,
+        emp_payroll_status: true,
       },
     };
   },
   methods: {
     openFilePicker() {
       this.$refs.fileInput.click();
+    },
+    async handleUpdateStatus(value, key) {
+      this.employment[key] = value;
+      const { id } = this.$route.params;
+      const response = await EditStatusEmployementAPI(id, { [key]: value });
+      if (response?.status === 401) {
+        return this.$router.push("/login");
+      }
+      this.loading = false;
     },
     async changeImage(event) {
       const file = event.target.files[0];
@@ -317,16 +387,20 @@ export default {
       employment.emp_desid = data?.emp_desid;
       employment.emp_fsuperior = data?.emp_fsuperior;
       employment.emp_ssuperior = data?.emp_ssuperior;
+      employment.emp_hr = data?.emp_hr;
       employment.emp_location = data?.emp_location;
       employment.emp_attadance = data?.emp_attadance;
       employment.emp_tanggungan = data?.emp_tanggungan;
       employment.company_id = data?.company_id?._id;
+      employment.emp_attendance_status = data?.emp_attendance_status;
+      employment.emp_payroll_status = data?.emp_payroll_status;
+      employment.emp_employment_status = data?.emp_employment_status;
     },
     async handleDetailEmployment() {
       const { id } = this.$route.params;
       const response = await DetailEmployementAPI(id);
       const data = response?.data;
-      if (response.status === 401) {
+      if (response?.status === 401) {
         return this.$router.push("/login");
       }
       this.handleAssignPersonalData(data);
