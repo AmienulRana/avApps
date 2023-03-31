@@ -223,6 +223,17 @@
             <SelectSearch
               :options="designation"
               property="des_name"
+              label="HR Employment*"
+              input_class="md:w-4/6 mt-2"
+              position="top"
+              :isOpen="show_select === 'hr'"
+              @handleShowSelect="show_select = 'hr'"
+              :selectedOption="employment.emp_hr"
+              @selected="employment.emp_hr = $event"
+            />
+            <SelectSearch
+              :options="designation"
+              property="des_name"
               label="Atasan Pertama*"
               input_class="md:w-4/6 mt-2"
               position="top"
@@ -456,6 +467,7 @@ export default {
         emp_status: "",
         emp_fsuperior: "",
         emp_ssuperior: "",
+        emp_hr: "",
         emp_tanggungan: "",
         emp_location: "",
       },
@@ -609,6 +621,7 @@ export default {
         emp_desid: this.employment.emp_desid?._id,
         emp_fsuperior: this.employment.emp_fsuperior?._id,
         emp_ssuperior: this.employment.emp_ssuperior?._id,
+        emp_hr: this.employment.emp_hr?._id,
       };
       const salary = {
         emp_salary: Number(this.basic_salary.salary),

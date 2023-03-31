@@ -226,6 +226,26 @@
             >(Set week with customized time)</span
           >
         </p>
+        <section class="my-2 flex justify-between items-center">
+          <Input
+            type="number"
+            label="Shift Late Tolarance"
+            class="flex-col md:w-5/12 mt-4"
+            label_class="w-full"
+            input_class="mt-2"
+            @change="data.shift_late_tolarance = $event"
+            :value="data?.shift_late_tolarance"
+          />
+          <Input
+            type="number"
+            label="Shift Very Late Tolarance"
+            class="flex-col md:w-5/12 mt-4"
+            label_class="w-full"
+            input_class="mt-2"
+            @change="data.shift_verylate_tolarance = $event"
+            :value="data?.shift_verylate_tolarance"
+          />
+        </section>
         <section class="mb-2.5" v-for="(week, i) in weeks" :key="i">
           <p class="mb-1.5 text-sm">{{ week?.title }}</p>
           <section class="flex justify-between items-center">
@@ -260,7 +280,7 @@
       </template>
     </section>
     <template #footer>
-      <section class="flex w-52 justify-between">
+      <section class="flex w-[230px] justify-between">
         <Button class="bg-gray-400 w-24 py-2 text-white rounded-md">
           Cancel
         </Button>
@@ -271,7 +291,7 @@
           :disabled="loading.addShift || !data.shift_name"
           v-if="!modal.edit && shift_type === 'Schedule'"
         >
-          Save Shc
+          Save Schedule
         </Button>
         <Button
           class="bg-green-500 w-24 py-2 text-white rounded-md"
@@ -290,12 +310,12 @@
           Edit Regular
         </Button>
         <Button
-          class="bg-green-500 w-24 py-2 text-white rounded-md"
+          class="bg-green-500 w-[110px] py-2 ml-2 text-white rounded-md"
           @click="EditShiftSchedule"
           :disabled="loading.addShift || !data.shift_name"
           v-if="modal.edit && shift_type === 'Schedule'"
         >
-          Edit Shcdule
+          Edit Schedule
         </Button>
       </section>
     </template>
@@ -401,6 +421,8 @@ export default {
             minute: "00",
           },
           break: "1",
+          shift_late_tolarance: 0,
+          shift_verylate_tolarance: 0,
         },
       };
     }
@@ -543,6 +565,8 @@ export default {
         shift_name: this.data.shift_name,
         ...schedule,
         shift_type: this.shift_type,
+        shift_late_tolarance: +this.data.shift_late_tolarance,
+        shift_verylate_tolarance: +this.data?.shift_verylate_tolarance,
       };
       const response = await EditShiftAPI(this.data._id, payload);
       if (response.status === 401) {
@@ -615,6 +639,8 @@ export default {
       this.modal.showModal = true;
       this.data._id = shift?._id;
       this.data.shift_name = shift?.shift_name;
+      this.data.shift_late_tolarance = shift?.shift_late_tolarance || 0;
+      this.data.shift_verylate_tolarance = shift?.shift_verylate_tolarance || 0;
       if (shift?.shift_type === "Regular") {
         this.shift_type = "Regular";
         this.data.shift_late_tolarance = shift?.shift_late_tolarance;

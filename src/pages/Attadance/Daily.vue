@@ -41,14 +41,7 @@
               class="ml-3 text-primary"
               v-if="filter.date && filter.date !== dateToday()"
               @click.stop="
-                handleFilter(
-                  (filter.date = dateToday()),
-                  filter.departement,
-                  filter.workshift,
-                  filter.behavior,
-                  filter.status,
-                  filter.employment
-                );
+                handleFilterDate((filter.date = dateToday()));
                 activeDropdown = '';
               "
             />
@@ -60,16 +53,7 @@
             <Calender
               class="absolute top-10 left-0 z-20 mt-2.5"
               v-if="activeDropdown === 'date'"
-              @selected="
-                handleFilter(
-                  (filter.date = $event),
-                  filter.departement,
-                  filter.workshift,
-                  filter.behavior,
-                  filter.status,
-                  filter.employment
-                )
-              "
+              @selected="handleFilterDate((filter.date = $event))"
             />
           </Transition>
         </section>
@@ -372,6 +356,12 @@
                         >
                           Edit
                         </li>
+                        <li
+                          class="px-4 py-2 text-red-500 hover:bg-gray-100 hover:text-red-400"
+                          @click="handleDeleteAttendance(attedance?._id)"
+                        >
+                          Delete
+                        </li>
                       </ul>
                     </div>
                   </td>
@@ -535,6 +525,7 @@
               data.emp_id === '' ||
               data.attendance_date === '' ||
               data.attendance_date_out === '' ||
+              modal.time_clockin.hour === '' ||
               loading.addAttendance
             "
             @click="handleAddAttendance"
@@ -549,7 +540,8 @@
               data.emp_id === '' ||
               data.attendance_date === '' ||
               data.attendance_date_out === '' ||
-              modal.time_clockin.hour === '' ||
+              (modal.time_clockin.hour === '' &&
+                data.attendance_status === 'Attendance') ||
               loading.addAttendance
             "
             @click="handleEditAttendance"
@@ -579,6 +571,7 @@ import {
   AddAttendanceAPI,
   GetAttendanceAPI,
   EditAttendanceAPI,
+  DeleteAttendanceAPI
 } from "@/actions/attendance";
 import Loading from "@/components/Loading.vue";
 import NoDataShowing from "@/components/NoDataShowing.vue";
@@ -683,6 +676,20 @@ export default {
         this.activeDropdown = id;
       }
     },
+    async handleDeleteAttendance(id){
+      const response = await DeleteAttendanceAPI(
+      id
+      );
+      if (response?.status === 401) {
+        this.$router.push("/login");
+        this.$store.commit("changeIsLoggedIn", false);
+      }
+      if (response?.status === 200) {
+        const date = this.filter.date ? this.filter.date : this.dateToday();
+        this.handleGetAttendance(date);
+      }
+      this.showMessageStatus(response);
+    },
     async handleGetDepartement() {
       const querySuperAdmin = `?company=${this.dataCompany?._id}`;
       const response = await GetDepartementAPI(querySuperAdmin);
@@ -690,6 +697,9 @@ export default {
         return this.$router.push("/login");
       }
       this.departement = response.data;
+    },
+    handleFilterDate(date) {
+      this.handleGetAttendance(date);
     },
     handleFilter(date, departement, workshift, behavior, status, employment) {
       const newAttendanceProp = this.all_attendance.map((attendance) => ({
@@ -699,7 +709,6 @@ export default {
         shift: attendance?.shift_id?._id,
       }));
       const filterConditions = [
-        { key: "attendance_date", value: date },
         { key: "behavior_at", value: behavior },
         { key: "shift", value: workshift },
         { key: "attendance_status", value: status },
@@ -793,16 +802,15 @@ export default {
       const year = dateObject.getFullYear();
       return `${year}-${month}-${day}`;
     },
-    async handleGetAttendance() {
+    async handleGetAttendance(date) {
       this.loading.getAttendance = true;
-      const queryAdminSuper = `?company_id=${this.dataCompany?._id}`;
+      const queryAdminSuper = `?company_id=${this.dataCompany?._id}&request_date=${date}`;
       const response = await GetAttendanceAPI(queryAdminSuper);
       if (response?.status === 401) {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
       if (response?.status === 200) {
-        // console.log(response.data);
         const filterAttedanceToday = response.data.filter(
           (attedance) => attedance?.attendance_date === this.dateToday()
         );
@@ -903,7 +911,8 @@ export default {
       }
       if (response?.status === 200) {
         this.clearInputValue();
-        this.handleGetAttendance();
+        const date = this.filter.date ? this.filter.date : this.dateToday();
+        this.handleGetAttendance(date);
         this.modal.showModal = false;
       }
       this.showMessageStatus(response);
@@ -928,7 +937,9 @@ export default {
   watch: {
     dataCompany: {
       handler: function () {
-        this.handleGetAttendance();
+        this.handleGetAttendance(
+          this.filter.date ? this.filter.date : this.dateToday()
+        );
         this.getShift();
         this.handleGetEmployement();
         this.handleGetDepartement();

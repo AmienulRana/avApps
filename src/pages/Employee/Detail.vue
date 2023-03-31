@@ -330,6 +330,7 @@ export default {
         emp_desid: {},
         emp_fsuperior: "",
         emp_ssuperior: "",
+        emp_hr: "",
         emp_location: "",
         emp_tanggungan: "",
         emp_attadance: {},
@@ -386,6 +387,7 @@ export default {
       employment.emp_desid = data?.emp_desid;
       employment.emp_fsuperior = data?.emp_fsuperior;
       employment.emp_ssuperior = data?.emp_ssuperior;
+      employment.emp_hr = data?.emp_hr;
       employment.emp_location = data?.emp_location;
       employment.emp_attadance = data?.emp_attadance;
       employment.emp_tanggungan = data?.emp_tanggungan;
