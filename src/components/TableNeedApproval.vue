@@ -96,9 +96,7 @@
                         assignDetailRequest(request, showModeListIdx)
                       "
                     >
-                      <router-link :to="`/employee/${request?.emp_id?._id}`">{{
-                        request?.emp_id?.emp_fullname
-                      }}</router-link>
+                      {{ request?.emp_id?.emp_fullname }}
                     </h1>
                     <p class="text-sm mb-1 text-gray-400">
                       {{ request?.emp_id?.email }}
@@ -124,24 +122,26 @@
     @close="showModal = false"
   >
     <section class="flex w-full justify-center">
-      <div>
+      <div class="w-36">
         <h2 class="text-base">At {{ detailLeave?.empleave_apply_date }}</h2>
-        <p class="text-gray-400 text-xs">
+        <p class="text-gray-400 text-xs truncate">
           Applied by
           <span class="text-blue-400">{{
             detailLeave?.emp_id?.emp_fullname
           }}</span>
         </p>
       </div>
-      <section class="relative px-10 border-l-2 h-52 ml-10">
+      <section class="relative px-10 border-l-2 h-48 ml-10">
         <div
           class="flex w-10 h-10 p-2 rounded-full bg-gray-100 absolute top-0 -left-5"
         >
           <img src="../assets/icons/log.svg" />
         </div>
-        <div class="bg-gray-100 mt-10 px-4 py-2 rounded">
+        <div class="bg-gray-100 mt-10 px-4 py-2 rounded w-60">
           <h2 class="text-sm flex items-center">
-            {{ detailLeave?.empleave_type_id }}
+            {{ detailLeave?.empleave_type_id?.leave_name }} ({{
+              detailLeave?.empleave_type_id?.leave_type
+            }})
             <span class="w-1.5 block h-1.5 rounded-full bg-gray-300 mx-4" />
             {{ detailLeave?.empleave_leave_duration }}
           </h2>
@@ -162,31 +162,201 @@
         </div>
       </section>
     </section>
+    <section
+      class="flex w-full justify-center h-32"
+      :class="
+        detailLeave?.empleave_hr?.status === 'Pending'
+          ? 'pending'
+          : detailLeave?.empleave_hr?.status === 'Approved'
+          ? 'approved'
+          : 'not-approved'
+      "
+    >
+      <div class="opacity-0 w-16 m-1"></div>
+      <div
+        class="bg-icon flex w-10 h-10 p-2 rounded-full bg-gray-100 justify-center items-center"
+      >
+        <font-awesome-icon
+          icon="fa-check"
+          class="text-xl"
+          v-if="detailLeave?.empleave_hr?.status === 'Approved'"
+        />
+        <font-awesome-icon
+          icon="fa-xmark"
+          class="text-xl"
+          v-else-if="detailLeave?.empleave_hr?.status === 'Rejected'"
+        />
+        <font-awesome-icon icon="fa-clock" class="text-xl" v-else />
+      </div>
+      <section class="relative px-10 border-l-2 h-full ml-10">
+        <div
+          class="indicator p-2 w-3 h-3 rounded-full bg-gray-100 absolute top-0 -left-2"
+        ></div>
+        <div class="bg-gray-100 px-4 py-2 rounded w-52 text-gray-400">
+          <p class="text-sm flex items-center">Approve HR</p>
+          <!-- <p class="text-sm mt-1">01 Dec, 22</p> -->
+        </div>
+      </section>
+    </section>
+    <section
+      class="flex w-full justify-center h-32"
+      :class="
+        detailLeave?.empleave_fsuperior?.status === 'Pending'
+          ? 'pending'
+          : detailLeave?.empleave_fsuperior?.status === 'Approved'
+          ? 'approved'
+          : 'not-approved'
+      "
+    >
+      <div class="opacity-0 w-16 m-1"></div>
+      <div
+        class="bg-icon flex w-10 h-10 p-2 rounded-full bg-gray-100 justify-center items-center"
+      >
+        <font-awesome-icon
+          icon="fa-check"
+          class="text-xl"
+          v-if="detailLeave?.empleave_fsuperior?.status === 'Approved'"
+        />
+        <font-awesome-icon
+          icon="fa-xmark"
+          class="text-xl"
+          v-else-if="detailLeave?.empleave_fsuperior?.status === 'Rejected'"
+        />
+        <font-awesome-icon icon="fa-clock" class="text-xl" v-else />
+      </div>
+      <section class="relative px-10 border-l-2 h-full ml-10">
+        <div
+          class="indicator p-2 w-3 h-3 rounded-full bg-gray-100 absolute top-0 -left-2"
+        ></div>
+        <div class="bg-gray-100 px-4 py-2 rounded w-52 text-gray-400">
+          <p class="text-sm flex items-center">Approve Atasan 1</p>
+          <!-- <p class="text-sm mt-1">01 Dec, 22</p> -->
+        </div>
+      </section>
+    </section>
+    <section
+      class="flex w-full justify-center h-32"
+      :class="
+        detailLeave?.empleave_ssuperior?.status === 'Pending'
+          ? 'pending'
+          : detailLeave?.empleave_ssuperior?.status === 'Approved'
+          ? 'approved'
+          : 'not-approved'
+      "
+    >
+      <div class="opacity-0 w-16 m-1"></div>
+      <div
+        class="flex bg-icon w-10 h-10 p-2 rounded-full justify-center items-center"
+      >
+        <font-awesome-icon
+          icon="fa-check"
+          class="text-xl"
+          v-if="detailLeave?.empleave_ssuperior?.status === 'Approved'"
+        />
+        <font-awesome-icon
+          icon="fa-xmark"
+          class="text-xl"
+          v-else-if="detailLeave?.empleave_ssuperior?.status === 'Rejected'"
+        />
+        <font-awesome-icon icon="fa-clock" class="text-xl" v-else />
+      </div>
+      <section class="relative px-10 border-l-2 h-full ml-10">
+        <div
+          class="indicator p-2 w-3 h-3 rounded-full bg-gray-100 absolute top-0 -left-2"
+        ></div>
+        <div class="bg-gray-100 px-4 py-2 rounded w-52 text-gray-400">
+          <p class="text-sm flex items-center">Approve Atasan 2</p>
+          <!-- <p class="text-sm mt-1">01 Dec, 22</p> -->
+        </div>
+      </section>
+    </section>
     <section class="mt-4">
       <label class="text-sm">Response Note</label>
       <textarea rows="4" class="w-full mt-2 border outline-primary py-4">
       </textarea>
-      <section class="grid grid-cols-3 items-center mt-4">
-        <p class="text-sm">Update status</p>
-        <div class="flex">
+      <section class="flex justify-between items-center mt-4">
+        <p class="text-sm">HR Response</p>
+        <div class="flex md:px-16">
           <Radio
             label="Pending"
-            value="Pending"
-            :checked="detailLeave?.empleave_status === 'Pending'"
-            @change="detailLeave.empleave_status = 'Pending'"
+            @change="detailLeave.empleave_hr.status = 'Pending'"
+            :checked="detailLeave?.empleave_hr.status === 'Pending'"
+            :modelValue="detailLeave?.empleave_hr.status"
+            name="hr_status"
           />
           <Radio
             label="Approved"
             class="mx-8"
-            value="Approved"
-            :checked="detailLeave?.empleave_status === 'Approved'"
-            @change="detailLeave.empleave_status = 'Approved'"
+            @change="detailLeave.empleave_hr.status = 'Approved'"
+            :checked="detailLeave?.empleave_hr.status === 'Approved'"
+            :modelValue="detailLeave?.empleave_hr.status"
+            name="hr_status"
           />
           <Radio
             label="Rejected"
-            value="Rejected"
-            :checked="detailLeave?.empleave_status === 'Rejected'"
-            @change="detailLeave.empleave_status = 'Rejected'"
+            @change="detailLeave.empleave_hr.status = 'Rejected'"
+            :checked="detailLeave?.empleave_hr.status === 'Rejected'"
+            :modelValue="detailLeave?.empleave_hr.status"
+            name="hr_status"
+          />
+        </div>
+      </section>
+      <section class="flex justify-between items-center mt-4">
+        <p class="text-sm">
+          {{ detailLeave?.empleave_fsuperior?.fsuperior_id?.des_name }}
+          Response
+        </p>
+        <div class="flex md:px-16">
+          <Radio
+            label="Pending"
+            @change="detailLeave.empleave_fsuperior.status = 'Pending'"
+            :checked="detailLeave?.empleave_fsuperior.status === 'Pending'"
+            :modelValue="detailLeave?.empleave_fsuperior.status"
+            name="fs_status"
+          />
+          <Radio
+            label="Approved"
+            class="mx-8"
+            @change="detailLeave.empleave_fsuperior.status = 'Approved'"
+            :checked="detailLeave?.empleave_fsuperior.status === 'Approved'"
+            :modelValue="detailLeave?.empleave_fsuperior.status"
+            name="fs_status"
+          />
+          <Radio
+            label="Rejected"
+            @change="detailLeave.empleave_fsuperior.status = 'Rejected'"
+            :checked="detailLeave?.empleave_fsuperior.status === 'Rejected'"
+            :modelValue="detailLeave?.empleave_fsuperior.status"
+            name="fs_status"
+          />
+        </div>
+      </section>
+      <section class="flex justify-between items-center mt-4">
+        <p class="text-sm">
+          {{ detailLeave?.empleave_ssuperior?.ssuperior_id?.des_name }} Response
+        </p>
+        <div class="flex md:px-16">
+          <Radio
+            label="Pending"
+            @change="detailLeave.empleave_ssuperior.status = 'Pending'"
+            :checked="detailLeave?.empleave_ssuperior.status === 'Pending'"
+            :modelValue="detailLeave?.empleave_ssuperior.status"
+            name="ss_status"
+          />
+          <Radio
+            label="Approved"
+            class="mx-8"
+            @change="detailLeave.empleave_ssuperior.status = 'Approved'"
+            :checked="detailLeave?.empleave_ssuperior.status === 'Approved'"
+            :modelValue="detailLeave?.empleave_ssuperior.status"
+            name="ss_status"
+          />
+          <Radio
+            label="Rejected"
+            @change="detailLeave.empleave_ssuperior.status = 'Rejected'"
+            :checked="detailLeave?.empleave_ssuperior.status === 'Rejected'"
+            :modelValue="detailLeave?.empleave_ssuperior.status"
+            name="ss_status"
           />
         </div>
       </section>
@@ -513,6 +683,7 @@ export default {
       return formattedTime;
     },
     assignDetailLeaveRequest(request) {
+      console.log(request);
       this.detailLeave = request;
     },
     assignDetailOvertimeRequest(request) {
