@@ -187,7 +187,6 @@ export default {
       this.departement = response.data;
     },
     handleFilter(departement, employment) {
-      console.log(this.attendances);
       const newAttendanceProp = this.attendances.map((attendance) => ({
         ...attendance,
         emp_depid: attendance?.emp_id?.emp_depid?._id,
