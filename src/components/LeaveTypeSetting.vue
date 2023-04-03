@@ -197,7 +197,6 @@ export default {
         this.$router.push("/login");
         this.$store.commit("changeIsLoggedIn", false);
       }
-      console.log(response);
       if (response?.status === 200) {
         this.leave_setting = response.data;
       }
